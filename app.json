@@ -1,0 +1,14 @@
+{
+  "expo": {
+    "name": "ESatZZim",
+    "slug": "ESatZZim",
+    "version": "1.0.0",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "platforms": ["web"],
+    "web": {
+      "favicon": "./assets/Logo.png",
+      "bundler": "metro"
+    }
+  }
+}
