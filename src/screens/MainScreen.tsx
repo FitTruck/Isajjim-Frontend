@@ -16,7 +16,7 @@ export default function Main() {
 
           {/* Header */}
           <View style={commonStyles.header}>
-            <Text style={commonStyles.logoText}>이삿짐</Text>
+            <Text style={commonStyles.logoText}>이삿찜</Text>
             <View style={commonStyles.headerRight}>
               <TouchableOpacity>
                 <Text style={commonStyles.mypageText}>Mypage</Text>
