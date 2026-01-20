@@ -1,13 +1,70 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Image} from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
-import { initializeApp } from 'firebase/app';
-import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { storage } from '../utils/firebase';
 import { commonStyles } from '../styles/commonStyles';
+import { BackendImage } from '../utils/firebase';
 
+import { v4 as uuidv4 } from 'uuid';
 
+// MainProps 정의
+type MainProps = {
+  onNavigateToResult?: (images: BackendImage[]) => void;
+};
 
-export default function Main() {
+export default function Main({ onNavigateToResult }: MainProps) {
+  
+  const [imageList, setImageList] = useState<BackendImage[]>([]); // 빈 배열로 초기화
+  const [statusMessage, setStatusMessage] = useState('');
+  
+  const handleWebUpload = async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({ // await: 이 함수가 완료될 때까지 다음 실행 멈춤
+      mediaTypes: ['images'], // 이미지 파일만
+      allowsMultipleSelection: true, // 다중 선택 활성화
+      quality: 1, // 원본 화질
+    });
+  
+    // 이미지 선택을 취소하지 않고, 이미지를 선택할 때만 실행
+    if (!result.canceled) {
+      setStatusMessage('업로드 중...');
+      const uploadedResults: BackendImage[] = []; // 업로드된 이미지들을 저장할 배열 생성
+
+      try {
+        // 선택된 이미지들을 하나씩 반복 처리
+        for (const asset of result.assets) {
+          // UUID를 사용하여 고유 ID 생성
+          const uniqueId = uuidv4();
+          
+          // 이미지 데이터를 blob으로 변환
+          const response = await fetch(asset.uri);
+          const blob = await response.blob();
+
+          // firebase storage에 업로드
+          const storageRef = ref(storage, `web_uploads/${uniqueId}`);
+          await uploadBytes(storageRef, blob);
+          const downloadUrl = await getDownloadURL(storageRef);
+
+          uploadedResults.push({
+            image_url: downloadUrl,
+          });
+        }
+
+        setImageList((prev) => [...prev, ...uploadedResults]);
+        setStatusMessage(`${uploadedResults.length}개의 파일 업로드 완료`);
+      } catch (error) {
+        console.error("Upload Error:", error);
+        setStatusMessage('업로드 실패');
+      }
+    }
+  };
+
+  const handleNextStep = () => {
+    if (onNavigateToResult) {
+      onNavigateToResult(imageList);
+    }
+  };
+
   return (
     <View style={commonStyles.container}>
       <ScrollView contentContainerStyle={commonStyles.scrollContent}>
@@ -32,8 +89,26 @@ export default function Main() {
             <View style={commonStyles.mainContent}>
               <Text style={commonStyles.mainTitle}>사진을 찍어서 이사 견적내기</Text>
               <Text style={commonStyles.mainSubtitle}>간단한 견적내기 시작</Text>
-              <TouchableOpacity style={styles.uploadButton}>
-                <Text style={styles.uploadButtonText}>이미지 올리기</Text>
+
+              <TouchableOpacity 
+                style={styles.uploadButton} 
+                onPress={handleWebUpload}
+              >
+                <Text style={styles.uploadButtonText}>파일 선택하기</Text>
+              </TouchableOpacity>
+
+              <Text style={styles.statusText}>{statusMessage}</Text>
+
+              <View style={styles.imageGrid}>
+                {imageList.map((item) => (
+                  <View key={item.image_id} style={styles.imageCard}>
+                    <Image source={{ uri: item.image_data }} style={styles.thumbnail} />
+                  </View>
+                ))}
+              </View>
+
+              <TouchableOpacity style={styles.uploadButton} onPress={handleNextStep}>
+                <Text style={styles.uploadButtonText}>다음단계</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -122,6 +197,30 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   
+  statusText: {
+    marginTop: 10,
+    color: '#666',
+    textAlign: 'center',
+  },
+  imageGrid: {
+    marginTop: 30,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 15,
+  },
+  imageCard: {
+    width: 150,
+    backgroundColor: '#f5f5f5',
+    borderRadius: 10,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: '#ddd',
+  },
+  thumbnail: {
+    width: '100%',
+    height: 100,
+  },
+
   // --- 왜 이삿찜 ---
   whyTitleSection: {
     marginTop: 559,

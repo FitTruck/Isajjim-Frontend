@@ -1,72 +1,26 @@
 import React from 'react';
-import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Image, Platform } from 'react-native';
 import { commonStyles } from '../styles/commonStyles';
+import { BackendImage } from '../utils/firebase';
+import ResultCard from '../components/ResultCard';
+import EstimateCard from '../components/EstimateCard';
 
-const mockResults = [
-  {
-    id: 1,
-    imageSource: require('../../assets/2019030600071_1.jpg'),
-    // 메타데이터 예시: 이미지 원본 크기
-    width: 621,
-    height: 369,
+interface ResultProps {
+  data: BackendImage[];
+}
+
+export default function Result({ data }: ResultProps) {
+  // 프론트에서 전달받은 이미지 데이터 리스트
+  const results = data.map((img, index) => ({
+    id: index.toString(),
+    imageSource: { uri: img.image_url },
     items: [
-      { name: '침대', option: '킹사이즈', count: 1 }
-    ]
-  },
-  {
-    id: 2,
-    imageSource: require('../../assets/Dining_table_for_two.jpg'),
-    // 메타데이터 예시: 세로가 긴 이미지
-    width: 300,
-    height: 400,
-    items: [
-      { name: '식탁', option: '2인용', count: 1 },
-      { name: '의자', option: '기본', count: 2 }
-    ]
-  }
-];
-
-// 결과 카드
-const ResultCard = ({ data }: { data: any }) => {
-
-  // 값이 존재 한다면 비율 계산. 존재하지 않는다면 1.4로 고정
-  const aspectRatio = (data.width && data.height)
-    ? data.width / data.height 
-    : 1.4; 
-
-  return (
-    <View style={styles.resultCardContainer}>
-
-      {/* 동적 이미지 */}
-      <Image source={data.imageSource} style={[styles.cardImage, { aspectRatio }]}/>
-
-      <View style={styles.resultCardContent}>
-        {data.items.map((item: any, index: number) => (
-          <View key={index} style={styles.itemContainer}>
-            <View style={styles.itemDetailContainer}>
-              <Text style={styles.itemTitle}>{item.name}</Text>
-              <Text style={styles.itemSubtitle}>{item.option}</Text>
-            </View>
-            <View>
-              <TouchableOpacity>
-                <Image source={require('../../assets/Minus.png')} style={styles.minus} />
-              </TouchableOpacity>
-              <Text style={styles.resultCardNumber}>{item.count}</Text>
-              <TouchableOpacity>
-                <Image source={require('../../assets/Plus.png')} style={styles.plus} />
-              </TouchableOpacity>
-            </View>
-          </View>
-        ))}
-      </View>
-    </View>
-  );
-};
-
-export default function Result() {
-  // 프론트에서 전달받은 이미지 데이터 리스트 (현재는 Mock 데이터 사용)
-  // 배열 형태이므로 개수 제한 없이 무한히 받을 수 있습니다.
-  const results = mockResults; 
+      // 임시 더미 데이터 (시각적 확인용)
+      { name: '스마트 침대', option: '킹사이즈 / 프레임 포함', count: 1 },
+      { name: '원목 책상', option: '1200x600 / 오크', count: 1 },
+      { name: '사무용 의자', option: '블랙 / 헤드레스트', count: 2 },
+    ], 
+  })); 
 
   return (
     <View style={commonStyles.container}>
@@ -107,6 +61,8 @@ export default function Result() {
 
           </View>
 
+          {/* 견적표 카드 추가 */}
+          <EstimateCard />
 
           {/* footer */}
           <View style={[commonStyles.footer, { display: 'none',} ]}>
@@ -160,69 +116,14 @@ const styles = StyleSheet.create({
   resultSectionContainer: {
     marginTop: 150,
     width: '100%',
-    alignItems: 'center',
+    alignItems: 'flex-start',
+    justifyContent: 'flex-start',
     paddingBottom: 100,
-  },
-
-  resultCardContainer: {
-    width: 621,
-    borderRadius: 10,
-    backgroundColor: '#FFFFFF',
-    alignItems: 'center',
-    borderWidth:1,
-    borderColor:'#EBEBEB',
-    position: 'relative',
+    paddingHorizontal: 80, // 헤더/푸터와 맞추기 위해 패딩 추가
     display: 'flex',
-    flexDirection: 'column',
-    marginBottom: 40, // 카드 간 간격 추가
-  },
-  cardImage: {
-    width: '100%',
-    height: undefined, // 높이를 undefined로 설정하여 aspectRatio에 따라 결정되도록 함
-    borderTopLeftRadius: 10,
-    borderTopRightRadius: 10,
-  },
-  resultCardContent: {
-    width: '100%',
-    borderBottomLeftRadius: 10,
-    borderBottomRightRadius: 10,
-    backgroundColor: '#FFFFFF',
-    alignItems: 'center',
-    textAlign: 'left',
-    paddingTop: 29,
-    paddingBottom: 12,
-    paddingHorizontal: 20,
-  },
-  itemContainer: {
-    width: '100%',
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 10,
-  },
-  itemDetailContainer: {
-    justifyContent: 'center',
-  },
-  itemTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#000',
-  },
-  itemSubtitle: {
-    fontSize: 16,
-    color: '#828282',
-  },
-  minus: {
-    width: 24,
-    height: 24,
-  },
-  plus: {
-    width: 24,
-    height: 24,
-  },
-  resultCardNumber: {
-    fontSize: 18,
-    fontWeight: '500',
-    marginHorizontal: 10,
+    flexWrap: 'wrap',
+    rowGap: 70,
+    columnGap: 60,
   },
 });
