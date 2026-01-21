@@ -1,13 +1,16 @@
 import React, { useState } from 'react'; // 상태를 저장하게 해줌
-import { View, Text, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Alert, Platform } from 'react-native';
 import { commonStyles } from '../styles/commonStyles';
+import { BACKEND_DOMAIN } from '../utils/Server';
+import FloorDetail from '../components/FloorDetail';
+import RoomSizeDetail from '../components/RoomSizeDetail';
 
 // 원래 HTML 스타일을 나타내는 절대 위치 버튼을 위한 도우미 컴포넌트
 const AbsoluteButton = ({ 
   x, y, width, height, label, value, selectedValue, onSelect 
 }: { // 타입정의(타입스크립트)
   x: number, y: number, width: number, height: number, label: string, 
-  value: string, selectedValue: string | null, onSelect: (v: string) => void 
+  value: any, selectedValue: any, onSelect: (v: any) => void 
 }) => {
   const isSelected = selectedValue === value;
   return (
@@ -15,9 +18,9 @@ const AbsoluteButton = ({
       style={[
         styles.absoluteCard,
         { left: x, top: y, width, height },
-        isSelected ? styles.cardSelected : styles.cardUnselected
+        isSelected ? styles.cardSelected : styles.cardUnselected // 선택된 것와 안된 것 나눔.
       ]}
-      onPress={() => onSelect(value)}
+      onPress={() => onSelect(value)} // 눌렀을 때 onSelect가 실행됨
     >
       <Text style={[
         styles.cardText, 
@@ -29,18 +32,91 @@ const AbsoluteButton = ({
   );
 };
 
-export default function UserSelect() { // 변수들 정의
+// app.tsx로부터 전달받을 함수의 자료형 정의
+interface UserSelectProps {
+  estimatedId: number | null;
+  onNavigateNext: (data: any) => void;
+  onGoHome: () => void;
+}
+
+export default function UserSelect({ estimatedId, onNavigateNext, onGoHome }: UserSelectProps) {
   const [buildingType, setBuildingType] = useState<string | null>(null);
-  // [상태 변수, 변경 함수]
-  // useState : 상태의 변경을 화면에 반영하게 함
-  // <타입 | null>(초기값) : 가능한 타입 정의. 소괄호는 초기값 의미.
-  const [roomStructure, setRoomStructure] = useState<string | null>(null);
-  const [houseSize, setHouseSize] = useState<string | null>(null); 
-  const [roomFloor, setRoomFloor] = useState<string | null>(null); 
-  const [stairs, setStairs] = useState<string | null>(null);
-  const [elevator, setElevator] = useState<string | null>(null);
-  const [parking, setParking] = useState<string | null>(null);
-  const [ladder, setLadder] = useState<string | null>(null);
+  const [roomSize, setRoomSize] = useState<string | null>(null);
+  const [floor, setFloor] = useState<string | null>(null);
+  const [elevator, setElevator] = useState<boolean | null>(null);
+  const [ladderTruck, setLadderTruck] = useState<string | null>(null);
+  const [roomType, setRoomType] = useState<string | null>(null);
+  const [duplex, setDuplex] = useState<boolean | null>(null);
+  const [groundStair, setGroundStair] = useState<boolean | null>(null);
+  const [parking, setParking] = useState<boolean | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+
+
+  // 백엔드 ENUM 값으로 매핑하는 함수
+  const mapToBackendValue = () => {
+    return {
+      buildingType: buildingType,
+      roomSize: roomSize,
+      floor: floor,
+      elevator: elevator,
+      ladderTruck: ladderTruck,
+      roomType: roomType,
+      duplex: duplex,
+      groundStair: groundStair, 
+      parking: parking,
+    };
+  };
+
+  const handlePressNext = async () => {
+    // 유효성 검사: 하나라도 null이면 경고
+    if (
+      !buildingType || 
+      !roomSize || 
+      !floor || 
+      !roomType || 
+      !ladderTruck ||
+      elevator === null ||
+      duplex === null ||
+      groundStair === null ||
+      parking === null
+    ) {
+      const msg = "모든 항목을 선택해주세요.";
+      if (Platform.OS === 'web') {
+        window.alert(msg);
+      } else { // 앱인 경우인데, 일단 남겨둠
+        Alert.alert("알림", msg);
+      }
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      const BACKEND_URL = `${BACKEND_DOMAIN}/api/v1/estimates/${estimatedId}`;
+      const payload = mapToBackendValue(); // payload : 사용자가 선택한 값들을 객체로 변환
+
+      // 백앤드로 보내기 및 받는 값
+      const response = await fetch(BACKEND_URL, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+
+      const responseData = await response.json();
+
+      if (response.ok && responseData.code === "OK") {
+        onNavigateNext(responseData);
+      } else {
+        Alert.alert("실패", "업로드 실패1: " + (responseData.message || "알 수 없는 오류"));
+      }
+    } catch (error) {
+      console.error("Save Error:", error);
+      Alert.alert("오류", "업로드 실패2");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  
 
   return (
     <View style={commonStyles.container}>
@@ -49,7 +125,9 @@ export default function UserSelect() { // 변수들 정의
           
           {/* 헤더 */}
           <View style={commonStyles.header}>
-            <Text style={commonStyles.logoText}>이삿짐</Text>
+            <TouchableOpacity onPress={onGoHome}>
+              <Text style={commonStyles.logoText}>이삿찜</Text>
+            </TouchableOpacity>
             <View style={commonStyles.headerRight}>
               <TouchableOpacity>
                 <Text style={commonStyles.mypageText}>Mypage</Text>
@@ -90,9 +168,9 @@ export default function UserSelect() { // 변수들 정의
                     width={238} 
                     height={94} 
                     label="빌라/연립" 
-                    value="빌라/연립" 
+                    value="VILLA" 
                     selectedValue={buildingType} 
-                    onSelect={setBuildingType} 
+                    onSelect={setBuildingType} // onSelect라는 것은 setBuildingType을 실행하는 것.
                   />
                   <AbsoluteButton 
                     x={238} 
@@ -100,7 +178,7 @@ export default function UserSelect() { // 변수들 정의
                     width={238} 
                     height={94} 
                     label="오피스텔" 
-                    value="오피스텔" 
+                    value="OFFICETEL" 
                     selectedValue={buildingType} 
                     onSelect={setBuildingType} 
                   />
@@ -110,7 +188,7 @@ export default function UserSelect() { // 변수들 정의
                     width={238} 
                     height={94} 
                     label="주택" 
-                    value="주택" 
+                    value="HOUSE" 
                     selectedValue={buildingType} 
                     onSelect={setBuildingType} 
                   />
@@ -120,7 +198,7 @@ export default function UserSelect() { // 변수들 정의
                     width={238} 
                     height={94} 
                     label="아파트" 
-                    value="아파트" 
+                    value="APARTMENT" 
                     selectedValue={buildingType} 
                     onSelect={setBuildingType} 
                   />
@@ -130,7 +208,7 @@ export default function UserSelect() { // 변수들 정의
                     width={238} 
                     height={94} 
                     label="상가/ 사무실" 
-                    value="상가/ 사무실" 
+                    value="COMMERCIAL" 
                     selectedValue={buildingType} 
                     onSelect={setBuildingType} 
                   />
@@ -147,9 +225,9 @@ export default function UserSelect() { // 변수들 정의
                     width={238} 
                     height={94} 
                     label="원룸" 
-                    value="원룸" 
-                    selectedValue={roomStructure} 
-                    onSelect={setRoomStructure} 
+                    value="STUDIO" 
+                    selectedValue={roomType} 
+                    onSelect={setRoomType} 
                   />
                   <AbsoluteButton 
                     x={238} 
@@ -157,9 +235,9 @@ export default function UserSelect() { // 변수들 정의
                     width={238} 
                     height={94} 
                     label="1.5룸" 
-                    value="1.5룸" 
-                    selectedValue={roomStructure} 
-                    onSelect={setRoomStructure} 
+                    value="ONE_AND_HALF" 
+                    selectedValue={roomType} 
+                    onSelect={setRoomType} 
                   />
                   <AbsoluteButton 
                     x={0} 
@@ -167,9 +245,9 @@ export default function UserSelect() { // 변수들 정의
                     width={238} 
                     height={94} 
                     label="2룸" 
-                    value="2룸" 
-                    selectedValue={roomStructure} 
-                    onSelect={setRoomStructure} 
+                    value="TWO_ROOM" 
+                    selectedValue={roomType} 
+                    onSelect={setRoomType} 
                   />
                   <AbsoluteButton 
                     x={238} 
@@ -177,9 +255,9 @@ export default function UserSelect() { // 변수들 정의
                     width={238} 
                     height={94} 
                     label="3룸" 
-                    value="3룸" 
-                    selectedValue={roomStructure} 
-                    onSelect={setRoomStructure} 
+                    value="THREE_ROOM" 
+                    selectedValue={roomType} 
+                    onSelect={setRoomType} 
                   />
                   <AbsoluteButton 
                     x={0} 
@@ -187,9 +265,9 @@ export default function UserSelect() { // 변수들 정의
                     width={238} 
                     height={94} 
                     label="4룸" 
-                    value="4룸" 
-                    selectedValue={roomStructure} 
-                    onSelect={setRoomStructure} 
+                    value="FOUR_ROOM" 
+                    selectedValue={roomType} 
+                    onSelect={setRoomType} 
                   />
                   <AbsoluteButton 
                     x={238} 
@@ -197,9 +275,9 @@ export default function UserSelect() { // 변수들 정의
                     width={238} 
                     height={94} 
                     label="5룸 이상" 
-                    value="5룸 이상" 
-                    selectedValue={roomStructure} 
-                    onSelect={setRoomStructure} 
+                    value="FIVE_PLUS" 
+                    selectedValue={roomType} 
+                    onSelect={setRoomType} 
                   />
                 </View>
               </View>
@@ -210,12 +288,7 @@ export default function UserSelect() { // 변수들 정의
               {/* 집 평수 */}
               <View style={{ width: 477, height: 150 }}>
                 <Text style={styles.sectionTitle}>집 평수</Text>
-                <View style={[styles.customInputBox, { top: 48 }]}>
-                  <Text style={styles.customInputValue}>{houseSize || '선택하세요'}</Text>
-                  <TouchableOpacity style={styles.selectButtonInline}>
-                    <Text style={styles.selectButtonInlineText}>선택</Text>
-                  </TouchableOpacity>
-                </View>
+                <RoomSizeDetail value={roomSize} onSelect={setRoomSize} />
               </View>
 
               {/* 복층 */}
@@ -228,9 +301,9 @@ export default function UserSelect() { // 변수들 정의
                     width={238} 
                     height={94} 
                     label="있음" 
-                    value="있음" 
-                    selectedValue={roomFloor} 
-                    onSelect={setRoomFloor} 
+                    value={true} 
+                    selectedValue={duplex} 
+                    onSelect={setDuplex} 
                   />
                   <AbsoluteButton 
                     x={238} 
@@ -238,9 +311,9 @@ export default function UserSelect() { // 변수들 정의
                     width={238} 
                     height={94} 
                     label="없음" 
-                    value="없음" 
-                    selectedValue={roomFloor} 
-                    onSelect={setRoomFloor} 
+                    value={false} 
+                    selectedValue={duplex} 
+                    onSelect={setDuplex} 
                   />
                 </View>
               </View>
@@ -251,12 +324,7 @@ export default function UserSelect() { // 변수들 정의
               {/* 층 */}
               <View style={{ width: 477, height: 150 }}>
                 <Text style={styles.sectionTitle}>층</Text>
-                <View style={[styles.customInputBox, { top: 48 }]}>
-                  <Text style={styles.customInputValue}>{stairs || '선택하세요'}</Text> 
-                  <TouchableOpacity style={styles.selectButtonInline}>
-                    <Text style={styles.selectButtonInlineText}>선택</Text>
-                  </TouchableOpacity>
-                </View>
+                <FloorDetail value={floor} onSelect={setFloor} />
               </View>
 
               {/* 1층 별도 계단 */}
@@ -273,9 +341,9 @@ export default function UserSelect() { // 변수들 정의
                     width={238} 
                     height={94} 
                     label="있음" 
-                    value="있음" 
-                    selectedValue={stairs} 
-                    onSelect={setStairs} 
+                    value={true} 
+                    selectedValue={groundStair} 
+                    onSelect={setGroundStair} 
                   />
                   <AbsoluteButton 
                     x={238} 
@@ -283,9 +351,9 @@ export default function UserSelect() { // 변수들 정의
                     width={238} 
                     height={94} 
                     label="없음" 
-                    value="없음" 
-                    selectedValue={stairs} 
-                    onSelect={setStairs} 
+                    value={false} 
+                    selectedValue={groundStair} 
+                    onSelect={setGroundStair} 
                   />
                 </View>
               </View>
@@ -307,7 +375,7 @@ export default function UserSelect() { // 변수들 정의
                     width={238} 
                     height={94} 
                     label="있음" 
-                    value="있음" 
+                    value={true} 
                     selectedValue={elevator} 
                     onSelect={setElevator} 
                   />
@@ -317,7 +385,7 @@ export default function UserSelect() { // 변수들 정의
                     width={238} 
                     height={94} 
                     label="없음" 
-                    value="없음" 
+                    value={false} 
                     selectedValue={elevator} 
                     onSelect={setElevator} 
                   />
@@ -337,7 +405,7 @@ export default function UserSelect() { // 변수들 정의
                     width={238} 
                     height={94} 
                     label="있음" 
-                    value="있음" 
+                    value={true} 
                     selectedValue={parking} 
                     onSelect={setParking} 
                   />
@@ -347,7 +415,7 @@ export default function UserSelect() { // 변수들 정의
                     width={238} 
                     height={94} 
                     label="없음" 
-                    value="없음" 
+                    value={false} 
                     selectedValue={parking} 
                     onSelect={setParking} 
                   />
@@ -371,9 +439,9 @@ export default function UserSelect() { // 변수들 정의
                     width={238} 
                     height={94} 
                     label="필요" 
-                    value="필요" 
-                    selectedValue={ladder} 
-                    onSelect={setLadder} 
+                    value="REQUIRED" 
+                    selectedValue={ladderTruck} 
+                    onSelect={setLadderTruck} 
                   />
                   <AbsoluteButton 
                     x={238} 
@@ -381,9 +449,9 @@ export default function UserSelect() { // 변수들 정의
                     width={238} 
                     height={94} 
                     label="필요없음" 
-                    value="필요없음" 
-                    selectedValue={ladder} 
-                    onSelect={setLadder} 
+                    value="NOT_REQUIRED" 
+                    selectedValue={ladderTruck} 
+                    onSelect={setLadderTruck} 
                   />
                   <AbsoluteButton 
                     x={0} 
@@ -391,9 +459,9 @@ export default function UserSelect() { // 변수들 정의
                     width={238} 
                     height={94} 
                     label="확인 필요" 
-                    value="확인 필요" 
-                    selectedValue={ladder} 
-                    onSelect={setLadder} 
+                    value="NEED_CONFIRM" 
+                    selectedValue={ladderTruck} 
+                    onSelect={setLadderTruck} 
                   />
                 </View>
               </View>
@@ -401,15 +469,22 @@ export default function UserSelect() { // 변수들 정의
 
             {/* 다음 단계 버튼 */}
             <View style={{ width: '60%', alignItems: 'flex-end', marginTop: 40 }}>
-              <TouchableOpacity style={{
+              <TouchableOpacity 
+                style={{
                   width: 124, 
                   height: 62, 
-                  backgroundColor: 'black', 
+                  backgroundColor: isSubmitting ? '#666' : 'black', 
                   borderRadius: 8,
                   justifyContent: 'center', 
-                  alignItems: 'center'
-              }}>
-                  <Text style={{ color: 'white', fontSize: 20, fontWeight: '500' }}>다음단계</Text>
+                  alignItems: 'center',
+                  opacity: isSubmitting ? 0.7 : 1
+                }}
+                onPress={handlePressNext}
+                disabled={isSubmitting}
+              >
+                  <Text style={{ color: 'white', fontSize: 20, fontWeight: '500' }}>
+                    {isSubmitting ? '저장 중...' : '다음단계'}
+                  </Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -450,6 +525,7 @@ export default function UserSelect() { // 변수들 정의
 
         </View>
       </ScrollView>
+
     </View>
     
   );
@@ -536,8 +612,6 @@ const styles = StyleSheet.create({
     paddingVertical: 14
   },
   selectButtonInlineText: {
-    color: 'white', 
-    fontSize: 20, 
     fontWeight: '500'
   }
 });

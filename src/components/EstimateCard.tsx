@@ -10,7 +10,7 @@ const EstimateCard = () => {
       {/* 용달 정보 섹션 */}
       <View style={{ width: 548, height: 109, left: 46, top: 112, position: 'absolute' }}>
         <Text style={styles.sectionHeader}>용달 정보</Text>
-        <View style={styles.row}>
+        <View style={[styles.row, { top: 48 }]}>
           <Text style={styles.itemLabel}>1톤</Text>
           <Text style={styles.itemValue}>1대</Text>
         </View>
@@ -48,9 +48,10 @@ const styles = StyleSheet.create({
   container: {
     width: 640,
     height: 613,
-    position: 'relative',
+    right: 80,
+    position: 'absolute',
     backgroundColor: 'white',
-    boxShadow: '0px 0px 5px rgba(0, 0, 0, 0.10)',
+    boxShadow: '0px 0px 8px rgba(0, 0, 0, 0.25)',
     overflow: 'hidden',
     borderRadius: 10,
   },

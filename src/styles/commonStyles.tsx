@@ -13,7 +13,6 @@ export const commonStyles = StyleSheet.create({
   },
   mainWrapper: {
     width: '100%',
-    flex:1,
     position: 'relative',
     backgroundColor: 'white',
   },
@@ -32,7 +31,7 @@ export const commonStyles = StyleSheet.create({
   },
   logoText: {
     fontSize: 50,
-    fontWeight: '400',
+    fontWeight: '500',
     color: 'black',
   },
   headerRight: {

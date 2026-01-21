@@ -2,66 +2,119 @@ import React, { useState } from 'react';
 import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Image} from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { storage } from '../utils/firebase';
+import { storage, BACKEND_DOMAIN } from '../utils/Server';
 import { commonStyles } from '../styles/commonStyles';
-import { BackendImage } from '../utils/firebase';
-
+import { UploadedImage } from '../types/reuseableData';
 import { v4 as uuidv4 } from 'uuid';
 
-// MainProps 정의
-type MainProps = {
-  onNavigateToResult?: (images: BackendImage[]) => void;
-};
 
-export default function Main({ onNavigateToResult }: MainProps) {
+// app.tsx로부터 전달받을 함수의 자료형 정의
+interface MainProps {
+  onNavigateNext: (images: UploadedImage[], estimateId: number) => void; //app.tsx에 정의되어 있는 함수임. images를 갖고 이동하는 함수.
+  onGoHome: () => void;
+}
+
+export default function Main({ onNavigateNext, onGoHome }: MainProps) {
+  // imageList는 UploadedImage 타입의 객체들의 배열
+  // imageList는 useState를 사용하여 초기값은 빈 배열로 설정
+  // imageList는 화면에 표시됨
+  const [imageList, setImageList] = useState<UploadedImage[]>([]); 
   
-  const [imageList, setImageList] = useState<BackendImage[]>([]); // 빈 배열로 초기화
+  
+  // statusMessage라는 객체를 만들고, 초기값은 빈 문자열로 설정. 값 변경은 setStatusMessage 함수를 사용
+  // statusMessage는 string 타입
+  // statusMessage는 화면에 표시됨
   const [statusMessage, setStatusMessage] = useState('');
-  
+  const [isProcessing, setIsProcessing] = useState(false);
+
+  // handleWebUpload 함수 정의
+  // async: 순서대로 기다려야 하는 작업이 있음을 나타냄. await와 함께 사용
   const handleWebUpload = async () => {
-    const result = await ImagePicker.launchImageLibraryAsync({ // await: 이 함수가 완료될 때까지 다음 실행 멈춤
+    // ImagePicker.launchImageLibraryAsync: 이미지 선택 창을 띄우고 이미지를 선택할 때까지 다음 실행 멈춤
+    // launchImageLibraryAsync는 비동기 함수이므로 await와 함께 사용
+    // await: 사용자가 사진을 고를 때까지 다음 줄로 넘어가지 않음
+    // launchImageLibraryAsync는 사용자가 선택한 이미지들의 정보를 담은 객체를 반환하는 함수
+    // result는 사용자가 선택한 이미지들의 정보를 담은 객체
+    const result = await ImagePicker.launchImageLibraryAsync({ 
       mediaTypes: ['images'], // 이미지 파일만
       allowsMultipleSelection: true, // 다중 선택 활성화
       quality: 1, // 원본 화질
     });
   
-    // 이미지 선택을 취소하지 않고, 이미지를 선택할 때만 실행
+    // result의 가장 상위 속성은 assets, canceled가 있다고 보면 됨. assets는 이미지 하나의 정보이고, canceled는 이미지 선택을 취소했는지 여부를 나타냄
     if (!result.canceled) {
       setStatusMessage('업로드 중...');
-      const uploadedResults: BackendImage[] = []; // 업로드된 이미지들을 저장할 배열 생성
+      const uploadedResults: UploadedImage[] = []; 
+      // 업로드된 이미지들을 저장할 배열 생성
 
       try {
         // 선택된 이미지들을 하나씩 반복 처리
+        // asset : 사용자가 선택한 이미지 하나의 정보를 담은 객체
         for (const asset of result.assets) {
-          // UUID를 사용하여 고유 ID 생성
-          const uniqueId = uuidv4();
+          // 고유 ID 생성 (중복 방지)
+          const tempId = uuidv4();
           
           // 이미지 데이터를 blob으로 변환
-          const response = await fetch(asset.uri);
-          const blob = await response.blob();
+          const response = await fetch(asset.uri); // "브라우저의 메모리로 올라간 브라우저 메모리 주소"를 인자로 하여 이미지의 상태 정보를 가져옴
+          const blob = await response.blob(); // 이미지를 이진수로 데이터 덩어리로 변환
 
           // firebase storage에 업로드
-          const storageRef = ref(storage, `web_uploads/${uniqueId}`);
-          await uploadBytes(storageRef, blob);
-          const downloadUrl = await getDownloadURL(storageRef);
+          const storageRef = ref(storage, `web_uploads/${tempId}`); // 저장소 내의 위치와 저장할 파일명을 하나로 묶어 storageRef라는 객체로 만든 것.
+          // storage는 ../utils/firebase.ts에 정의되어 있음
+          await uploadBytes(storageRef, blob); // 경로 및 blob을 인자로 하여 storage에 업로드
+
+          const uri = await getDownloadURL(storageRef); // 업로드된 파일의 URL을 가져옴
 
           uploadedResults.push({
-            image_url: downloadUrl,
+            id: tempId, // 생성한 id
+            uri: uri, // 업로드된 이미지의 URL
+            width: asset.width, // 이미지의 너비
+            height: asset.height, // 이미지의 높이
           });
         }
 
-        setImageList((prev) => [...prev, ...uploadedResults]);
+        setImageList((prev) => [...prev, ...uploadedResults]); //imageList 객체 갱신함 "파일 선택하기" 버튼을 여러번 눌러서 이미지 추가가 가능하도록 함 
         setStatusMessage(`${uploadedResults.length}개의 파일 업로드 완료`);
-      } catch (error) {
-        console.error("Upload Error:", error);
+
+      } catch {
         setStatusMessage('업로드 실패');
       }
     }
   };
 
-  const handleNextStep = () => {
-    if (onNavigateToResult) {
-      onNavigateToResult(imageList);
+  const handleNextStep = async () => {
+    if (isProcessing) return;
+    setIsProcessing(true);
+    setStatusMessage('서버에 분석 요청 중...');
+
+    try {
+      // 실제 백엔드 API 주소로 변경
+      const BACKEND_URL = `${BACKEND_DOMAIN}/api/v1/estimates`; 
+
+      // response: 서버가 보낸 응답. 데이터 및 데이터 외적인 정보가 포함됨.
+      const response = await fetch(BACKEND_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          imageUrls: imageList.map(img => img.uri),
+        })
+      });
+      
+      const responseData = await response.json(); // 자동으로 자료형이 any라서 따로 자료형 설정 없어도 된다. 
+
+      if (responseData?.data?.estimateId) { 
+        onNavigateNext(imageList, responseData.data.estimateId); // app.tsx로 이미지와 id를 보냄
+      } else {
+        console.error('Server Error:', responseData);
+        setStatusMessage('서버 전송 실패0: ' + (responseData.message || '알 수 없는 오류'));
+      }
+    } catch (error) {
+      console.error('Network Error:', error);
+      setStatusMessage('서버 전송 중 오류 발생. 백엔드 서버를 확인해주세요.');
+    } finally {
+      setIsProcessing(false);
     }
   };
 
@@ -73,7 +126,9 @@ export default function Main({ onNavigateToResult }: MainProps) {
 
           {/* Header */}
           <View style={commonStyles.header}>
-            <Text style={commonStyles.logoText}>이삿짐</Text>
+            <TouchableOpacity onPress={onGoHome}>
+              <Text style={commonStyles.logoText}>이삿찜</Text>
+            </TouchableOpacity>
             <View style={commonStyles.headerRight}>
               <TouchableOpacity>
                 <Text style={commonStyles.mypageText}>Mypage</Text>
@@ -101,15 +156,24 @@ export default function Main({ onNavigateToResult }: MainProps) {
 
               <View style={styles.imageGrid}>
                 {imageList.map((item) => (
-                  <View key={item.image_id} style={styles.imageCard}>
-                    <Image source={{ uri: item.image_data }} style={styles.thumbnail} />
+                  <View key={item.id} style={styles.imageCard}>
+                    <Image source={{ uri: item.uri }} style={styles.thumbnail} />
                   </View>
                 ))}
               </View>
 
-              <TouchableOpacity style={styles.uploadButton} onPress={handleNextStep}>
-                <Text style={styles.uploadButtonText}>다음단계</Text>
-              </TouchableOpacity>
+              {imageList.length > 0 && (
+                <TouchableOpacity 
+                  style={[styles.uploadButton, isProcessing && styles.disabledButton]} 
+                  onPress={handleNextStep}
+                  disabled={isProcessing}
+                >
+                  <Text style={styles.uploadButtonText}>
+                    {isProcessing ? '처리 중...' : '다음단계'}
+                  </Text>
+                </TouchableOpacity>
+              )}
+
             </View>
           </View>
 
@@ -196,6 +260,10 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '500',
   },
+  disabledButton: {
+    backgroundColor: '#666',
+    opacity: 0.7,
+  },
   
   statusText: {
     marginTop: 10,
@@ -223,7 +291,7 @@ const styles = StyleSheet.create({
 
   // --- 왜 이삿찜 ---
   whyTitleSection: {
-    marginTop: 559,
+    marginTop: 500,
     width: '100%',
     alignItems: 'center',
   },
