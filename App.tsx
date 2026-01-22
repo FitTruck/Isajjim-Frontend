@@ -8,7 +8,7 @@ export default function App() {
   const [currentScreen, setCurrentScreen] = useState<'main' | 'user-select' | 'result'>('main');// 현재 화면 상태를 관리
   const [uploadedImages, setUploadedImages] = useState<UploadedImage[]>([]);// 데이터 관리
   const [estimateId, setEstimateId] = useState<number | null>(null); // 견적 ID 관리
-  const [resultData, setResultData] = useState<any>(null); // 결과 데이터 관리
+  const [ResultOfUserSelect, setResultOfUserSelect] = useState<any>(null); // 결과 데이터 관리
   const [mainKey, setMainKey] = useState(0); // MainScreen 리셋을 위한 키
 
 
@@ -25,7 +25,7 @@ export default function App() {
 
   // Result화면으로 가는 로직
   const handleNavigateToResult = (data: any) => {
-    setResultData(data);
+    setResultOfUserSelect(data);
     setCurrentScreen('result');
   };
 
@@ -58,7 +58,7 @@ export default function App() {
         <Result 
           data={uploadedImages} 
           estimateId={estimateId}
-          resultData={resultData}
+          ResultOfUserSelect={ResultOfUserSelect}
           onGoHome={handleReset}
         />
       )}

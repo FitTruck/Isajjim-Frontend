@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { View, Text, ScrollView, StyleSheet, TouchableOpacity, useWindowDimensions, Alert } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { commonStyles } from '../styles/commonStyles';
 import { UploadedImage, BACKEND_DOMAIN } from '../utils/Server';
 import ResultCard from '../components/ResultCard';
@@ -9,17 +9,17 @@ import EstimateCard from '../components/EstimateCard';
 interface ResultProps {
   data: UploadedImage[];
   estimateId: number | null;
-  resultData: any;
+  ResultOfUserSelect: any;
   onGoHome: () => void;
 }
 
-export default function Result({ data, estimateId, resultData, onGoHome }: ResultProps) {
-  const [results, setResults] = useState<any[]>([]);
+export default function Result({ data, estimateId, ResultOfUserSelect, onGoHome }: ResultProps) {
+  const [results, setResults] = useState<any[]>([]); // 결과 데이터에는 여러 자료형이 들어있어서 any로 설정
 
   useEffect(() => {
-    // resultData 매핑 로직
-    const mappedResults = (resultData?.data?.images) 
-    ? resultData.data.images.map((img: any) => ({
+    // ResultOfUserSelect 매핑 로직
+    const mappedResults = (ResultOfUserSelect?.data?.images) 
+    ? ResultOfUserSelect.data.images.map((img: any) => ({
         id: img.imageId || Math.random(),
         image: { uri: img.imageUrl },
         width: 100, 
@@ -39,19 +39,16 @@ export default function Result({ data, estimateId, resultData, onGoHome }: Resul
         items: []
       }));
       setResults(mappedResults);
-  }, [data, resultData]);
+  }, [data, ResultOfUserSelect]);
 
+  // 플러스/마이너스 버튼을 눌렀을 때 값 변경 및 백엔드로 변경내용 전송 함수
   const handleUpdateQuantity = async (furnitureId: number, delta: number) => {
-    if (!estimateId) return;
-
-    // 1. 현재 상태에서 해당 가구 찾기 및 낙관적 업데이트 준비 (옵션)
-    // 여기서는 간단히 서버 요청 후 업데이트 방식을 사용하거나, 
-    // 서버가 변경된 전체 리스트를(혹은 견적을) 준다고 가정하고 처리합니다.
+    if (!estimateId) return; // 견적서id가 없으면 리턴(안전장치)
     
     // 타겟 찾기
     let currentCount = 0;
     results.forEach(img => {
-      img.items.forEach((item: any) => {
+      img.items.forEach((item: any) => {  // forEach는 return되는 값이 없음.
         if (item.id === furnitureId) currentCount = item.count;
       });
     });
@@ -95,10 +92,10 @@ export default function Result({ data, estimateId, resultData, onGoHome }: Resul
   };
   // estimateCard에 쓸거
   const estimateCardData = {
-    truckType: resultData.truckType,
-    truckQuantity: resultData.quantity,
-    boxType: resultData.boxType,
-    boxQuantity: resultData.quantity,
+    truckType: ResultOfUserSelect.truckType,
+    truckQuantity: ResultOfUserSelect.quantity,
+    boxType: ResultOfUserSelect.boxType,
+    boxQuantity: ResultOfUserSelect.quantity,
   }
 
 

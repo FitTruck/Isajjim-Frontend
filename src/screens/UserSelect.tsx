@@ -101,12 +101,12 @@ export default function UserSelect({ estimatedId, onNavigateNext, onGoHome }: Us
         body: JSON.stringify(payload),
       });
 
-      const responseData = await response.json();
+      const ResultOfUserSelect = await response.json();
 
-      if (response.ok && responseData.code === "OK") {
-        onNavigateNext(responseData);
+      if (response.ok && ResultOfUserSelect.code === "OK") {
+        onNavigateNext(ResultOfUserSelect);
       } else {
-        Alert.alert("실패", "업로드 실패1: " + (responseData.message || "알 수 없는 오류"));
+        Alert.alert("실패", "업로드 실패1: " + (ResultOfUserSelect.message || "알 수 없는 오류"));
       }
     } catch (error) {
       console.error("Save Error:", error);
