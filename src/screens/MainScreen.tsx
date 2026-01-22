@@ -58,7 +58,6 @@ export default function Main({ onNavigateNext, onGoHome }: MainProps) {
           const uri = await getDownloadURL(storageRef); // 업로드된 파일의 URL을 가져옴
 
           uploadedResults.push({ // uploadedResult라는 배열에 업로드된 이미지의 정보를 추가함
-            id: tempId, // 생성한 id
             uri: uri, // 업로드된 이미지의 URL
             width: asset.width, // 이미지의 너비
             height: asset.height, // 이미지의 높이
@@ -154,7 +153,7 @@ export default function Main({ onNavigateNext, onGoHome }: MainProps) {
               <View style={styles.imageGrid}>
                 {/* 이미지가 다시 업로드 되면 imageList도 업데이트 되니까 선택한 이미지가 모두 드러나게 되어있음 */}
                 {imageList.map((item) => (
-                  <View key={item.id} style={styles.imageCard}>
+                  <View style={styles.imageCard}>
                     <Image source={{ uri: item.uri }} style={styles.thumbnail} />
                   </View>
                 ))}
