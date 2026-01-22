@@ -115,9 +115,7 @@ export default function UserSelect({ estimatedId, onNavigateNext, onGoHome }: Us
       setIsSubmitting(false);
     }
   };
-
   
-
   return (
     <View style={commonStyles.container}>
       <ScrollView contentContainerStyle={commonStyles.scrollContent}>
