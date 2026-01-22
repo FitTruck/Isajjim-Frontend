@@ -163,7 +163,10 @@ export default function Result({ data, estimateId, ResultOfUserSelect, onGoHome 
 
           {/* 견적표 카드 추가 */}
           <View style={styles.estimateCardContainer}>
-            <EstimateCard data={estimateData} status={updateStatus} />
+            <EstimateCard 
+              data={estimateData} 
+              status={updateStatus} 
+            />
           </View>
 
           {/* footer */}
