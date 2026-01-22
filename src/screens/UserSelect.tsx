@@ -5,15 +5,15 @@ import { BACKEND_DOMAIN } from '../utils/Server';
 import FloorDetail from '../components/FloorDetail';
 import RoomSizeDetail from '../components/RoomSizeDetail';
 
-// 원래 HTML 스타일을 나타내는 절대 위치 버튼을 위한 도우미 컴포넌트
+// 각 선택 버튼 컴포넌트
 const AbsoluteButton = ({ 
   x, y, width, height, label, value, selectedValue, onSelect 
-}: { // 타입정의(타입스크립트)
+}: { // 타입정의
   x: number, y: number, width: number, height: number, label: string, 
   value: any, selectedValue: any, onSelect: (v: any) => void 
 }) => {
   const isSelected = selectedValue === value;
-  return (
+  return ( // 이렇게 생겼다
     <TouchableOpacity
       style={[
         styles.absoluteCard,
