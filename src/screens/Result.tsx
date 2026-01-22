@@ -12,52 +12,73 @@ interface ResultProps {
   ResultOfUserSelect: any;
   onGoHome: () => void;
 }
-
+// data : main에서 전달받은 이미지 url과 width, height 정보
+// estimateId : main에서 백엔드에게 받은 견적서id
+// ResultOfUserSelect : userselect에서 받은 resultCard에 들어갈 값과 estimateCard에 들어갈 값  
 export default function Result({ data, estimateId, ResultOfUserSelect, onGoHome }: ResultProps) {
-  const [results, setResults] = useState<any[]>([]); // 결과 데이터에는 여러 자료형이 들어있어서 any로 설정
+  // results: ResultCard컴포넌트의 속성으로 전달할 값임
+  const [results, setResults] = useState<any[]>([]); 
+  
+  // 견적서 컴포넌트에 전달할 값임
+  const [estimateData, setEstimateData] = useState<any>({}); // 딕셔너리값임
+  const [updateStatus, setUpdateStatus] = useState<'idle' | 'updating' | 'done'>('idle');
 
+  // 첫 실행 시에 자동 실행됨.
   useEffect(() => {
-    // ResultOfUserSelect 매핑 로직
-    const mappedResults = (ResultOfUserSelect?.data?.images) 
-    ? ResultOfUserSelect.data.images.map((img: any) => ({
-        id: img.imageId || Math.random(),
-        image: { uri: img.imageUrl },
-        width: 100, 
-        height: 100,
-        items: img.furnitureList ? img.furnitureList.map((f: any) => ({
-          id: f.furnitureId,
-          name: f.label, 
-          option: f.type, 
-          count: f.count
+    if (ResultOfUserSelect.data.images) {
+      // mappedResultCard : ResultCard에 필요한 이미지와 content객체
+      const mappedResultCard = ResultOfUserSelect.data.images.map((imgResult: any, i: number) => ({
+        // main에서 전달받은 이미지 url과 width, height 정보
+        image: { 
+          uri: data[i].uri,
+          width: data[i].width,
+          height: data[i].height,
+        },
+        // furnitureList : userselect에서 전달받은 가구 정보
+        contents: imgResult.furnitureList ? imgResult.furnitureList.map((f: any) => ({
+          furnitureId: f.furnitureId,
+          label: f.label, 
+          type: f.type, 
+          quantity: f.quantity,
         })) : []
-      }))
-    : data.map(img => ({
-        id: img.id,
-        image: { uri: img.uri },
-        width: img.width,
-        height: img.height,
-        items: []
       }));
-      setResults(mappedResults);
-  }, [data, ResultOfUserSelect]);
+      setResults(mappedResultCard);
+      
+      if (ResultOfUserSelect.data.items) {
+        setEstimateData({
+          truckType: ResultOfUserSelect.data.items.itemType,
+          truckQuantity: ResultOfUserSelect.data.items.quantity,
+        });
+      }
 
-  // 플러스/마이너스 버튼을 눌렀을 때 값 변경 및 백엔드로 변경내용 전송 함수
-  const handleUpdateQuantity = async (furnitureId: number, delta: number) => {
+    } else {
+      Alert.alert("오류", "분석결과를 불러올 수 없습니다.");
+    }
+  }, [ResultOfUserSelect]); //이 값이 바뀔 때마다 useEffect 실행되는 거임.
+
+  // ResultCard컴포넌트를 보면 onQuantityChange라는 것이 실행되면 handleUpdataQuantity 함수가 실행됨.
+  // ResultCard.tsx에서 furnitureId와 newQuantity값을 받아온 것임.
+  const handleUpdateQuantity = async (furnitureId: number, newQuantity: number) => {
     if (!estimateId) return; // 견적서id가 없으면 리턴(안전장치)
     
-    // 타겟 찾기
-    let currentCount = 0;
-    results.forEach(img => {
-      img.items.forEach((item: any) => {  // forEach는 return되는 값이 없음.
-        if (item.id === furnitureId) currentCount = item.count;
-      });
-    });
+    // 프론트에서 즉각 변경하는 부분 : results의 값을 변경하는 로직임. results는 useState로 만든 값이므로 results의 값이 바뀌면, 자동으로 results를 쓰는 모든 컴포넌트를 다시 그림. >> ResultCard 컴포넌트의 속성이 즉각적으로 변경됨.
+    setResults(prev => prev.map(result => ({ // 기존의 results를 써서 results를 수정하겠다는 뜻임. result는 results중에서 하나씩 가져온 객체. 즉, 카드 하나에 대한 정보임.
+      ...result, // "...result, contents:" 다른 것들은 그대로 놔두고 contents만 바꾼다. 
+      contents: result.contents.map((item: any) => // 카드 이미지에 인식된 하나의 가구를 item이라 하자. 카드 하나 중에서도 아이템 하나
+        item.furnitureId === furnitureId ? { ...item, quantity: newQuantity } : item 
+        // item의 id가 furnitureId와 같다면 수량을 newQuantity로 바꾼다.
+        // item.furnitureId 순회하면서 볼 가구들의 id
+        // furnitureId : 변경할 가구의 id
+        // 그것이 동일하다면 그것의 quantity를 바꿔야함. 그래서 바꿀 값으로 newQuantity를 넣음.
+        // "...item, quantity: newQuantity" : item의 다른 값들은 놔두고 quantity만 newQuantity로 바꾼다.
+      )
+    })));
 
-    const newCount = currentCount + delta;
-    if (newCount < 0) return; // 0개 미만 방지
+    // 프론트의 값이 변경되면, 견적서 또한 업데이트 되어야 한다. 그 동안의 status를 나타내는 변수(updateStatus)를 "updating"으로 설정!
+    setUpdateStatus('updating');
 
+    // 백엔드로 바뀐 정보를 보내는 부분
     try {
-      // furniture에는 furnitureId로 처리해야함
       const response = await fetch(`${BACKEND_DOMAIN}/api/v1/estimates/${estimateId}/furniture`, {
         method: 'PATCH',
         headers: {
@@ -65,38 +86,34 @@ export default function Result({ data, estimateId, ResultOfUserSelect, onGoHome 
         },
         body: JSON.stringify({
           furnitureId: furnitureId,
-          count: newCount
+          quantity: newQuantity
         }),
       });
 
-      const json = await response.json();
+      // resultOfUpdate에는 트럭 타입과 수량에 대한 정보가 담겨있음.
+      const resultOfUpdate = await response.json();
 
-      if (response.ok && json.code === 'OK') {
-        // 성공 시 서버에서 받은 최신 데이터로 업데이트
-        // 만약 서버가 전체 데이터를 다시 준다면 setResults로 매핑하여 업데이트
-        // 여기서는 예시로 로컬 상태만 업데이트하거나, 서버 응답 구조에 따라 처리가 필요합니다.
-        // 현재는 로컬 상태 업데이트로 구현:
-        setResults(prev => prev.map(img => ({
-          ...img,
-          items: img.items.map((item: any) => 
-            item.id === furnitureId ? { ...item, count: newCount } : item
-          )
-        })));
+      if (response.ok && resultOfUpdate.code === 'OK') {
+        
+        setEstimateData({ // 여기서 받은 값을 견적서 컴포넌트에 전달해서 견적서 업데이트 할거임.
+          truckType: resultOfUpdate.data.items.itemType,
+          truckQuantity: resultOfUpdate.data.items.quantity,
+        });
+
+        // 업데이트 상태를 done으로 변경
+        setUpdateStatus('done');
+
       } else {
-        Alert.alert("업데이트 실패", json.message || "알 수 없는 오류");
+        // 실패 시 처리 : "견적서"글자 옆에 "견적서 업데이트 실패" 띄우도록 만드는 것도 고려해야함.
+        Alert.alert("업데이트 실패", resultOfUpdate.message || "알 수 없는 오류");
+        setUpdateStatus('idle'); // 실패 시 상태 초기화
       }
     } catch (e) {
       console.error(e);
       Alert.alert("오류", "서버 통신 중 오류가 발생했습니다.");
+      setUpdateStatus('idle'); // 에러 시 상태 초기화
     }
   };
-  // estimateCard에 쓸거
-  const estimateCardData = {
-    truckType: ResultOfUserSelect.truckType,
-    truckQuantity: ResultOfUserSelect.quantity,
-    boxType: ResultOfUserSelect.boxType,
-    boxQuantity: ResultOfUserSelect.quantity,
-  }
 
 
   return (
@@ -134,11 +151,11 @@ export default function Result({ data, estimateId, ResultOfUserSelect, onGoHome 
           {/* 결과 섹션 컨테이너 */}
           <View style={styles.resultSectionContainer}>
             
-            {results.map((result) => ( // 객체 이름을 result로 설정
-              <ResultCard 
-                key={result.id} 
-                data={result} 
-                onQuantityChange={handleUpdateQuantity}
+            {results.map((result) => ( // 각 이미지에 대한 값을 맵핑하여 ResultCard컴포넌트를 여러개 생성함
+              <ResultCard
+                image={result.image}
+                items={result.contents}
+                onQuantityChange={handleUpdateQuantity} // onQuantityChange는 ResultCard에서 furnitureId와 newQuantity를 인자로 받기 때문에 그 인자가 handleUpdateQuantity 함수로 전달됨.
               />
             ))}
 
@@ -146,7 +163,7 @@ export default function Result({ data, estimateId, ResultOfUserSelect, onGoHome 
 
           {/* 견적표 카드 추가 */}
           <View style={styles.estimateCardContainer}>
-            <EstimateCard />
+            <EstimateCard data={estimateData} status={updateStatus} />
           </View>
 
           {/* footer */}
@@ -217,7 +234,7 @@ const styles = StyleSheet.create({
     marginTop: 200,
     width: '100%',
     position: 'relative',
-    height: 613, // EstimateCard의 높이(613px)만큼 공간 확보
+    height: 500, // EstimateCard의 높이(500px)만큼 공간 확보
     marginBottom: 200, // footer와의 간격을 위해 추가
   },
 });
