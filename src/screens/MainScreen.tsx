@@ -65,8 +65,8 @@ export default function Main({ onNavigateNext, onGoHome }: MainProps) {
           });
         }
 
-        setImageList((prev) => [...prev, ...uploadedResults]); //imageList 객체 갱신함 "파일 선택하기" 버튼을 여러번 눌러서 이미지 추가가 가능하도록 함 
-        setStatusMessage(`${uploadedResults.length}개의 파일 업로드 완료`);
+        setImageList((prev) => [...prev, ...uploadedResults]); // 이전꺼 그대로 놔두고 업로드된 이미지 추가
+        setStatusMessage(`${imageList.length + uploadedResults.length}개의 파일 업로드 완료`);
 
       } catch {
         setStatusMessage('업로드 실패');
