@@ -11,15 +11,16 @@ interface EstimateCardProps {
 }
 
 const EstimateCard = ({ data, status }: EstimateCardProps) => {
-  // 애니메이션을 위한 투명도 값 (0 ~ 1)
-  // 초기 상태(idle)에서는 체크 표시가 보여야 하므로 doneOpacity는 1로 시작
-  const updatingOpacity = useRef(new Animated.Value(0)).current;
-  const doneOpacity = useRef(new Animated.Value(1)).current;
+  // useRef : Estimate 컴포넌트가 리렌더링 되어도 변수값 유지
+  // useRef가 반환하는 값의 속성 중에 current가 있고 그 current값은 Animated.Value(0)의 값임
+  // Animated.Value(x) -> 값을 자연스럽게 그라데이션으로 변경 
+  const updatingOpacity = useRef(new Animated.Value(0)).current; // 0인 상태로 시작하는 애니메이션 숫자
+  const doneOpacity = useRef(new Animated.Value(1)).current; // 1인 상태로 시작하는 애니메이션 숫자
 
   useEffect(() => {
     if (status === 'updating') {
       // 체크 -> 생성중... (애니메이션 없이 즉시 변경)
-      updatingOpacity.setValue(1);
+      updatingOpacity.setValue(1); //setValue: 변수 값을 즉시 변경하는 리액트 내부 함수
       doneOpacity.setValue(0);
     } else if (status === 'done') {
       // 생성중... -> 체크 (부드럽게 페이드 효과)
@@ -44,31 +45,23 @@ const EstimateCard = ({ data, status }: EstimateCardProps) => {
 
   return (
     <View style={styles.container}>
-      {/* 견적표 타이틀 및 상태 */}
-      <View style={{ position: 'absolute', top: 46, left: 46, flexDirection: 'row', alignItems: 'center' }}>
+      {/* '견적표' 타이틀 및 상태 */}
+      <View style={styles.headerContainer}>
         <Text style={styles.title}>견적표</Text>
         
         {/* 상태 텍스트들을 절대 위치로 겹쳐놓고 투명도만 조절하여 자연스럽게 교체 */}
-        <View style={{ marginLeft: 15, justifyContent: 'center' }}>
-          <Animated.Text style={{ 
-            opacity: updatingOpacity, 
-            position: 'absolute', 
-            fontSize: 16, 
-            color: 'gray',
-            width: 150 // 텍스트 겹침 방지용 너비 확보
-          }}>
+        <View style={styles.statusWrapper}>
+          <Animated.Text style={[{ 
+            opacity: updatingOpacity 
+          }, styles.updatingStatusText]}>
             견적서 생성중...
           </Animated.Text>
-          <Animated.View style={{ 
-            opacity: doneOpacity, 
-            position: 'absolute',
-            top: -2, // 이미지 높이 보정
-            width: 28,
-            height: 28,
-          }}>
+          <Animated.View style={[{ 
+            opacity: doneOpacity 
+          }, styles.doneStatusIconWrapper]}>
             <Image 
               source={require('../../assets/Check.png')} 
-              style={{ width: '100%', height: '100%' }}
+              style={styles.checkIcon}
               resizeMode="contain"
             />
           </Animated.View>
@@ -76,9 +69,9 @@ const EstimateCard = ({ data, status }: EstimateCardProps) => {
       </View>
 
       {/* 용달 정보 섹션 */}
-      <View style={{ width: 548, height: 109, left: 46, top: 112, position: 'absolute' }}>
+      <View style={styles.infoSection}>
         <Text style={styles.sectionHeader}>용달 정보</Text>
-        <View style={[styles.row, { top: 48 }]}>
+        <View style={styles.row}>
           <Text style={styles.itemLabel}>{data?.truckType || '-'}</Text>
           <Text style={styles.itemValue}>{data?.truckQuantity || 0}대</Text>
         </View>
@@ -88,8 +81,10 @@ const EstimateCard = ({ data, status }: EstimateCardProps) => {
       <View style={styles.divider} />
 
       {/* 가격 비교하기 섹션 */}
-      <Text style={[styles.title, { top: 285 }]}>가격 비교하기</Text>
-      <Text style={styles.subtitle}>AI 및 사용자 설정으로 산출된 견적 업로드 !</Text>
+      <View style={styles.compareSection}>
+        <Text style={styles.compareTitle}>가격 비교하기</Text>
+        <Text style={styles.subtitle}>AI 및 사용자 설정으로 산출된 견적 업로드 !</Text>
+      </View>
 
       {/* 비교하기 버튼 */}
       <TouchableOpacity style={styles.compareButton}>
@@ -102,13 +97,18 @@ const EstimateCard = ({ data, status }: EstimateCardProps) => {
 const styles = StyleSheet.create({
   container: {
     width: 640,
-    height: 500,
+    height: 'auto',
     right: 80,
+    padding: 46,
     position: 'absolute',
     backgroundColor: 'white',
     boxShadow: '0px 0px 8px rgba(0, 0, 0, 0.25)',
     overflow: 'hidden',
     borderRadius: 10,
+  },
+  headerContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   title: {
     color: 'black',
@@ -117,12 +117,33 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     lineHeight: 44,
   },
+  statusWrapper: {
+    marginLeft: 16,
+    justifyContent: 'center',
+  },
+  updatingStatusText: {
+    position: 'absolute',
+    fontSize: 16,
+    color: 'gray',
+    width: 150, // 텍스트 겹침 방지용 너비 확보
+  },
+  doneStatusIconWrapper: {
+    position: 'absolute',
+    top: -2,
+    width: 28,
+    height: 28,
+  },
+  checkIcon: {
+    width: '100%',
+    height: '100%',
+  },
+  infoSection: {
+    width: 548,
+    marginTop: 30,
+  },
   sectionHeader: {
     width: 221,
     height: 60,
-    left: 0,
-    top: 0,
-    position: 'absolute',
     color: 'black',
     fontSize: 24,
     fontFamily: 'Inter',
@@ -133,7 +154,6 @@ const styles = StyleSheet.create({
   row: {
     width: 548,
     height: 37,
-    position: 'absolute',
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -161,17 +181,23 @@ const styles = StyleSheet.create({
   divider: {
     width: 549,
     height: 0,
-    left: 46,
-    top: 240,
-    position: 'absolute',
+    marginTop: 20,
     borderBottomWidth: 1,
     borderColor: 'rgba(209, 217, 224, 0.57)',
   },
+  compareSection: {
+    marginTop: 30,
+  },
+  compareTitle: {
+    color: 'black',
+    fontSize: 40,
+    fontFamily: 'Inter',
+    fontWeight: '600',
+    lineHeight: 44,
+  },
   subtitle: {
     width: 515,
-    left: 46,
-    top: 336,
-    position: 'absolute',
+    marginTop: 8,
     color: '#828282',
     fontSize: 24,
     fontFamily: 'Inter',
@@ -181,9 +207,7 @@ const styles = StyleSheet.create({
   compareButton: {
     width: 548,
     height: 52,
-    left: 46,
-    top: 400,
-    position: 'absolute',
+    marginTop: 30,
     backgroundColor: 'black',
     boxShadow: '0px 1px 2px rgba(0, 0, 0, 0.05)',
     borderRadius: 8,
