@@ -10,6 +10,7 @@ export const commonStyles = StyleSheet.create({
   },
   scrollContent: {
     flexGrow: 1,
+    paddingTop: 80,
   },
   mainWrapper: {
     width: '100%',
@@ -17,53 +18,10 @@ export const commonStyles = StyleSheet.create({
     backgroundColor: 'white',
   },
 
-  // --- Header Styles ---
-  header: {
-    width: '100%',
-    height: 80, 
-    position: 'absolute', 
-    top: 0,
-    zIndex: 100, 
-    backgroundColor: 'rgba(255, 255, 255, 0.95)', 
-    paddingHorizontal: '5%',
-    flexDirection: 'row', 
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    borderBottomWidth: 1,
-    borderBottomColor: '#F1F3F4', 
-  },
-  logoText: {
-    fontSize: 26, 
-    fontWeight: '700', 
-    color: '#202124', 
-    fontFamily: 'sans-serif', 
-    letterSpacing: -0.5,
-  },
-  headerRight: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 24,
-  },
-  mypageText: { 
-    fontSize: 15,
-    fontWeight: '500',
-    color: '#5F6368', 
-  },
-  loginButton: {
-    backgroundColor: '#1A73E8', 
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 4, 
-  },
-  loginButtonText: {
-    color: 'white',
-    fontSize: 14,
-    fontWeight: '500',
-  },
 
   // --- Main Section Styles ---
   mainSection: {
-    marginTop: 274,
+    marginTop: 220,
     width: '100%',
     alignItems: 'center',
   },
