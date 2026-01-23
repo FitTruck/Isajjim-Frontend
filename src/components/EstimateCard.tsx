@@ -72,8 +72,8 @@ const EstimateCard = ({ data, status }: EstimateCardProps) => {
       <View style={styles.infoSection}>
         <Text style={styles.sectionHeader}>용달 정보</Text>
         <View style={styles.row}>
-          <Text style={styles.itemLabel}>{data?.truckType || '-'}</Text>
-          <Text style={styles.itemValue}>{data?.truckQuantity || 0}대</Text>
+          <Text style={styles.itemLabel}>{data.truckType || '오류'}</Text>
+          <Text style={styles.itemValue}>{data.truckQuantity || '오류'}</Text>
         </View>
       </View>
 
@@ -143,7 +143,7 @@ const styles = StyleSheet.create({
   },
   sectionHeader: {
     width: 221,
-    height: 60,
+    height: 55,
     color: 'black',
     fontSize: 24,
     fontFamily: 'Inter',
@@ -155,13 +155,12 @@ const styles = StyleSheet.create({
     width: 548,
     height: 37,
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    justifyContent: 'center',
   },
   itemLabel: {
-    width: 58.44,
+    width: 200,
     height: 33,
-    left: 32,
+    left: 0,
     color: '#828282',
     fontSize: 21,
     fontFamily: 'Inter',
@@ -180,8 +179,7 @@ const styles = StyleSheet.create({
   },
   divider: {
     width: 549,
-    height: 0,
-    marginTop: 20,
+    marginTop: 15,
     borderBottomWidth: 1,
     borderColor: 'rgba(209, 217, 224, 0.57)',
   },
