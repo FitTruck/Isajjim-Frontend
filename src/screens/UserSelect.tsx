@@ -5,6 +5,7 @@ import { BACKEND_DOMAIN } from '../utils/Server';
 import FloorDetail from '../components/FloorDetail';
 import RoomSizeDetail from '../components/RoomSizeDetail';
 import LoadingModal from '../components/LoadingModal';
+import Header from '../components/Header';
 
 // 각 선택 버튼 컴포넌트
 const AbsoluteButton = ({ 
@@ -125,24 +126,10 @@ export default function UserSelect({ estimatedId, onNavigateNext, onGoHome }: Us
       <LoadingModal visible={isSubmitting} />
 
       {/* 헤더 */}
-      <View style={commonStyles.header}>
-        <TouchableOpacity onPress={onGoHome}>
-          <Text style={commonStyles.logoText}>이삿찜</Text>
-        </TouchableOpacity>
-        <View style={commonStyles.headerRight}>
-          <TouchableOpacity>
-            <Text style={commonStyles.mypageText}>Mypage</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={commonStyles.loginButton}>
-            <Text style={commonStyles.loginButtonText}>Login</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
+      <Header onGoHome={onGoHome} />
 
       <ScrollView contentContainerStyle={commonStyles.scrollContent}>
         <View style={commonStyles.mainWrapper}>
-          
-
 
           {/* 메인 섹션 */}
           <View style={commonStyles.mainSection}>
@@ -479,7 +466,7 @@ export default function UserSelect({ estimatedId, onNavigateNext, onGoHome }: Us
                 style={{
                   width: 124, 
                   height: 62, 
-                  backgroundColor: isSubmitting ? '#666' : 'black', 
+                  backgroundColor: isSubmitting ? '#666' : '#F0893B', 
                   borderRadius: 8,
                   justifyContent: 'center', 
                   alignItems: 'center',
@@ -575,7 +562,7 @@ const styles = StyleSheet.create({
     alignItems: 'center'
   },
   cardSelected: {
-    backgroundColor: 'black'
+    backgroundColor: '#F0893B'
   },
   cardUnselected: {
     backgroundColor: 'white'
@@ -612,7 +599,7 @@ const styles = StyleSheet.create({
     color: '#AFAFAF'
   },
   selectButtonInline: {
-    backgroundColor: 'black', 
+    backgroundColor: '#F0893B', 
     borderRadius: 8, 
     paddingHorizontal: 32, 
     paddingVertical: 14
