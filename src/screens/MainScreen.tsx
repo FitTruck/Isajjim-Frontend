@@ -6,6 +6,7 @@ import { storage, BACKEND_DOMAIN } from '../utils/Server';
 import { commonStyles } from '../styles/commonStyles';
 import { UploadedImage } from '../utils/Server';
 import { v4 as uuidv4 } from 'uuid';
+import Header from '../components/Header';
 
 
 // app.tsx로부터 전달받을 함수의 자료형 정의
@@ -116,24 +117,12 @@ export default function Main({ onNavigateNext, onGoHome }: MainProps) {
 
   return (
     <View style={commonStyles.container}>
+      {/* Header */}
+      <Header onGoHome={onGoHome} />
+
       <ScrollView contentContainerStyle={commonStyles.scrollContent}>
         {/* Main Wrapper */}
         <View style={commonStyles.mainWrapper}>
-
-          {/* Header */}
-          <View style={commonStyles.header}>
-            <TouchableOpacity onPress={onGoHome}>
-              <Text style={commonStyles.logoText}>이삿찜</Text>
-            </TouchableOpacity>
-            <View style={commonStyles.headerRight}>
-              <TouchableOpacity>
-                <Text style={commonStyles.mypageText}>Mypage</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={commonStyles.loginButton}>
-                <Text style={commonStyles.loginButtonText}>Login</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
 
           {/* 메인 섹션 */}
           <View style={commonStyles.mainSection}>
@@ -246,7 +235,7 @@ export default function Main({ onNavigateNext, onGoHome }: MainProps) {
 const styles = StyleSheet.create({
   // --- 이미지 업로드 버튼 ---
   uploadButton: {
-    backgroundColor: 'black',
+    backgroundColor: '#F0893B',
     paddingHorizontal: 24,
     paddingVertical: 14,
     borderRadius: 8,
@@ -259,6 +248,7 @@ const styles = StyleSheet.create({
   },
   disabledButton: {
     backgroundColor: '#666',
+
     opacity: 0.7,
   },
   
