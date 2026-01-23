@@ -22,7 +22,7 @@ export default function Result({ data, estimateId, ResultOfUserSelect, onGoHome 
   
   // 견적서 컴포넌트에 전달할 값임
   const [estimateData, setEstimateData] = useState<any>({}); // 딕셔너리값임
-  const [updateStatus, setUpdateStatus] = useState<'idle' | 'updating' | 'done'>('idle');
+  const [updateStatus, setUpdateStatus] = useState<'prev' | 'updating' | 'done'>('idle');
 
   // 첫 실행 시에 자동 실행됨.
   useEffect(() => {

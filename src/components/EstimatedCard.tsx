@@ -7,7 +7,7 @@ interface EstimateCardProps {
     truckType: string;
     truckQuantity: number;
   }
-  status: 'idle' | 'updating' | 'done';
+  status: 'prev' | 'updating' | 'done';
 }
 
 const EstimatedCard = ({ data, status }: EstimateCardProps) => {
@@ -37,7 +37,7 @@ const EstimatedCard = ({ data, status }: EstimateCardProps) => {
         }),
       ]).start();
     } else {
-      // idle 상태 (초기 상태 혹은 리셋): 체크 표시만 보임
+      // prev 상태 (초기 상태 혹은 리셋): 체크 표시만 보임
       updatingOpacity.setValue(0);
       doneOpacity.setValue(1);
     }
