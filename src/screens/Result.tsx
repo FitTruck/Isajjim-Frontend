@@ -3,7 +3,7 @@ import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Alert } from 'rea
 import { commonStyles } from '../styles/commonStyles';
 import { UploadedImage, BACKEND_DOMAIN } from '../utils/Server';
 import ResultCard from '../components/ResultCard';
-import EstimateCard from '../components/EstimateCard';
+import EstimatedCard from '../components/EstimatedCard';
 import Header from '../components/Header';
 
 // app.tsx로부터 전달받을 함수의 자료형 정의
@@ -154,7 +154,7 @@ export default function Result({ data, estimateId, ResultOfUserSelect, onGoHome 
 
             {/* 견적표 카드 추가 */}
             <View style={styles.estimateCardContainer}>
-              <EstimateCard 
+              <EstimatedCard 
                 data={estimateData} 
                 status={updateStatus} 
               />
