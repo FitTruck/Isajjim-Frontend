@@ -17,6 +17,7 @@ const EstimatedCard = ({ data, status }: EstimateCardProps) => {
   const updatingOpacity = useRef(new Animated.Value(0)).current; // 0인 상태로 시작하는 애니메이션 숫자
   const doneOpacity = useRef(new Animated.Value(1)).current; // 1인 상태로 시작하는 애니메이션 숫자
 
+  // result화면에서 받아오는 status값이 변경될 때마다 실행되는 함수임. 컴포넌트도 다시 그림
   useEffect(() => {
     if (status === 'updating') {
       // 체크 -> 생성중... (애니메이션 없이 즉시 변경)
@@ -135,7 +136,7 @@ const styles = StyleSheet.create({
     color: 'gray',
     width: 100, 
     right: 0,
-    textAlign: 'left',
+    textAlign: 'right',
   },
   doneStatusIconWrapper: {
     position: 'absolute',

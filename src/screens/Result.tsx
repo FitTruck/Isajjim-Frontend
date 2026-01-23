@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Alert, Platform } from 'react-native';
 import { commonStyles } from '../styles/commonStyles';
 import { UploadedImage, BACKEND_DOMAIN } from '../utils/Server';
 import ResultCard from '../components/ResultCard';
@@ -22,7 +22,7 @@ export default function Result({ data, estimateId, ResultOfUserSelect, onGoHome 
   
   // 견적서 컴포넌트에 전달할 값임
   const [estimateData, setEstimateData] = useState<any>({}); // 딕셔너리값임
-  const [updateStatus, setUpdateStatus] = useState<'prev' | 'updating' | 'done'>('idle');
+  const [updateStatus, setUpdateStatus] = useState<'prev' | 'updating' | 'done'>('prev');
 
   // 첫 실행 시에 자동 실행됨.
   useEffect(() => {
@@ -107,12 +107,12 @@ export default function Result({ data, estimateId, ResultOfUserSelect, onGoHome 
       } else {
         // 실패 시 처리 : "견적서"글자 옆에 "견적서 업데이트 실패" 띄우도록 만드는 것도 고려해야함.
         Alert.alert("업데이트 실패", resultOfUpdate.message || "알 수 없는 오류");
-        setUpdateStatus('idle'); // 실패 시 상태 초기화
+        setUpdateStatus('prev'); // 실패 시 상태 초기화
       }
     } catch (e) {
       console.error(e);
       Alert.alert("오류", "서버 통신 중 오류가 발생했습니다.");
-      setUpdateStatus('idle'); // 에러 시 상태 초기화
+      setUpdateStatus('prev'); // 에러 시 상태 초기화
     }
   };
 
@@ -232,7 +232,9 @@ const styles = StyleSheet.create({
   estimateCardContainer: {
     marginTop: 150, // resultSectionContainer margin과 맞춤
     width: '25%',
-    position: 'relative',
+    position: 'sticky' as any,
+    top: 150, // 상단에서 어느 정도 떨어져서 고정될지 설정
+    zIndex: 10,
     height: 'auto',
     marginBottom: 200, 
     alignItems: 'center',
