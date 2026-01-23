@@ -36,13 +36,9 @@ export default function Main({ onNavigateNext, onGoHome }: MainProps) {
     // result의 가장 상위 속성은 assets, canceled가 있다고 보면 됨. assets는 이미지 하나의 정보이고, canceled는 이미지 선택을 취소했는지 여부를 나타냄
     if (!result.canceled) { // 취소하지 않았다면~
       setStatusMessage('업로드 중...');
-      const uploadedResults: UploadedImage[] = []; 
-      // 업로드된 이미지들을 저장할 배열 생성
-
       try {
-        // 선택된 이미지들을 하나씩 반복 처리
-        // asset : 사용자가 선택한 이미지 하나의 정보를 담은 객체
-        for (const asset of result.assets) {
+        // 병렬 처리를 위해 map을 사용하여 모든 업로드 작업을 Promise 배열로 생성
+        const uploadPromises = result.assets.map(async (asset) => {
           // 고유 ID 생성 (중복 방지)
           const tempId = uuidv4();
           
@@ -58,17 +54,22 @@ export default function Main({ onNavigateNext, onGoHome }: MainProps) {
 
           const uri = await getDownloadURL(storageRef); // 업로드된 파일의 URL을 가져옴
 
-          uploadedResults.push({ // uploadedResult라는 배열에 업로드된 이미지의 정보를 추가함
-            uri: uri, // 업로드된 이미지의 URL
+          return { 
+            uri: uri, // 업로드된 이미지의 firebase상 URL
             width: asset.width, // 이미지의 너비
             height: asset.height, // 이미지의 높이
-          });
-        }
+          } as UploadedImage;
+        });
+
+        // Promise.all을 사용하여 모든 업로드가 완료될 때까지 기다림 (병렬 처리)
+        // Promise.all : 
+        const uploadedResults = await Promise.all(uploadPromises);
 
         setImageList((prev) => [...prev, ...uploadedResults]); // 이전꺼 그대로 놔두고 업로드된 이미지 추가
         setStatusMessage(`${imageList.length + uploadedResults.length}개의 파일 업로드 완료`);
 
-      } catch {
+      } catch (error) {
+        console.error(error);
         setStatusMessage('업로드 실패');
       }
     }
@@ -79,7 +80,7 @@ export default function Main({ onNavigateNext, onGoHome }: MainProps) {
     if (isProcessing) return; // '다음단계'버튼을 여러번 누르는 걸 대비
 
     setIsProcessing(true); // 처리 중으로 상태 변경
-    setStatusMessage('서버에 전송 중...');
+    setStatusMessage('서버에 이미지 전송 중...');
 
     try {
       // 실제 백엔드 API 주소로 변경
@@ -94,7 +95,7 @@ export default function Main({ onNavigateNext, onGoHome }: MainProps) {
           // 데이터 형식을 표현할 때, json은 application/json으로 표기해야함.
         },
         body: JSON.stringify({ // 보내는 데이터의 내용물
-          imageUrls: imageList.map(img => img.uri),
+          imageUrls: imageList.map(img => img.uri), // img.uri는 firebase storage 상의 이미지 URL임.
         })
       });
       
