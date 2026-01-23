@@ -21,8 +21,20 @@ const EstimatedCard = ({ data, status }: EstimateCardProps) => {
   useEffect(() => {
     if (status === 'updating') {
       // 체크 -> 생성중... (애니메이션 없이 즉시 변경)
-      updatingOpacity.setValue(1); //setValue: 변수 값을 즉시 변경하는 리액트 내부 함수
-      doneOpacity.setValue(0);
+      updatingOpacity.setValue(1); //setValue(1) : 변수 값을 1로 변경(check를 보이게 하는 리액트 내부 함수)
+      Animated.parallel([
+        Animated.timing(updatingOpacity, {
+          toValue: 0,
+          duration: 200,
+          useNativeDriver: true,
+        }),
+        Animated.timing(doneOpacity, {
+          toValue: 1,
+          duration: 400,
+          useNativeDriver: true,
+        }),
+      ]).start();
+      doneOpacity.setValue(0); //setValue(0) : 변수 값을 0으로 변경(견적서 생성중...을 보이게 하는 리액트 내부 함수)
     } else if (status === 'done') {
       // 생성중... -> 체크 (부드럽게 페이드 효과)
       Animated.parallel([
