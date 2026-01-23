@@ -6,33 +6,7 @@ import FloorDetail from '../components/FloorDetail';
 import RoomSizeDetail from '../components/RoomSizeDetail';
 import LoadingModal from '../components/LoadingModal';
 import Header from '../components/Header';
-
-// 각 선택 버튼 컴포넌트
-const AbsoluteButton = ({ 
-  x, y, width, height, label, value, selectedValue, onSelect 
-}: { // 타입정의
-  x: number, y: number, width: number, height: number, label: string, 
-  value: any, selectedValue: any, onSelect: (v: any) => void 
-}) => {
-  const isSelected = selectedValue === value;
-  return ( // 이렇게 생겼다
-    <TouchableOpacity
-      style={[
-        styles.absoluteCard,
-        { left: x, top: y, width, height },
-        isSelected ? styles.cardSelected : styles.cardUnselected // 선택된 것와 안된 것 나눔.
-      ]}
-      onPress={() => onSelect(value)} // 눌렀을 때 onSelect가 실행됨
-    >
-      <Text style={[
-        styles.cardText, 
-        isSelected ? styles.textSelected : styles.textUnselected
-      ]}>
-        {label}
-      </Text>
-    </TouchableOpacity>
-  );
-};
+import DetailSelectBtn from '../components/DetailSelectBtn';
 
 // app.tsx로부터 전달받을 함수의 자료형 정의
 interface UserSelectProps {
@@ -155,7 +129,7 @@ export default function UserSelect({ estimatedId, onNavigateNext, onGoHome }: Us
                   top: 43, left: 0, 
                   width: 476, height: 281, 
                   backgroundColor: '#EBEBEB' }}>
-                  <AbsoluteButton
+                  <DetailSelectBtn
                     x={0} 
                     y={0} 
                     width={238} 
@@ -165,7 +139,7 @@ export default function UserSelect({ estimatedId, onNavigateNext, onGoHome }: Us
                     selectedValue={buildingType} 
                     onSelect={setBuildingType} // onSelect라는 것은 setBuildingType을 실행하는 것.
                   />
-                  <AbsoluteButton 
+                  <DetailSelectBtn 
                     x={238} 
                     y={0} 
                     width={238} 
@@ -175,7 +149,7 @@ export default function UserSelect({ estimatedId, onNavigateNext, onGoHome }: Us
                     selectedValue={buildingType} 
                     onSelect={setBuildingType} 
                   />
-                  <AbsoluteButton 
+                  <DetailSelectBtn 
                     x={0} 
                     y={94} 
                     width={238} 
@@ -185,7 +159,7 @@ export default function UserSelect({ estimatedId, onNavigateNext, onGoHome }: Us
                     selectedValue={buildingType} 
                     onSelect={setBuildingType} 
                   />
-                  <AbsoluteButton 
+                  <DetailSelectBtn 
                     x={238} 
                     y={94} 
                     width={238} 
@@ -195,7 +169,7 @@ export default function UserSelect({ estimatedId, onNavigateNext, onGoHome }: Us
                     selectedValue={buildingType} 
                     onSelect={setBuildingType} 
                   />
-                  <AbsoluteButton 
+                  <DetailSelectBtn 
                     x={0} 
                     y={187} 
                     width={238} 
@@ -212,7 +186,7 @@ export default function UserSelect({ estimatedId, onNavigateNext, onGoHome }: Us
               <View style={{ width: 477, height: 324 }}>
                 <Text style={styles.sectionTitle}>방 구조</Text>
                 <View style={{ position: 'absolute', top: 43, left: 0 }}>
-                  <AbsoluteButton 
+                  <DetailSelectBtn 
                     x={0} 
                     y={0} 
                     width={238} 
@@ -222,7 +196,7 @@ export default function UserSelect({ estimatedId, onNavigateNext, onGoHome }: Us
                     selectedValue={roomType} 
                     onSelect={setRoomType} 
                   />
-                  <AbsoluteButton 
+                  <DetailSelectBtn 
                     x={238} 
                     y={0} 
                     width={238} 
@@ -232,7 +206,7 @@ export default function UserSelect({ estimatedId, onNavigateNext, onGoHome }: Us
                     selectedValue={roomType} 
                     onSelect={setRoomType} 
                   />
-                  <AbsoluteButton 
+                  <DetailSelectBtn 
                     x={0} 
                     y={93} 
                     width={238} 
@@ -242,7 +216,7 @@ export default function UserSelect({ estimatedId, onNavigateNext, onGoHome }: Us
                     selectedValue={roomType} 
                     onSelect={setRoomType} 
                   />
-                  <AbsoluteButton 
+                  <DetailSelectBtn 
                     x={238} 
                     y={93} 
                     width={238} 
@@ -252,7 +226,7 @@ export default function UserSelect({ estimatedId, onNavigateNext, onGoHome }: Us
                     selectedValue={roomType} 
                     onSelect={setRoomType} 
                   />
-                  <AbsoluteButton 
+                  <DetailSelectBtn 
                     x={0} 
                     y={186} 
                     width={238} 
@@ -262,7 +236,7 @@ export default function UserSelect({ estimatedId, onNavigateNext, onGoHome }: Us
                     selectedValue={roomType} 
                     onSelect={setRoomType} 
                   />
-                  <AbsoluteButton 
+                  <DetailSelectBtn 
                     x={238} 
                     y={186} 
                     width={238} 
@@ -288,7 +262,7 @@ export default function UserSelect({ estimatedId, onNavigateNext, onGoHome }: Us
               <View style={{ width: 477, height: 150 }}>
                 <Text style={styles.sectionTitle}>복층</Text>
                 <View style={{ position: 'absolute', top: 43, left: 0 }}>
-                  <AbsoluteButton 
+                  <DetailSelectBtn 
                     x={0} 
                     y={0} 
                     width={238} 
@@ -298,7 +272,7 @@ export default function UserSelect({ estimatedId, onNavigateNext, onGoHome }: Us
                     selectedValue={duplex} 
                     onSelect={setDuplex} 
                   />
-                  <AbsoluteButton 
+                  <DetailSelectBtn 
                     x={238} 
                     y={0} 
                     width={238} 
@@ -328,7 +302,7 @@ export default function UserSelect({ estimatedId, onNavigateNext, onGoHome }: Us
                   top: 43, 
                   left: 0 
                 }}>
-                  <AbsoluteButton 
+                  <DetailSelectBtn 
                     x={0} 
                     y={0} 
                     width={238} 
@@ -338,7 +312,7 @@ export default function UserSelect({ estimatedId, onNavigateNext, onGoHome }: Us
                     selectedValue={groundStair} 
                     onSelect={setGroundStair} 
                   />
-                  <AbsoluteButton 
+                  <DetailSelectBtn 
                     x={238} 
                     y={0} 
                     width={238} 
@@ -362,7 +336,7 @@ export default function UserSelect({ estimatedId, onNavigateNext, onGoHome }: Us
                   top: 43, 
                   left: 0 
                 }}>
-                  <AbsoluteButton 
+                  <DetailSelectBtn 
                     x={0} 
                     y={0} 
                     width={238} 
@@ -372,7 +346,7 @@ export default function UserSelect({ estimatedId, onNavigateNext, onGoHome }: Us
                     selectedValue={elevator} 
                     onSelect={setElevator} 
                   />
-                  <AbsoluteButton 
+                  <DetailSelectBtn 
                     x={238} 
                     y={0} 
                     width={238} 
@@ -392,7 +366,7 @@ export default function UserSelect({ estimatedId, onNavigateNext, onGoHome }: Us
                   position: 'absolute', 
                   top: 43, left: 0 
                 }}>
-                  <AbsoluteButton 
+                  <DetailSelectBtn 
                     x={0} 
                     y={0} 
                     width={238} 
@@ -402,7 +376,7 @@ export default function UserSelect({ estimatedId, onNavigateNext, onGoHome }: Us
                     selectedValue={parking} 
                     onSelect={setParking} 
                   />
-                  <AbsoluteButton 
+                  <DetailSelectBtn 
                     x={238} 
                     y={0} 
                     width={238} 
@@ -426,7 +400,7 @@ export default function UserSelect({ estimatedId, onNavigateNext, onGoHome }: Us
                   width: 476, height: 187, 
                   backgroundColor: '#EBEBEB' 
                 }}>
-                  <AbsoluteButton 
+                  <DetailSelectBtn 
                     x={0} 
                     y={0} 
                     width={238} 
@@ -436,7 +410,7 @@ export default function UserSelect({ estimatedId, onNavigateNext, onGoHome }: Us
                     selectedValue={ladderTruck} 
                     onSelect={setLadderTruck} 
                   />
-                  <AbsoluteButton 
+                  <DetailSelectBtn 
                     x={238} 
                     y={0} 
                     width={238} 
@@ -446,7 +420,7 @@ export default function UserSelect({ estimatedId, onNavigateNext, onGoHome }: Us
                     selectedValue={ladderTruck} 
                     onSelect={setLadderTruck} 
                   />
-                  <AbsoluteButton 
+                  <DetailSelectBtn 
                     x={0} 
                     y={93} 
                     width={238} 
@@ -554,29 +528,7 @@ const styles = StyleSheet.create({
     color: 'black', 
     marginBottom: 10
   },
-  absoluteCard: {
-    position: 'absolute',
-    borderWidth: 1, 
-    borderColor: '#AFAFAF',
-    justifyContent: 'center', 
-    alignItems: 'center'
-  },
-  cardSelected: {
-    backgroundColor: '#F0893B'
-  },
-  cardUnselected: {
-    backgroundColor: 'white'
-  },
-  cardText: {
-    fontSize: 22, 
-    fontWeight: '500'
-  },
-  textSelected: { 
-    color: 'white' 
-  },
-  textUnselected: { 
-    color: 'black' 
-  },
+
 
   // 사용자 지정 입력 박스 스타일
   customInputBox: {
