@@ -4,6 +4,7 @@ import { commonStyles } from '../styles/commonStyles';
 import { UploadedImage, BACKEND_DOMAIN } from '../utils/Server';
 import ResultCard from '../components/ResultCard';
 import EstimateCard from '../components/EstimateCard';
+import Header from '../components/Header';
 
 // app.tsx로부터 전달받을 함수의 자료형 정의
 interface ResultProps {
@@ -118,24 +119,12 @@ export default function Result({ data, estimateId, ResultOfUserSelect, onGoHome 
 
   return (
     <View style={commonStyles.container}>
+      {/* Header */}
+      <Header onGoHome={onGoHome} />
+
       <ScrollView contentContainerStyle={commonStyles.scrollContent}>
         {/* Main Wrapper */}
         <View style={commonStyles.mainWrapper}>
-
-          {/* Header */}
-          <View style={commonStyles.header}>
-            <TouchableOpacity onPress={onGoHome}>
-              <Text style={commonStyles.logoText}>이삿찜</Text>
-            </TouchableOpacity>
-            <View style={commonStyles.headerRight}>
-              <TouchableOpacity>
-                <Text style={commonStyles.mypageText}>Mypage</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={commonStyles.loginButton}>
-                <Text style={commonStyles.loginButtonText}>Login</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
 
           {/* 메인 섹션 */}
           <View style={commonStyles.mainSection}>
@@ -148,26 +137,30 @@ export default function Result({ data, estimateId, ResultOfUserSelect, onGoHome 
           {/* 구분선 */}
           <View style={styles.divider}/>
 
-          {/* 결과 섹션 컨테이너 */}
-          <View style={styles.resultSectionContainer}>
-            
-            {results.map((result) => ( // 각 이미지에 대한 값을 맵핑하여 ResultCard컴포넌트를 여러개 생성함
-              <ResultCard
-                image={result.image}
-                items={result.contents}
-                onQuantityChange={handleUpdateQuantity} // onQuantityChange는 ResultCard에서 furnitureId와 newQuantity를 인자로 받기 때문에 그 인자가 handleUpdateQuantity 함수로 전달됨.
+          <View style={styles.resultEstimateCardContainer}>
+            {/* 결과 섹션 컨테이너 */}
+            <View style={styles.resultSectionContainer}>
+              
+              {results.map((result, index) => (
+                <ResultCard
+                  key={index}
+                  image={result.image}
+                  items={result.contents}
+                  onQuantityChange={handleUpdateQuantity}
+                />
+              ))}
+
+            </View>
+
+            {/* 견적표 카드 추가 */}
+            <View style={styles.estimateCardContainer}>
+              <EstimateCard 
+                data={estimateData} 
+                status={updateStatus} 
               />
-            ))}
-
+            </View>
           </View>
-
-          {/* 견적표 카드 추가 */}
-          <View style={styles.estimateCardContainer}>
-            <EstimateCard 
-              data={estimateData} 
-              status={updateStatus} 
-            />
-          </View>
+          
 
           {/* footer */}
           <View style={commonStyles.footer}>
@@ -217,16 +210,19 @@ const styles = StyleSheet.create({
     height: 26, 
     backgroundColor: '#F7F7F7'
   },
-
+  resultEstimateCardContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+  },
   resultSectionContainer: {
     marginTop: 150,
-    width: '100%',
+    width: '75%',
     maxWidth: 1740,
-    alignSelf: 'center',
-    justifyContent: 'center', // 가로 방향 중앙 정렬
+    alignSelf: 'flex-start',
+    justifyContent: 'center',
     paddingBottom: 100,
-    paddingHorizontal: 20, // 화면이 아주 작을 때를 위한 최소한의 여백만 남김
-    display: 'flex',
+    paddingHorizontal: 0, // 화면이 아주 작을 때를 위한 최소한의 여백만 남김
     flexDirection: 'row',
     flexWrap: 'wrap',
     rowGap: 70,
@@ -234,10 +230,11 @@ const styles = StyleSheet.create({
   },
 
   estimateCardContainer: {
-    marginTop: 200,
-    width: '100%',
+    marginTop: 150, // resultSectionContainer margin과 맞춤
+    width: '25%',
     position: 'relative',
-    height: 500, // EstimateCard의 높이(500px)만큼 공간 확보
-    marginBottom: 200, // footer와의 간격을 위해 추가
+    height: 'auto',
+    marginBottom: 200, 
+    alignItems: 'center',
   },
 });
