@@ -1,9 +1,10 @@
 import React, { useState } from 'react'; // 상태를 저장하게 해줌
-import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Alert, Platform } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Alert, Platform, Modal, ActivityIndicator } from 'react-native';
 import { commonStyles } from '../styles/commonStyles';
 import { BACKEND_DOMAIN } from '../utils/Server';
 import FloorDetail from '../components/FloorDetail';
 import RoomSizeDetail from '../components/RoomSizeDetail';
+import LoadingModal from '../components/LoadingModal';
 
 // 각 선택 버튼 컴포넌트
 const AbsoluteButton = ({ 
@@ -89,7 +90,9 @@ export default function UserSelect({ estimatedId, onNavigateNext, onGoHome }: Us
       return;
     }
 
+    // 로딩 모달 띄우기
     setIsSubmitting(true);
+
     try {
       const BACKEND_URL = `${BACKEND_DOMAIN}/api/v1/estimates/${estimatedId}`;
       const payload = mapToBackendValue(); // payload : 사용자가 선택한 값들을 객체로 변환
@@ -112,29 +115,34 @@ export default function UserSelect({ estimatedId, onNavigateNext, onGoHome }: Us
       console.error("Save Error:", error);
       Alert.alert("오류", "업로드 실패2");
     } finally {
-      setIsSubmitting(false);
+      setIsSubmitting(false); // 백엔드에서 값을 받아왔다면 로딩 모달 끄기 
     }
   };
   
   return (
     <View style={commonStyles.container}>
+      {/* 로딩 모달 */}
+      <LoadingModal visible={isSubmitting} />
+
+      {/* 헤더 */}
+      <View style={commonStyles.header}>
+        <TouchableOpacity onPress={onGoHome}>
+          <Text style={commonStyles.logoText}>이삿찜</Text>
+        </TouchableOpacity>
+        <View style={commonStyles.headerRight}>
+          <TouchableOpacity>
+            <Text style={commonStyles.mypageText}>Mypage</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={commonStyles.loginButton}>
+            <Text style={commonStyles.loginButtonText}>Login</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+
       <ScrollView contentContainerStyle={commonStyles.scrollContent}>
         <View style={commonStyles.mainWrapper}>
           
-          {/* 헤더 */}
-          <View style={commonStyles.header}>
-            <TouchableOpacity onPress={onGoHome}>
-              <Text style={commonStyles.logoText}>이삿찜</Text>
-            </TouchableOpacity>
-            <View style={commonStyles.headerRight}>
-              <TouchableOpacity>
-                <Text style={commonStyles.mypageText}>Mypage</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={commonStyles.loginButton}>
-                <Text style={commonStyles.loginButtonText}>Login</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
+
 
           {/* 메인 섹션 */}
           <View style={commonStyles.mainSection}>
