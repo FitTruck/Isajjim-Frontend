@@ -29,6 +29,7 @@ export default function App() {
     setCurrentScreen('result');
   };
 
+  // 전체 리셋
   const handleReset = () => {
     setUploadedImages([]); // 업로드한 이미지 정보 초기화 key만 바꾼다고 해서 업로드한 이미지까지 초기화 되는 것은 아님.
     setEstimateId(null); // 견적 ID 초기화
