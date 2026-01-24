@@ -4,7 +4,7 @@ import { translateLabel, translateType } from '../utils/Translator';
 
 interface ResultCardProps {
   image: {
-    uri: string;
+    localUri: string;
     width: number;
     height: number;
   }; 
@@ -40,14 +40,14 @@ const ResultCard = ({ image, items, onQuantityChange }: ResultCardProps) => {
       {/* 이미지 */}
       <View style={styles.imageWrapper}>
         <Image
-          source={{ uri: image.uri }} 
+          source={{ uri: image.localUri }} 
           style={[styles.cardImage, { aspectRatio: ratio }]} // 이미지 비율을 잘 쓰고 있음
           resizeMode="cover" 
         />
       </View>
 
       <View style={styles.resultCardContent}>
-        {translatedItems.map((item) => (
+        {translatedItems.map((item) => ( // 번역된 가구명을 사용해서 한다.
           <View key={item.furnitureId} style={styles.itemContainer}>
             <View style={styles.itemDetailContainer}>
               <Text style={styles.itemTitle}>{item.label}</Text>

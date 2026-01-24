@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Alert, Platform } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { commonStyles } from '../styles/commonStyles';
 import { UploadedImage, BACKEND_DOMAIN } from '../utils/Server';
 import ResultCard from '../components/ResultCard';
@@ -31,7 +31,8 @@ export default function Result({ data, estimateId, ResultOfUserSelect, onGoHome 
       const mappedResultCard = ResultOfUserSelect.data.images.map((imgResult: any, i: number) => ({
         // main에서 전달받은 이미지 url과 width, height 정보
         image: { 
-          uri: data[i].uri,
+          firebaseUri: data[i].firebaseUri,
+          localUri: data[i].localUri,
           width: data[i].width,
           height: data[i].height,
         },

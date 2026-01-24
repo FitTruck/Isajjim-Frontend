@@ -3,7 +3,8 @@ import { getStorage } from 'firebase/storage';
 
 // --- 데이터 ---
 export interface UploadedImage {
-  uri: string;
+  firebaseUri: string;
+  localUri: string;
   width: number;
   height: number;
 }

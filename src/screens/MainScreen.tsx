@@ -55,14 +55,14 @@ export default function Main({ onNavigateNext, onGoHome }: MainProps) {
           const uri = await getDownloadURL(storageRef); // 업로드된 파일의 URL을 가져옴
 
           return { 
-            uri: uri, // 업로드된 이미지의 firebase상 URL
+            firebaseUri: uri, // 업로드된 이미지의 firebase상 URL
+            localUri: asset.uri, // 업로드된 이미지의 로컬 URL
             width: asset.width, // 이미지의 너비
             height: asset.height, // 이미지의 높이
           } as UploadedImage;
         });
 
         // Promise.all을 사용하여 모든 업로드가 완료될 때까지 기다림 (병렬 처리)
-        // Promise.all : 
         const uploadedResults = await Promise.all(uploadPromises);
 
         setImageList((prev) => [...prev, ...uploadedResults]); // 이전꺼 그대로 놔두고 업로드된 이미지 추가
@@ -95,7 +95,7 @@ export default function Main({ onNavigateNext, onGoHome }: MainProps) {
           // 데이터 형식을 표현할 때, json은 application/json으로 표기해야함.
         },
         body: JSON.stringify({ // 보내는 데이터의 내용물
-          imageUrls: imageList.map(img => img.uri), // img.uri는 firebase storage 상의 이미지 URL임.
+          imageUrls: imageList.map(img => img.firebaseUri), // img.uri는 firebase storage 상의 이미지 URL임.
         })
       });
       
@@ -144,7 +144,7 @@ export default function Main({ onNavigateNext, onGoHome }: MainProps) {
                 {/* 이미지가 다시 업로드 되면 imageList도 업데이트 되니까 선택한 이미지가 모두 드러나게 되어있음 */}
                 {imageList.map((item) => (
                   <View style={styles.imageCard}>
-                    <Image source={{ uri: item.uri }} style={styles.thumbnail} />
+                    <Image source={{ uri: item.localUri }} style={styles.thumbnail} />
                   </View>
                 ))}
               </View>
