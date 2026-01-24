@@ -80,9 +80,9 @@ export const typeTranslations: { [key: string]: string } = {
 };
 
 export function translateLabel(label: string): string {
-    return furnitureTranslations[label] || '번역본이 지정되어 있지 않음';
+    return furnitureTranslations[label] || '번역함수에 정의되지 않은 가구';
 }
 
 export function translateType(type: string): string {
-    return typeTranslations[type] || '번역본이 지정되어 있지 않음';
+    return typeTranslations[type] || '번역함수에 정의되지 않은 가구';
 }
