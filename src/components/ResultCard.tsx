@@ -1,5 +1,6 @@
-import React, { useState }  from 'react';
+import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import { translateLabel, translateType } from '../utils/Translator';
 
 interface ResultCardProps {
   image: {
@@ -25,19 +26,14 @@ interface ResultCardProps {
 const ResultCard = ({ image, items, onQuantityChange }: ResultCardProps) => {
   const ratio = image.width / image.height; // 사진 비율 계산
 
-  // label을 영어로 받으니까 그걸 한글로 변환하는 로직이 필요할 지 모름. 모든 레이블에 대해 한글로 변환해야함.
-  // 이런 식의 로직이 들어가게 될 수도 있다는 것임. 그러면 이 파일로 보내기 전에 만들자. 새로운 번역로직파일 만들어야함.
-  for (let i = 0; i < items.length; i++) {
-    if (items[i].label === "TV") {
-      items[i].label = "텔레비전";
-    }
-    if (items[i].label === "SOFA") {
-      items[i].label = "소파";
-    }
-    if (items[i].label === "BED") {
-      items[i].label = "침대";
-    }
-  }
+  // props로 받은 items를 직접 수정하지 않고, 렌더링 시 변환된 값을 사용하도록 함
+  // 만약 데이터 자체를 변환해야 한다면 원본을 건드리지 않기 위해 map을 새로 돌리는 것이 좋음
+  // 변수까지도 새로 지정함.
+  const translatedItems = items.map(item => ({
+    ...item,
+    label: translateLabel(item.label),
+    type: translateType(item.type)
+  }));
 
   return (
     <View style={styles.resultCardContainer}>
@@ -51,7 +47,7 @@ const ResultCard = ({ image, items, onQuantityChange }: ResultCardProps) => {
       </View>
 
       <View style={styles.resultCardContent}>
-        {items.map((item) => (
+        {translatedItems.map((item) => (
           <View key={item.furnitureId} style={styles.itemContainer}>
             <View style={styles.itemDetailContainer}>
               <Text style={styles.itemTitle}>{item.label}</Text>
