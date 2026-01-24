@@ -30,8 +30,7 @@ export default function Result({ data, estimateId, ResultOfUserSelect, onGoHome 
       // mappedResultCard : ResultCard에 필요한 이미지와 content객체
       const mappedResultCard = ResultOfUserSelect.data.images.map((imgResult: any, i: number) => ({
         // main에서 전달받은 이미지 url과 width, height 정보
-        image: { 
-          firebaseUri: data[i].firebaseUri,
+        image: {
           localUri: data[i].localUri,
           width: data[i].width,
           height: data[i].height,
