@@ -131,11 +131,14 @@ const styles = StyleSheet.create({
   },
   itemTitle: {
     fontSize: 20,
-    fontWeight: 'bold',
+    fontFamily : 'inter',
+    fontWeight: 600,
     color: '#000',
   },
   itemSubtitle: {
-    fontSize: 16,
+    fontSize: 15,
+    fontFamily : 'inter',
+    fontWeight: 500,
     color: '#828282',
   },
   itemCountContainer: {
