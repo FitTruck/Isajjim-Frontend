@@ -20,58 +20,28 @@ export default function Main({ onNavigateNext, onGoHome }: MainProps) {
   const [statusMessage, setStatusMessage] = useState(''); 
   const [isProcessing, setIsProcessing] = useState(false);
 
-  // async: 순서대로 기다려야 하는 작업이 있음을 나타냄. await와 함께 사용
+  // await을 쓸려면 부모 함수에 async이 있어야함.
   const handleWebUpload = async () => {
-    // ImagePicker.launchImageLibraryAsync: 이미지 선택 창을 띄우고 이미지를 선택후 이미지 정보를 담은 객체를 반환함
-    // launchImageLibraryAsync는 비동기 함수이므로 await와 함께 사용
     // await: 사용자가 사진을 고를 때까지 다음 줄로 넘어가지 않음
     // result는 사용자가 선택한 이미지들의 정보(assets, canceled)를 담은 객체
     const result = await ImagePicker.launchImageLibraryAsync({
-      // 이미지를 가져올 때의 설정
       mediaTypes: ['images'], // 이미지 파일만
       allowsMultipleSelection: true, // 다중 선택 활성화
-      quality: 1, // 원본 화질
+      quality: 1,
     });
   
     // result의 가장 상위 속성은 assets, canceled가 있다고 보면 됨. assets는 이미지 하나의 정보이고, canceled는 이미지 선택을 취소했는지 여부를 나타냄
     if (!result.canceled) { // 취소하지 않았다면~
-      setStatusMessage('업로드 중...');
-      try {
-        // 병렬 처리를 위해 map을 사용하여 모든 업로드 작업을 Promise 배열로 생성
-        const uploadPromises = result.assets.map(async (asset) => {
-          // 고유 ID 생성 (중복 방지)
-          const tempId = uuidv4();
-          
-          const response = await fetch(asset.uri); // "브라우저의 메모리로 올라간 브라우저 메모리 주소"를 인자로 하여 이미지의 상태 정보를 가져옴
-          const blob = await response.blob(); // 이미지를 이진수로 데이터 덩어리로 변환
+      // 로컬 이미지 추가
+      const newImages = result.assets.map(asset => ({
+        localUri: asset.uri,
+        width: asset.width,
+        height: asset.height,
+        // firebaseUri는 아직 없음
+      } as UploadedImage));
 
-          // firebase storage에 업로드
-          // 저장소 내의 위치와 저장할 파일명을 하나로 묶어 storageRef라는 객체로 만듦.
-          const storageRef = ref(storage, `web_uploads/${tempId}`); 
-          // storage는 ../utils/Server.ts에 정의되어 있음
-
-          await uploadBytes(storageRef, blob); // 경로 및 blob을 인자로 하여 storage에 업로드
-
-          const uri = await getDownloadURL(storageRef); // 업로드된 파일의 URL을 가져옴
-
-          return { 
-            firebaseUri: uri, // 업로드된 이미지의 firebase상 URL
-            localUri: asset.uri, // 업로드된 이미지의 로컬 URL
-            width: asset.width, // 이미지의 너비
-            height: asset.height, // 이미지의 높이
-          } as UploadedImage;
-        });
-
-        // Promise.all을 사용하여 모든 업로드가 완료될 때까지 기다림 (병렬 처리)
-        const uploadedResults = await Promise.all(uploadPromises);
-
-        setImageList((prev) => [...prev, ...uploadedResults]); // 이전꺼 그대로 놔두고 업로드된 이미지 추가
-        setStatusMessage(`${imageList.length + uploadedResults.length}개의 파일 업로드 완료`);
-
-      } catch (error) {
-        console.error(error);
-        setStatusMessage('업로드 실패');
-      }
+      setImageList((prev) => [...prev, ...newImages]);
+      setStatusMessage(`${newImages.length + imageList.length}개의 파일 선택 완료`);
     }
   };
 
@@ -83,34 +53,60 @@ export default function Main({ onNavigateNext, onGoHome }: MainProps) {
     setStatusMessage('서버에 이미지 전송 중...');
 
     try {
-      // 실제 백엔드 API 주소로 변경
+      const uploadedImages = await Promise.all(imageList.map(async (img) => {
+
+        try {
+           // 고유 ID 생성
+           const tempId = uuidv4();
+           
+           const response = await fetch(img.localUri);
+           const blob = await response.blob(); 
+
+           // firebase storage에 업로드
+           const storageRef = ref(storage, `web_uploads/${tempId}`);
+           await uploadBytes(storageRef, blob); 
+           const uri = await getDownloadURL(storageRef); // 업로드된 파일의 URL
+
+           return {
+             ...img, // 다른 것들은 그대로 놔두고
+             firebaseUri: uri // firebaseUri 만 변경해.
+           };
+        } catch (err) {
+          console.error(`firebase에 이미지 업로드 실패 (${img.localUri}):`, err);
+          throw err;
+        }
+      }));
+
+      // uploadedImages는 firebaseUri가 추가된 완전체임
+      setImageList(uploadedImages);
+
       const BACKEND_URL = `${BACKEND_DOMAIN}/api/v1/estimates`; 
 
       // response: 서버가 보낸 응답. 데이터 및 데이터 외적인 정보가 포함됨.
       const response = await fetch(BACKEND_URL, { //fetch를 통해서 데이터를 보낸다.
-        method: 'POST', //Post방식이므로 값을 받아온다.
+        method: 'POST', //Post방식 : 요청하는 형식대로 값 보내고, 값 받아오기
         headers: { // headers: 보낼 데이터에 대한 메타데이터를 적는 곳임 
           'Content-Type': 'application/json', 
           // 보낼 데이터가 json임을 명시. 'content-type'은 사용자 지정 속성이 아님
           // 데이터 형식을 표현할 때, json은 application/json으로 표기해야함.
         },
         body: JSON.stringify({ // 보내는 데이터의 내용물
-          imageUrls: imageList.map(img => img.firebaseUri), // img.uri는 firebase storage 상의 이미지 URL임.
+          imageUrls: uploadedImages.map(img => img.firebaseUri),  // imageList는 이전 값이므로 uploadedImages를 사용해야함
         })
       });
       
       const responseData = await response.json(); // 자동으로 자료형이 any라서 따로 자료형 설정 없어도 된다. 
 
-      if (responseData?.data?.estimateId) { 
-        // app.tsx로 이미지와 estimatedId를 보냄
-        onNavigateNext(imageList, responseData.data.estimateId); 
+      if (responseData.data.estimateId) { 
+        // app.tsx로 이미지와 estimatedId를 보냄 (uploadedImages에는 이제 firebaseUri가 다 있음)
+        onNavigateNext(imageList as UploadedImage[], responseData.data.estimateId); 
       } else {
-        console.error('Server Error:', responseData);
-        setStatusMessage('서버 전송 실패0: ' + (responseData.message || '알 수 없는 오류'));
+        console.error('estimateId를 받아오지 못함');
+        setStatusMessage('서버 전송 실패');
       }
     } catch (error) {
       console.error('Network Error:', error);
-      setStatusMessage('서버 전송 중 오류 발생. 백엔드 서버를 확인해주세요.');
+      setStatusMessage('서버 전송 중 오류 발생.');
     } finally {
       setIsProcessing(false);
     }

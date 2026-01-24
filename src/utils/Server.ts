@@ -3,7 +3,7 @@ import { getStorage } from 'firebase/storage';
 
 // --- 데이터 ---
 export interface UploadedImage {
-  firebaseUri: string;
+  firebaseUri?: string; // ?를 붙임으로써 항상 값이 채워질 필요는 없는 값이됨. 나중에 채워도 되는 값이 된다는 뜻. >> 이것 때문에 편한게 됨 
   localUri: string;
   width: number;
   height: number;
