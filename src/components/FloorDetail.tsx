@@ -24,8 +24,7 @@ export default function FloorDetail({ value, onSelect }: FloorDetailProps) {
 
   return (
     <>
-      {/* 화면에 표시되는 선택 영역 */}
-      <View style={[styles.customInputBox, { top: 48 }]}>
+      <View style={styles.customInputBox}>
         <Text style={[styles.customInputValue, value ? { color: 'black' } : {}]}>
           {selectedFloorLabel}
         </Text> 
@@ -96,7 +95,8 @@ const styles = StyleSheet.create({
     alignItems: 'center', 
     justifyContent: 'space-between',
     paddingLeft: 30, 
-    paddingRight: 10
+    paddingRight: 10,
+    top: 48
   },
   customInputValue: {
     fontSize: 25, 
@@ -104,7 +104,7 @@ const styles = StyleSheet.create({
     color: '#AFAFAF'
   },
   selectButtonInline: {
-    backgroundColor: 'black', 
+    backgroundColor: '#F0893B', 
     borderRadius: 8, 
     paddingHorizontal: 32, 
     paddingVertical: 14
