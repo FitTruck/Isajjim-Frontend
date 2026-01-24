@@ -79,10 +79,23 @@ export const typeTranslations: { [key: string]: string } = {
   "DIGITAL_PIANO": "디지털피아노",
 };
 
+export const truckTypeTranslations: { [key: string]: string } = {
+  "TRUCK_1_TON": "1Ton",
+  "TRUCK_2_5_TON": "2.5Ton",
+  "TRUCK_5_TON": "5Ton",
+}
+
 export function translateLabel(label: string): string {
-    return furnitureTranslations[label] || '번역함수에 정의되지 않은 가구';
+  if(label) return furnitureTranslations[label] || '번역되지 않음';
+  else return '값이 없음';
 }
 
 export function translateType(type: string): string {
-    return typeTranslations[type] || '번역함수에 정의되지 않은 가구';
+  if(type) return typeTranslations[type] || '번역되지 않음';
+  else return '값이 없음';
+}
+
+export function translateTruckType(truckType: string): string {
+  if(truckType) return truckTypeTranslations[truckType] || '번역되지 않음';
+  else return '값이 없음';
 }

@@ -1,6 +1,7 @@
 // React Hooks 및 Animated 추가 import
 import React, { useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Animated, Image } from 'react-native';
+import { translateTruckType } from '../utils/Translator';
 
 interface EstimateCardProps {
   data: {
@@ -48,6 +49,8 @@ const EstimatedCard = ({ data, status }: EstimateCardProps) => {
     }
   }, [status]);
 
+  const translatedTruckType = translateTruckType(data.truckType);
+
   return (
     <View style={styles.container}>
       {/* '견적표' 타이틀 및 상태 */}
@@ -77,8 +80,8 @@ const EstimatedCard = ({ data, status }: EstimateCardProps) => {
       <View style={styles.infoSection}>
         <Text style={styles.sectionHeader}>용달 정보</Text>
         <View style={styles.row}>
-          <Text style={styles.itemLabel}>{data.truckType || '오류'}</Text>
-          <Text style={styles.itemValue}>{data.truckQuantity || '오류'}</Text>
+          <Text style={styles.truckType}>{translatedTruckType}</Text>
+          <Text style={styles.truckQuantity}>{data.truckQuantity || '값이 없음'}</Text>
         </View>
       </View>
 
@@ -171,14 +174,14 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     marginBottom: 5,
   },
-  itemLabel: {
+  truckType: {
     color: '#828282',
     fontSize: 14,
     fontFamily: 'Inter',
     fontWeight: '500',
     lineHeight: 20,
   },
-  itemValue: {
+  truckQuantity: {
     textAlign: 'right',
     color: '#828282',
     fontSize: 14,
