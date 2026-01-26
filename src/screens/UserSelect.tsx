@@ -2,11 +2,11 @@ import React, { useState } from 'react'; // 상태를 저장하게 해줌
 import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Alert, Platform, Modal, ActivityIndicator } from 'react-native';
 import { commonStyles } from '../styles/commonStyles';
 import { BACKEND_DOMAIN } from '../utils/Server';
-import FloorDetail from '../components/FloorDetail';
-import RoomSizeDetail from '../components/RoomSizeDetail';
-import LoadingModal from '../components/LoadingModal';
-import Header from '../components/Header';
-import DetailSelectBtn from '../components/DetailSelectBtn';
+import FloorDetail from '../components/UserSelect/FloorDetail';
+import RoomSizeDetail from '../components/UserSelect/RoomSizeDetail';
+import LoadingModal from '../components/UserSelect/LoadingModal';
+import Header from '../components/common/Header';
+import DetailSelectBtn from '../components/UserSelect/DetailSelectBtn';
 
 // app.tsx로부터 전달받을 함수의 자료형 정의
 interface UserSelectProps {

@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
-import { translateLabel, translateType } from '../utils/Translator';
+import { translateLabel, translateType } from '../../utils/Translator';
 
 
 
