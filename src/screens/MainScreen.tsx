@@ -6,7 +6,7 @@ import { storage, BACKEND_DOMAIN } from '../utils/Server';
 import { commonStyles } from '../styles/commonStyles';
 import { UploadedImage } from '../utils/Server';
 import { v4 as uuidv4 } from 'uuid';
-import Header from '../components/Header';
+import Header from '../components/common/Header';
 
 
 // app.tsx로부터 전달받을 함수의 자료형 정의

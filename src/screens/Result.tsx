@@ -2,9 +2,9 @@ import { useState, useEffect } from 'react';
 import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { commonStyles } from '../styles/commonStyles';
 import { UploadedImage, BACKEND_DOMAIN } from '../utils/Server';
-import ResultCard from '../components/ResultCard';
-import EstimatedCard from '../components/EstimatedCard';
-import Header from '../components/Header';
+import ResultCard from '../components/Result/ResultCard';
+import EstimatedCard from '../components/Result/EstimatedCard';
+import Header from '../components/common/Header';
 
 // app.tsx로부터 전달받을 함수의 자료형 정의
 interface ResultProps {

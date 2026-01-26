@@ -1,6 +1,6 @@
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image as RNImage } from "react-native";
 import { commonStyles } from "../styles/commonStyles";
-import Header from "../components/Header";
+import Header from "../components/common/Header";
 
 // app.tsx로부터 전달받을 함수의 자료형 정의
 interface CompareProps {
