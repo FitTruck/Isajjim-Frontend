@@ -1,7 +1,7 @@
 // React Hooks 및 Animated 추가 import
 import React, { useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Animated, Image } from 'react-native';
-import { translateTruckType } from '../utils/Translator';
+import { translateTruckType } from '../../utils/Translator';
 
 interface EstimateCardProps {
   data: {
@@ -69,7 +69,7 @@ const EstimatedCard = ({ data, status, onNavigateNext }: EstimateCardProps) => {
             opacity: doneOpacity 
           }, styles.doneStatusIconWrapper]}>
             <Image 
-              source={require('../../assets/Check.png')} 
+              source={require('../../../assets/Check.png')} 
               style={styles.checkIcon}
               resizeMode="contain"
             />

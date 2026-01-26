@@ -64,7 +64,7 @@ const ResultCard = ({ image, items, onQuantityChange }: ResultCardProps) => {
                   onQuantityChange(item.furnitureId, newQuantity);
                 }}
               >
-                <Image source={require('../../assets/Minus.png')} style={styles.minus} />
+                <Image source={require('../../../assets/Minus.png')} style={styles.minus} />
               </TouchableOpacity>
               <Text style={styles.resultCardNumber}>{item.quantity}</Text>
               <TouchableOpacity 
@@ -74,7 +74,7 @@ const ResultCard = ({ image, items, onQuantityChange }: ResultCardProps) => {
                   onQuantityChange(item.furnitureId, newQuantity);
                 }}
               >
-                <Image source={require('../../assets/Plus.png')} style={styles.plus} />
+                <Image source={require('../../../assets/Plus.png')} style={styles.plus} />
               </TouchableOpacity>
             </View>
           </View>
