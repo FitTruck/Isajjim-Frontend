@@ -107,10 +107,8 @@ export default function UserSelect({ estimatedId, onNavigateNext, onGoHome }: Us
 
           {/* 메인 섹션 */}
           <View style={commonStyles.mainSection}>
-            <View style={commonStyles.mainContent}>
               <Text style={commonStyles.mainTitle}>필수 기재 사항</Text>
               <Text style={commonStyles.mainSubtitle}>정확한 견적을 위해 필요한 사항입니다</Text>
-            </View>
           </View>
 
           {/* 구분선 */}
