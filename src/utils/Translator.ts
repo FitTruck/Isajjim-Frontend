@@ -87,12 +87,12 @@ export const truckTypeTranslations: { [key: string]: string } = {
 
 export function translateLabel(label: string): string {
   if(label) return furnitureTranslations[label] || '번역되지 않음';
-  else return '값이 없음';
+  else return '';
 }
 
 export function translateType(type: string): string {
   if(type) return typeTranslations[type] || '번역되지 않음';
-  else return '값이 없음';
+  else return '';
 }
 
 export function translateTruckType(truckType: string): string {
