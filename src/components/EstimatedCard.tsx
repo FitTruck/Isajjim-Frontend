@@ -9,9 +9,10 @@ interface EstimateCardProps {
     truckQuantity: number;
   }
   status: 'prev' | 'updating' | 'done';
+  onNavigateNext: () => void;
 }
 
-const EstimatedCard = ({ data, status }: EstimateCardProps) => {
+const EstimatedCard = ({ data, status, onNavigateNext }: EstimateCardProps) => {
   // useRef : Estimate 컴포넌트가 리렌더링 되어도 변수값 유지
   // useRef가 반환하는 값의 속성 중에 current가 있고 그 current값은 Animated.Value(0)의 값임
   // Animated.Value(x) -> 값을 자연스럽게 그라데이션으로 변경 
@@ -95,7 +96,7 @@ const EstimatedCard = ({ data, status }: EstimateCardProps) => {
       </View>
 
       {/* 비교하기 버튼 */}
-      <TouchableOpacity style={styles.compareButton}>
+      <TouchableOpacity style={styles.compareButton} onPress={onNavigateNext}>
         <Text style={styles.compareButtonText}>비교하기</Text>
       </TouchableOpacity>
     </View>

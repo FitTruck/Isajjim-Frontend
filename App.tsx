@@ -2,10 +2,11 @@ import { useState } from 'react';
 import Main from './src/screens/MainScreen';
 import UserSelect from './src/screens/UserSelect';
 import Result from './src/screens/Result'
+import Compare from './src/screens/Compare'
 import { UploadedImage } from './src/utils/Server';
 
 export default function App() {
-  const [currentScreen, setCurrentScreen] = useState<'main' | 'user-select' | 'result'>('main');// 현재 화면 상태를 관리
+  const [currentScreen, setCurrentScreen] = useState<'main' | 'user-select' | 'result' | 'compare'>('main');// 현재 화면 상태를 관리
   const [uploadedImages, setUploadedImages] = useState<UploadedImage[]>([]);// MainScreen에서 전달받은 이미지url과 width, height 정보
   const [estimateId, setEstimateId] = useState<number | null>(null); // MainScreen에서 백엔드에게 받은 견적서id
   const [ResultOfUserSelect, setResultOfUserSelect] = useState<any>(null); // UserSelect에서 받은 resultCard에 들어갈 값과 estimateCard에 들어갈 값 
@@ -27,6 +28,10 @@ export default function App() {
   const handleNavigateToResult = (data: any) => {
     setResultOfUserSelect(data);
     setCurrentScreen('result');
+  };
+
+  const handleNavigateToCompare = () => {
+    setCurrentScreen('compare');
   };
 
   // 전체 리셋
@@ -60,6 +65,12 @@ export default function App() {
           data={uploadedImages} 
           estimateId={estimateId}
           ResultOfUserSelect={ResultOfUserSelect}
+          onNavigateNext={handleNavigateToCompare}
+          onGoHome={handleReset}
+        />
+      )}
+      {currentScreen === 'compare' && (
+        <Compare
           onGoHome={handleReset}
         />
       )}
