@@ -229,7 +229,7 @@ export default function Main({ onNavigateNext, onGoHome }: MainProps) {
 const styles = StyleSheet.create({
   // --- 이미지 업로드 버튼 ---
   uploadButton: {
-    backgroundColor: '#F0893B',
+    backgroundColor: '#D97757', // New main color
     paddingHorizontal: 24,
     paddingVertical: 14,
     borderRadius: 8,
@@ -248,7 +248,7 @@ const styles = StyleSheet.create({
   
   statusText: {
     marginTop: 10,
-    color: '#666',
+    color: '#3D3D3A',
     textAlign: 'center',
   },
   imageGrid: {
@@ -279,7 +279,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 40,
     fontWeight: '600',
-    color: 'black',
+    color: '#3D3D3A',
     textAlign: 'center',
   },
   featuresSection: {
@@ -310,7 +310,7 @@ const styles = StyleSheet.create({
   cardTitle: {
     fontSize: 25,
     fontWeight: '600', //semibold
-    color: 'black',
+    color: '#3D3D3A',
     marginTop: 10,
     marginBottom: 25,
     textAlign: 'center',
@@ -318,7 +318,7 @@ const styles = StyleSheet.create({
   cardDesc: {
     fontSize: 25,
     fontWeight: '500', //medium
-    color: '#828282',
+    color: '#3D3D3A',
     textAlign: 'center',
     lineHeight: 30,
   },
@@ -327,7 +327,7 @@ const styles = StyleSheet.create({
   stepSection: {
     width: '100%',
     height: 548,
-    backgroundColor: '#F7F7F7',
+    backgroundColor: '#EAE7E4', // Slightly darker warm beige
     alignItems: 'center',
   },
   stepTitleContainer: {
@@ -337,7 +337,7 @@ const styles = StyleSheet.create({
   stepTitleText: {
     fontSize: 40,
     fontWeight: '600',
-    color: 'black',
+    color: '#3D3D3A',
     textAlign: 'center',
     marginTop: 47,
     lineHeight: 44,
