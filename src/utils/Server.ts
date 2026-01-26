@@ -21,4 +21,4 @@ const app = initializeApp(firebaseConfig); // 실행되면 firebaseStorage와 �
 export const storage = getStorage(app); // storage: getStorage함수를 통해 firebase와 연결된 저장소 자체가 되어버림.
 
 // --- 백엔드 도메인 설정 ---
-export const BACKEND_DOMAIN = "http://api.isajjim.kro.kr:8080";
+export const BACKEND_DOMAIN = "https://api.isajjim.kro.kr";
