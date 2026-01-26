@@ -123,41 +123,38 @@ export default function Main({ onNavigateNext, onGoHome }: MainProps) {
 
           {/* 메인 섹션 */}
           <View style={commonStyles.mainSection}>
-            <View style={commonStyles.mainContent}>
-              <Text style={commonStyles.mainTitle}>사진을 찍어서 이사 견적내기</Text>
-              <Text style={commonStyles.mainSubtitle}>간단한 견적내기 시작</Text>
+            <Text style={commonStyles.mainTitle}>사진을 찍어서 이사 견적내기</Text>
+            <Text style={commonStyles.mainSubtitle}>간단한 견적내기 시작</Text>
 
-              <TouchableOpacity 
-                style={styles.uploadButton} 
-                onPress={handleWebUpload}
-              >
-                <Text style={styles.uploadButtonText}>파일 선택하기</Text>
-              </TouchableOpacity>
+            <TouchableOpacity 
+              style={styles.uploadButton} 
+              onPress={handleWebUpload}
+            >
+              <Text style={styles.uploadButtonText}>파일 선택하기</Text>
+            </TouchableOpacity>
 
-              <Text style={styles.statusText}>{statusMessage}</Text>
+            <Text style={styles.statusText}>{statusMessage}</Text>
 
-              <View style={styles.imageGrid}>
-                {/* 이미지가 다시 업로드 되면 imageList도 업데이트 되니까 선택한 이미지가 모두 드러나게 되어있음 */}
-                {imageList.map((item) => (
-                  <View style={styles.imageCard}>
-                    <Image source={{ uri: item.localUri }} style={styles.thumbnail} />
-                  </View>
-                ))}
-              </View>
-
-              {imageList.length > 0 && ( //&& 이후를 return문이라 생각하면 됨
-                <TouchableOpacity 
-                  style={[styles.uploadButton, isProcessing && styles.disabledButton]} 
-                  onPress={handleNextStep}
-                  disabled={isProcessing} // 버튼 활성화를 처리 상태로 정함
-                >
-                  <Text style={styles.uploadButtonText}>
-                    {isProcessing ? '처리 중...' : '다음단계'}
-                  </Text>
-                </TouchableOpacity>
-              )}
-
+            <View style={styles.imageGrid}>
+              {/* 이미지가 다시 업로드 되면 imageList도 업데이트 되니까 선택한 이미지가 모두 드러나게 되어있음 */}
+              {imageList.map((item) => (
+                <View style={styles.imageCard}>
+                  <Image source={{ uri: item.localUri }} style={styles.thumbnail} />
+                </View>
+              ))}
             </View>
+
+            {imageList.length > 0 && ( //&& 이후를 return문이라 생각하면 됨
+              <TouchableOpacity 
+                style={[styles.uploadButton, isProcessing && styles.disabledButton]} 
+                onPress={handleNextStep}
+                disabled={isProcessing} // 버튼 활성화를 처리 상태로 정함
+              >
+                <Text style={styles.uploadButtonText}>
+                  {isProcessing ? '처리 중...' : '다음단계'}
+                </Text>
+              </TouchableOpacity>
+            )}
           </View>
 
           {/* 왜 이삿짐인가요? 섹션 */}

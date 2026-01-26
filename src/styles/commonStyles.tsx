@@ -22,12 +22,9 @@ export const commonStyles = StyleSheet.create({
   // --- Main Section Styles ---
   mainSection: {
     marginTop: 220,
-    width: '100%',
-    alignItems: 'center',
-  },
-  mainContent: {
     width: 837,
     alignItems: 'center',
+    alignSelf: 'center',
     gap: 23,
   },
   mainTitle: {
