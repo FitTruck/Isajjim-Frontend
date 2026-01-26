@@ -32,7 +32,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     zIndex: 100, 
-    backgroundColor: 'rgba(245, 242, 238, 0.95)', 
+    backgroundColor: 'rgb(250, 249, 245)', 
     paddingHorizontal: '5%',
     flexDirection: 'row', 
     alignItems: 'center',
