@@ -134,9 +134,6 @@ export default function UserSelect({ estimatedId, onNavigateNext, onGoHome }: Us
               <Text style={commonStyles.mainSubtitle}>정확한 견적을 위해 필요한 사항입니다</Text>
           </View>
 
-          {/* 구분선 */}
-          <View style={styles.divider} />
-
           {/* 선택 섹션 컨테이너 */}
           <View style={styles.selectSectionContainer}>
             
@@ -520,15 +517,6 @@ export default function UserSelect({ estimatedId, onNavigateNext, onGoHome }: Us
 }
 
 const styles = StyleSheet.create({
-  divider: {
-    position: 'absolute', 
-    left: 0, 
-    right: 0, 
-    top: 453, 
-    height: 26, 
-    backgroundColor: '#F7F7F7'
-  },
-
   selectSectionContainer: {
     marginTop: 150,
     width: '100%', 
@@ -546,7 +534,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 25, 
     fontWeight: '700', 
-    color: 'black', 
+    color: '#3D3D3A', 
     marginBottom: 10
   },
 
@@ -569,10 +557,10 @@ const styles = StyleSheet.create({
   customInputValue: {
     fontSize: 25, 
     fontWeight: '500', 
-    color: '#AFAFAF'
+    color: '#3D3D3A'
   },
   selectButtonInline: {
-    backgroundColor: '#F0893B', 
+    backgroundColor: '#D97757', 
     borderRadius: 8, 
     paddingHorizontal: 32, 
     paddingVertical: 14

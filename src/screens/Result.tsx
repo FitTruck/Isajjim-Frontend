@@ -135,9 +135,6 @@ export default function Result({ data, estimateId, ResultOfUserSelect, onNavigat
               <Text style={commonStyles.mainSubtitle}>이미지 분석 결과</Text>
           </View>
 
-          {/* 구분선 */}
-          <View style={styles.divider}/>
-
           {/* 결과 및 견적표 카드 컨테이너 */}
           <View style={styles.resultEstimateCardContainer}>
             {/* 결과 섹션 컨테이너 */}
@@ -206,14 +203,6 @@ export default function Result({ data, estimateId, ResultOfUserSelect, onNavigat
 }
 
 const styles = StyleSheet.create({
-  divider: {
-    position: 'absolute', 
-    left: 0, 
-    right: 0, 
-    top: 453, 
-    height: 26, 
-    backgroundColor: '#F7F7F7'
-  },
   resultEstimateCardContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
