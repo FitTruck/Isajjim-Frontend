@@ -65,32 +65,55 @@ export default function UserSelect({ estimatedId, onNavigateNext, onGoHome }: Us
       return;
     }
 
-    // 로딩 모달 띄우기
+    // 로딩 모달
     setIsSubmitting(true);
 
     try {
       const BACKEND_URL = `${BACKEND_DOMAIN}/api/v1/estimates/${estimatedId}`;
-      const payload = mapToBackendValue(); // payload : 사용자가 선택한 값들을 객체로 변환
+      const payload = mapToBackendValue();
 
-      // 백앤드로 보내기 및 받는 값
+      // PATCH 요청 보내기
       const response = await fetch(BACKEND_URL, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
 
-      const ResultOfUserSelect = await response.json();
-
-      if (response.ok && ResultOfUserSelect.code === "OK") {
-        onNavigateNext(ResultOfUserSelect);
-      } else {
-        Alert.alert("실패", "업로드 실패1: " + (ResultOfUserSelect.message || "알 수 없는 오류"));
+      if (!response.ok) {
+        throw new Error("초기 수정 요청 실패");
       }
+
+      // SSE 연결
+      const SSE_URL = `${BACKEND_DOMAIN}/api/v1/estimates/${estimatedId}/sse`;
+      const eventSource = new EventSource(SSE_URL);
+
+      eventSource.addEventListener("sse", async (event) => {
+        console.log("받은 SSE 데이터:", event.data); // "COMPLETED" 확인용
+        // 서버에서 완료 신호를 보내주는 경우에 다음 화면으로
+        if (event.data === "COMPLETED") {
+          const response = await fetch(BACKEND_URL, {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' },
+          });
+
+          const ResultOfUserSelect = await response.json();
+
+          onNavigateNext(ResultOfUserSelect);
+          eventSource.close(); // 연결 종료
+          setIsSubmitting(false);
+        }
+      });
+
+      eventSource.onerror = (error) => {
+        console.error("SSE Error:", error);
+        eventSource.close();
+        Alert.alert("오류", "실시간 연결 중 문제가 발생했습니다.");
+        setIsSubmitting(false);
+      };
     } catch (error) {
-      console.error("Save Error:", error);
-      Alert.alert("오류", "업로드 실패2");
-    } finally {
-      setIsSubmitting(false); // 백엔드에서 값을 받아왔다면 로딩 모달 끄기 
+      console.error("Process Error:", error);
+      Alert.alert("오류", "업로드 중 문제가 발생했습니다.");
+      setIsSubmitting(false);
     }
   };
   
