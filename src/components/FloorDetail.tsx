@@ -25,7 +25,7 @@ export default function FloorDetail({ value, onSelect }: FloorDetailProps) {
   return (
     <>
       <View style={styles.customInputBox}>
-        <Text style={[styles.customInputValue, value ? { color: 'black' } : {}]}>
+        <Text style={[styles.customInputValue, value ? { color: '#3D3D3A' } : {}]}>
           {selectedFloorLabel}
         </Text> 
         <TouchableOpacity 
@@ -101,10 +101,10 @@ const styles = StyleSheet.create({
   customInputValue: {
     fontSize: 25, 
     fontWeight: '500', 
-    color: '#AFAFAF'
+    color: '#3D3D3A'
   },
   selectButtonInline: {
-    backgroundColor: '#F0893B', 
+    backgroundColor: '#D97757', 
     borderRadius: 8, 
     paddingHorizontal: 32, 
     paddingVertical: 14
@@ -134,7 +134,7 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontWeight: 'bold',
     marginBottom: 15,
-    color: 'black'
+    color: '#3D3D3A'
   },
   modalItem: {
     paddingVertical: 15,
@@ -149,10 +149,10 @@ const styles = StyleSheet.create({
   },
   modalItemText: {
     fontSize: 18,
-    color: '#333'
+    color: '#3D3D3A'
   },
   modalItemTextSelected: {
-    color: 'black',
+    color: '#3D3D3A',
     fontWeight: 'bold'
   },
   modalCloseButton: {

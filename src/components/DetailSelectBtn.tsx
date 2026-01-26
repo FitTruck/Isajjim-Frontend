@@ -44,7 +44,7 @@ const styles = StyleSheet.create({
     alignItems: 'center'
   },
   cardSelected: {
-    backgroundColor: '#F0893B'
+    backgroundColor: '#D97757'
   },
   cardUnselected: {
     backgroundColor: 'white'
@@ -57,7 +57,7 @@ const styles = StyleSheet.create({
     color: 'white' 
   },
   textUnselected: { 
-    color: 'black' 
+    color: '#3D3D3A' 
   },
 });
 

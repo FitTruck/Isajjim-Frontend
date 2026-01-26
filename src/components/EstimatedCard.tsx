@@ -126,7 +126,7 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
   },
   title: {
-    color: 'black',
+    color: '#3D3D3A',
     fontSize: 24,
     fontFamily: 'Inter',
     fontWeight: '600',
@@ -141,7 +141,7 @@ const styles = StyleSheet.create({
   updatingStatusText: {
     position: 'absolute',
     fontSize: 12,
-    color: 'gray',
+    color: '#3D3D3A',
     width: 100, 
     right: 0,
     textAlign: 'right',
@@ -163,7 +163,7 @@ const styles = StyleSheet.create({
   sectionHeader: {
     width: '100%',
     marginBottom: 10,
-    color: 'black',
+    color: '#3D3D3A',
     fontSize: 18,
     fontFamily: 'Inter',
     fontWeight: '500',
@@ -176,7 +176,7 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
   truckType: {
-    color: '#828282',
+    color: '#3D3D3A',
     fontSize: 14,
     fontFamily: 'Inter',
     fontWeight: '500',
@@ -184,7 +184,7 @@ const styles = StyleSheet.create({
   },
   truckQuantity: {
     textAlign: 'right',
-    color: '#828282',
+    color: '#3D3D3A',
     fontSize: 14,
     fontFamily: 'Inter',
     fontWeight: '500',
@@ -201,7 +201,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   compareTitle: {
-    color: 'black',
+    color: '#3D3D3A',
     fontSize: 20,
     fontFamily: 'Inter',
     fontWeight: '600',
@@ -220,7 +220,7 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 40,
     marginTop: 20,
-    backgroundColor: '#F0893B',
+    backgroundColor: '#D97757',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.05,

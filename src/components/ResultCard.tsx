@@ -136,13 +136,13 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontFamily : 'inter',
     fontWeight: 600,
-    color: '#000',
+    color: '#3D3D3A',
   },
   itemSubtitle: {
     fontSize: 15,
     fontFamily : 'inter',
     fontWeight: 500,
-    color: '#828282',
+    color: '#62625D',
   },
   itemCountContainer: {
     width: 200,
@@ -188,7 +188,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 28,
     fontWeight: '500',
-    color: 'black',
+    color: '#3D3D3A',
     textAlign: 'center',
   },
 });

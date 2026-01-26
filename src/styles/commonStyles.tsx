@@ -5,7 +5,7 @@ export const commonStyles = StyleSheet.create({
   container: {
     width: '100%',
     flex: 1,
-    backgroundColor: 'white',
+    backgroundColor: 'rgb(250, 249, 245)',
     position: 'relative',
   },
   scrollContent: {
@@ -15,7 +15,7 @@ export const commonStyles = StyleSheet.create({
   mainWrapper: {
     width: '100%',
     position: 'relative',
-    backgroundColor: 'white',
+    backgroundColor: 'transparent',
   },
 
 
@@ -30,12 +30,12 @@ export const commonStyles = StyleSheet.create({
   mainTitle: {
     fontSize: 64,
     fontWeight: '700',
-    color: 'black',
+    color: '#3D3D3A',
     textAlign: 'center',
   },
   mainSubtitle: {
     fontSize: 24,
-    color: '#828282',
+    color: '#62625D',
     textAlign: 'center',
     lineHeight: 36,
   },
@@ -46,7 +46,7 @@ export const commonStyles = StyleSheet.create({
     bottom: 0,
     width: '100%',
     height: 264,
-    backgroundColor: 'white',
+    backgroundColor: 'transparent',
     paddingHorizontal: 80,
   },
   footerLine: {
@@ -59,7 +59,7 @@ export const commonStyles = StyleSheet.create({
   },
   footerLogo: {
     fontSize: 24,
-    color: 'black',
+    color: '#3D3D3A',
     marginTop: 52,
   },
   footerLinksRow: {
@@ -77,12 +77,12 @@ export const commonStyles = StyleSheet.create({
   footerTopic: {
     fontSize: 16,
     fontWeight: '500',
-    color: 'black',
+    color: '#3D3D3A',
   },
   footerPage: {
     fontSize: 16,
     fontWeight: '500',
-    color: '#454545',
+    color: '#3D3D3A',
   },
   socialIcons: {
     position: 'absolute',

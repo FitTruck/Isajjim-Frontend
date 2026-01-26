@@ -13,10 +13,10 @@ export default function Header({ onGoHome }: HeaderProps) {
       </TouchableOpacity>
       <View style={styles.headerRight}>
         <TouchableOpacity>
-          <Text style={styles.mypageText}>Mypage</Text>
+          <Text style={styles.mypageText}>마이페이지</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.loginButton}>
-          <Text style={styles.loginButtonText}>Login</Text>
+          <Text style={styles.loginButtonText}>로그인</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -32,33 +32,34 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     zIndex: 100, 
-    backgroundColor: 'rgba(255, 255, 255, 0.95)', 
+    backgroundColor: 'rgba(245, 242, 238, 0.95)', 
     paddingHorizontal: '5%',
     flexDirection: 'row', 
     alignItems: 'center',
     justifyContent: 'space-between',
     borderBottomWidth: 1,
-    borderBottomColor: '#F1F3F4', 
+    borderBottomColor: 'rgba(221, 215, 208, 1)', 
   },
   logoText: {
     fontSize: 26, 
     fontWeight: '700', 
-    color: '#202124', 
+    color: '#3D3D3A', 
     fontFamily: 'sans-serif', 
     letterSpacing: -0.5,
   },
   headerRight: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
     gap: 24,
   },
   mypageText: { 
     fontSize: 15,
     fontWeight: '500',
-    color: '#5F6368', 
+    color: '#3D3D3A', 
   },
   loginButton: {
-    backgroundColor: '#F0893B', 
+    backgroundColor: '#D97757', 
     paddingHorizontal: 20,
     paddingVertical: 10,
     borderRadius: 4, 
