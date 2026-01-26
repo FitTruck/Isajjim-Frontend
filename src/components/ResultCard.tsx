@@ -2,6 +2,8 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { translateLabel, translateType } from '../utils/Translator';
 
+
+
 interface ResultCardProps {
   image: {
     localUri: string;
@@ -46,6 +48,7 @@ const ResultCard = ({ image, items, onQuantityChange }: ResultCardProps) => {
         />
       </View>
 
+      {/* 이미지 밑의 내용 */}
       <View style={styles.resultCardContent}>
         {translatedItems.map((item) => ( // 번역된 가구명을 사용해서 한다.
           <View key={item.furnitureId} style={styles.itemContainer}>
