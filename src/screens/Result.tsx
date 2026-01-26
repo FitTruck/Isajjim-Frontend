@@ -11,12 +11,12 @@ interface ResultProps {
   data: UploadedImage[];
   estimateId: number | null;
   ResultOfUserSelect: any;
+  onNavigateNext: () => void;
   onGoHome: () => void;
 }
-// data : main에서 전달받은 이미지 url과 width, height 정보
-// estimateId : main에서 백엔드에게 받은 견적서id
+
 // ResultOfUserSelect : userselect에서 받은 resultCard에 들어갈 값과 estimateCard에 들어갈 값  
-export default function Result({ data, estimateId, ResultOfUserSelect, onGoHome }: ResultProps) {
+export default function Result({ data, estimateId, ResultOfUserSelect, onNavigateNext, onGoHome }: ResultProps) {
   // results: ResultCard컴포넌트의 속성으로 전달할 값임
   const [results, setResults] = useState<any[]>([]); 
   
@@ -116,6 +116,9 @@ export default function Result({ data, estimateId, ResultOfUserSelect, onGoHome 
     }
   };
 
+  const handleNextStep = () => {
+    onNavigateNext();
+  }
 
   return (
     <View style={commonStyles.container}>
@@ -128,15 +131,14 @@ export default function Result({ data, estimateId, ResultOfUserSelect, onGoHome 
 
           {/* 메인 섹션 */}
           <View style={commonStyles.mainSection}>
-            <View style={commonStyles.mainContent}>
               <Text style={commonStyles.mainTitle}>AI 결과 확인하기</Text>
               <Text style={commonStyles.mainSubtitle}>이미지 분석 결과</Text>
-            </View>
           </View>
 
           {/* 구분선 */}
           <View style={styles.divider}/>
 
+          {/* 결과 및 견적표 카드 컨테이너 */}
           <View style={styles.resultEstimateCardContainer}>
             {/* 결과 섹션 컨테이너 */}
             <View style={styles.resultSectionContainer}>
@@ -152,13 +154,15 @@ export default function Result({ data, estimateId, ResultOfUserSelect, onGoHome 
 
             </View>
 
-            {/* 견적표 카드 추가 */}
+            {/* 견적표 컨테이너 */}
             <View style={styles.estimateCardContainer}>
               <EstimatedCard 
                 data={estimateData} 
                 status={updateStatus} 
+                onNavigateNext={handleNextStep}
               />
             </View>
+            
           </View>
           
 
@@ -230,10 +234,10 @@ const styles = StyleSheet.create({
   },
 
   estimateCardContainer: {
-    marginTop: 150, // resultSectionContainer margin과 맞춤
+    marginTop: 150,
     width: '25%',
     position: 'sticky' as any,
-    top: 150, // 상단에서 어느 정도 떨어져서 고정될지 설정
+    top: 150, // 고정 위치 설정
     zIndex: 10,
     height: 'auto',
     marginBottom: 200, 
