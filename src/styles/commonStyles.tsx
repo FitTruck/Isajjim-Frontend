@@ -21,7 +21,7 @@ export const commonStyles = StyleSheet.create({
 
   // --- Main Section Styles ---
   mainSection: {
-    marginTop: 220,
+    marginTop: 140,
     width: 837,
     alignItems: 'center',
     alignSelf: 'center',
