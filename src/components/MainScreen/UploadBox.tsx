@@ -9,45 +9,34 @@ interface UploadBoxProps {
 }
 
 const UploadContent = ({ isDragging }: { isDragging: boolean }) => {
-  let textContent;
-  if (isDragging) {
-    textContent = (
-      <>
-        
-      </>
-    );
-  } else {
-    textContent = (
-      <>
+  return (
+    <View style={styles.contentWrapper}>
+      {/* 드래그 아닐 때 */}
+      <View style={[styles.contentLayer, { opacity: isDragging ? 0 : 1 }]}>
+        <View style={styles.iconContainer}>
+          <Icon name="upload" size={48} color="#F0893B" />
+        </View>
         <Text style={styles.uploadTitle}>클릭 또는 드롭하여 이미지 업로드</Text>
         <Text style={styles.uploadSubTitle}>JPG, PNG, HEIC 형식 지원</Text>
-      </>
-    );
-  }
-
-  let icon;
-  if (isDragging) {
-    icon = <Image source={require('../../../assets/drop.png')} style={styles.dropIcon} />;
-  } else {
-    icon = <Icon name="upload" size={48} color="#F0893B" />;
-  }
-  return (
-    <>
-      <View style={styles.iconContainer}>
-        {icon}
       </View>
-      {textContent}
-    </>
+
+      {/* 드래그 했을 때 */}
+      <View style={[styles.contentLayer, { opacity: isDragging ? 1 : 0 }]}>
+        <View style={styles.iconContainer}>
+          <Image source={require('../../../assets/drop.png')} style={styles.dropIcon} />
+        </View>
+      </View>
+    </View>
   );
 };
 
 export default function UploadBox({ onFilesSelected }: UploadBoxProps) {
   const [isHovered, setIsHovered] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
-  const dragCounter = useRef(0);
+  const dragCounter = useRef(0); // useState와 다르게 값이 바뀌어도 컴포넌트를 다시 그리지 않음.
   const uploadBoxRef = useRef<any>(null);
 
-  // 이미지가 추가될 때마다 실행되니까 추가될 때마다 이미지 정보 main에 있는 imageList로 보냄
+  // 클릭시 : 이미지가 추가될 때마다 실행되니까 추가될 때마다 이미지 정보 main에 있는 imageList로 보냄
   const handleWebUpload = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -56,6 +45,7 @@ export default function UploadBox({ onFilesSelected }: UploadBoxProps) {
     });
 
     if (!result.canceled) {
+      // 비동기 작업이 없으므로 Promise.all이 없어도 됨.
       const newImages = result.assets.map(asset => ({
         localUri: asset.uri,
         width: asset.width,
@@ -66,14 +56,15 @@ export default function UploadBox({ onFilesSelected }: UploadBoxProps) {
     }
   };
 
-  // --- Drag & Drop Effect (Web) ---
+  // 드래그 앤 드롭(웹 브라우저의 고유 기능. 앱으로는 불가능. -> 웹 고유 기능을 가져와야 함)
   useEffect(() => {
+    // uploadBoxRef에는 current가 있는데, 거기에 tagName, style, innerText같은 것들이 있음.
     if (Platform.OS === 'web' && uploadBoxRef.current) {
-      const element = uploadBoxRef.current as unknown as HTMLElement;
+      const element = uploadBoxRef.current as unknown as HTMLElement; //element를 HTMLElement로 쓰겠다는 말
 
       const handleDragEnter = (e: DragEvent) => {
-        e.preventDefault();
-        e.stopPropagation();
+        e.preventDefault(); // 기본 동작 막음
+        e.stopPropagation(); // 이벤트 버블링 막음
         dragCounter.current += 1;
         if (e.dataTransfer && e.dataTransfer.items && e.dataTransfer.items.length > 0) {
           setIsDragging(true);
@@ -81,8 +72,8 @@ export default function UploadBox({ onFilesSelected }: UploadBoxProps) {
       };
 
       const handleDragLeave = (e: DragEvent) => {
-        e.preventDefault();
-        e.stopPropagation();
+        e.preventDefault(); // 기본 동작 막음
+        e.stopPropagation(); // 이벤트 버블링 막음
         dragCounter.current -= 1;
         if (dragCounter.current === 0) {
           setIsDragging(false);
@@ -90,46 +81,49 @@ export default function UploadBox({ onFilesSelected }: UploadBoxProps) {
       };
 
       const handleDragOver = (e: DragEvent) => {
-        e.preventDefault();
-        e.stopPropagation();
-        // Necessary to allow dropping
+        e.preventDefault(); // 원래는 브라우저 기본값으로 드롭할 수 없지만, 브라우저 기본 동작 막기로 드롭 가능해진다.  
+        e.stopPropagation(); // 이벤트 버블링 막기
       };
 
+      // 드롭했을 때
       const handleDrop = async (e: DragEvent) => {
-        e.preventDefault();
-        e.stopPropagation();
+        e.preventDefault(); // 기본 동작 막음
+        e.stopPropagation(); // 이벤트 버블링 막음
+
+        // 드래그 상태 해제(드롭 했으니까)
         setIsDragging(false);
         dragCounter.current = 0;
 
-        if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-          const files = Array.from(e.dataTransfer.files);
-          const imageFiles = files.filter(file => file.type.startsWith('image/'));
+        // e.dataTransfer.files가 드래그 받은 이미지 파일 목록이래
+        if (e.dataTransfer && e.dataTransfer.files.length > 0) {
+          const files = Array.from(e.dataTransfer.files); // 파일 목록을 배열로 변환
 
+          const imageFiles = files.filter(file => file.type.startsWith('image/')); // 이미지 파일만 필터링(텍스트 파일 등 제외)
+          // 드롭 한 것들 중에 이미지가 없으면 아무 것도 없이 리턴
           if (imageFiles.length === 0) return;
+          // > imageFiles에는 이미지 파일에 대한 배열인거임.
 
-          try {
-            const newImages = await Promise.all(
-              imageFiles.map(async (file) => {
-                return new Promise<UploadedImage>((resolve) => {
-                  const img = new window.Image();
-                  const objectUrl = URL.createObjectURL(file);
-                  
-                  img.onload = () => {
-                    resolve({
-                      localUri: objectUrl,
-                      width: img.width,
-                      height: img.height,
-                    });
-                  };
-                  img.src = objectUrl;
+          // window.Image()는 비동기 작업이므로 promise.all로 병렬처리
+          const newImages = await Promise.all(imageFiles.map(async (file) => {
+            return new Promise<UploadedImage>((resolve) => { // resolve: 작업이 끝나면 resolve를 통해 알려줌
+              const img = new window.Image(); // 가상의 이미지 태그
+              const objectUrl = URL.createObjectURL(file);
+              
+              img.onload = () => {
+                resolve({
+                  localUri: objectUrl,
+                  width: img.width,
+                  height: img.height,
                 });
-              })
-            );
-            
-            onFilesSelected(newImages);
-          } catch (error) {
-            console.error("Error processing dropped images:", error);
-          }
+              };
+              img.src = objectUrl;
+            });
+          }));
+
+          // > 이 과정을 통해 newImages는 localUri, width, height가 담긴 배열이 됨.
+
+          // 이 함수를 통해 main으로 이미지 배열 쏴줌
+          onFilesSelected(newImages);
         }
       };
 
@@ -147,7 +141,7 @@ export default function UploadBox({ onFilesSelected }: UploadBoxProps) {
     }
   }, [onFilesSelected]);
 
-  // Web인 경우 View 사용 (이벤트 핸들링 호환성 위함)
+  // 웹인 경우 View를 사용하여 드래그 앤 드롭 기능을 구현
   return (
     <View
       ref={uploadBoxRef}
@@ -182,7 +176,7 @@ const styles = StyleSheet.create({
     ...Platform.select({
       web: {
         cursor: 'pointer',
-        transition: 'all 0.17s', 
+        transition: 'all 0.17s ease-in-out', 
       },
     }) as any,
   },
@@ -227,5 +221,21 @@ const styles = StyleSheet.create({
     fontWeight: '400',
     color: '#9CA3AF',
     textAlign: 'center',
+  },
+  contentWrapper: {
+    width: '100%',
+    height: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+    position: 'relative',
+  },
+  contentLayer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
