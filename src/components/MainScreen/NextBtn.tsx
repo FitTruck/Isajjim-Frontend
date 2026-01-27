@@ -3,6 +3,7 @@ import { StyleSheet, TouchableOpacity, Text, Alert, Platform } from 'react-nativ
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { v4 as uuidv4 } from 'uuid';
 import { UploadedImage, storage, BACKEND_DOMAIN } from '../../utils/Server';
+import AlertBox from '../common/AlertBox';
 
 interface NextBtnProps {
   imageList: UploadedImage[];
@@ -11,17 +12,15 @@ interface NextBtnProps {
 
 export default function NextBtn({ imageList, onNavigateNext }: NextBtnProps) {
   const [isLoading, setIsLoading] = useState(false);
+  const [isAlertVisible, setIsAlertVisible] = useState(false);
 
   const handleNextStep = async () => {
     // '다음단계' 중복 클릭 방지 : 이미 눌렀다면 isLoading = true이므로 리턴.
     if (isLoading) return;
 
     if (imageList.length === 0) {
-      if (Platform.OS === 'web') {
-        window.alert('이미지를 최소 1장 이상 업로드해주세요.');
-      } else {
-        Alert.alert('알림', '이미지를 최소 1장 이상 업로드해주세요.');
-      }
+      setIsAlertVisible(true);
+      setTimeout(() => setIsAlertVisible(false), 2000); // 2초 뒤 자동으로 사라지게
       return;
     }
 
@@ -85,6 +84,9 @@ export default function NextBtn({ imageList, onNavigateNext }: NextBtnProps) {
       <Text style={styles.nextBtnText}>
         {isLoading ? '처리중...' : '다음단계'}
       </Text>
+      {isAlertVisible && (
+        <AlertBox value="이미지를 최소 1장 이상 업로드해주세요." />
+      )}
     </TouchableOpacity>
   );
 }
