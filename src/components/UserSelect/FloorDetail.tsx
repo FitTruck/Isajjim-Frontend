@@ -104,7 +104,7 @@ const styles = StyleSheet.create({
     color: '#3D3D3A'
   },
   selectButtonInline: {
-    backgroundColor: '#D97757', 
+    backgroundColor: '#F0893B', 
     borderRadius: 8, 
     paddingHorizontal: 32, 
     paddingVertical: 14

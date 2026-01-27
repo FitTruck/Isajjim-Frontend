@@ -220,7 +220,7 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 40,
     marginTop: 20,
-    backgroundColor: '#D97757',
+    backgroundColor: '#F0893B',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.05,
