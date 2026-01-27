@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { StyleSheet, View, Text, Pressable, Platform } from 'react-native';
+import { StyleSheet, View, Text, Platform, Image } from 'react-native';
 import Icon from '@expo/vector-icons/Feather';
 import * as ImagePicker from 'expo-image-picker';
 import { UploadedImage } from '../../utils/Server';
@@ -7,6 +7,39 @@ import { UploadedImage } from '../../utils/Server';
 interface UploadBoxProps {
   onFilesSelected: (newImages: UploadedImage[]) => void;
 }
+
+const UploadContent = ({ isDragging }: { isDragging: boolean }) => {
+  let textContent;
+  if (isDragging) {
+    textContent = (
+      <>
+        
+      </>
+    );
+  } else {
+    textContent = (
+      <>
+        <Text style={styles.uploadTitle}>클릭 또는 드롭하여 이미지 업로드</Text>
+        <Text style={styles.uploadSubTitle}>JPG, PNG, HEIC 형식 지원</Text>
+      </>
+    );
+  }
+
+  let icon;
+  if (isDragging) {
+    icon = <Image source={require('../../../assets/drop.png')} style={styles.dropIcon} />;
+  } else {
+    icon = <Icon name="upload" size={48} color="#F0893B" />;
+  }
+  return (
+    <>
+      <View style={styles.iconContainer}>
+        {icon}
+      </View>
+      {textContent}
+    </>
+  );
+};
 
 export default function UploadBox({ onFilesSelected }: UploadBoxProps) {
   const [isHovered, setIsHovered] = useState(false);
@@ -115,50 +148,21 @@ export default function UploadBox({ onFilesSelected }: UploadBoxProps) {
   }, [onFilesSelected]);
 
   // Web인 경우 View 사용 (이벤트 핸들링 호환성 위함)
-  if (Platform.OS === 'web') {
-    return (
-      <View
-        ref={uploadBoxRef}
-        style={[
-          styles.uploadContainer,
-          isHovered && styles.uploadContainerHover,
-          isDragging && styles.uploadContainerDragging
-        ]}
-        // @ts-ignore - React Native Web supports these
-        onClick={handleWebUpload}
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
-      >
-        <View style={styles.iconContainer}>
-          <Icon name="upload" size={48} color="#F0893B"/>
-        </View>
-        <Text style={styles.uploadTitle}>클릭 또는 드롭하여 이미지 업로드</Text>
-        <Text style={styles.uploadSubTitle}>
-          JPG, PNG, HEIC 형식 지원
-        </Text>
-      </View>
-    );
-  }
-
-  // Native인 경우 Pressable 사용
   return (
-    <Pressable
+    <View
+      ref={uploadBoxRef}
       style={[
         styles.uploadContainer,
-        isHovered && styles.uploadContainerHover
+        isHovered && styles.uploadContainerHover,
+        isDragging && styles.uploadContainerDragging
       ]}
-      onPress={handleWebUpload}
-      onHoverIn={() => setIsHovered(true)}
-      onHoverOut={() => setIsHovered(false)}
+      // @ts-ignore - React Native Web supports these
+      onClick={handleWebUpload}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
     >
-      <View style={styles.iconContainer}>
-        <Icon name="upload" size={48} color="#F0893B"/>
-      </View>
-      <Text style={styles.uploadTitle}>클릭 또는 드롭하여 이미지 업로드</Text>
-      <Text style={styles.uploadSubTitle}>
-        JPG, PNG, HEIC 형식 지원
-      </Text>
-    </Pressable>
+      <UploadContent isDragging={isDragging}/>
+    </View>
   );
 }
 
@@ -194,6 +198,15 @@ const styles = StyleSheet.create({
     borderColor: '#F0893B',
     backgroundColor: 'rgb(250, 249, 245)',
     borderStyle: 'solid',
+    ...Platform.select({
+      web: {
+        boxShadow: '0px 0px 7px rgba(0, 0, 0, 0.17)',
+      },
+    }) as any,
+  },
+  dropIcon :{
+    width: 100,
+    height: 100,
   },
   iconContainer: {
     width: 100,
