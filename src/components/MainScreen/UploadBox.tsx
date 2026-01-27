@@ -47,6 +47,8 @@ export default function UploadBox({ onFilesSelected }: UploadBoxProps) {
     if (!result.canceled) {
       // 비동기 작업이 없으므로 Promise.all이 없어도 됨.
       const newImages = result.assets.map(asset => ({
+        fileName: asset.fileName,
+        mimeType: asset.mimeType,
         localUri: asset.uri,
         width: asset.width,
         height: asset.height,
@@ -111,6 +113,8 @@ export default function UploadBox({ onFilesSelected }: UploadBoxProps) {
               
               img.onload = () => {
                 resolve({
+                  fileName: file.name,
+                  mimeType: file.type,
                   localUri: objectUrl,
                   width: img.width,
                   height: img.height,
