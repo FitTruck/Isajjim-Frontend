@@ -50,7 +50,7 @@ const ResultCard = ({ image, items, onQuantityChange }: ResultCardProps) => {
 
       {/* 이미지 밑의 내용 */}
       <View style={styles.resultCardContent}>
-        {translatedItems.map((item) => ( // 번역된 가구명을 사용해서 한다.
+        {translatedItems.map((item) => ( // 번역된 가구명 사용
           <View key={item.furnitureId} style={styles.itemContainer}>
             <View style={styles.itemDetailContainer}>
               <Text style={styles.itemTitle}>{item.label}</Text>

@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
-import { StyleSheet, TouchableOpacity, Text, Alert, Platform } from 'react-native';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { StyleSheet, TouchableOpacity, Text } from 'react-native';
 import { v4 as uuidv4 } from 'uuid';
-import { UploadedImage, storage, BACKEND_DOMAIN } from '../../utils/Server';
+import { UploadedImage, BACKEND_DOMAIN } from '../../utils/Server';
 import AlertBox from '../common/AlertBox';
 
 interface NextBtnProps {
@@ -20,7 +19,6 @@ export default function NextBtn({ imageList, onNavigateNext }: NextBtnProps) {
 
     if (imageList.length === 0) {
       setIsAlertVisible(true);
-      setTimeout(() => setIsAlertVisible(false), 2000); // 2초 뒤 자동으로 사라지게
       return;
     }
 
@@ -45,10 +43,9 @@ export default function NextBtn({ imageList, onNavigateNext }: NextBtnProps) {
 
           // 로컬 파일을 Blob으로 변환
           const response = await fetch(img.localUri);
-          const blob = await response.blob();
-
+          const blob = await response.blob(); 
+          
           // GCS에 직접 PUT 요청
-          const uploadStartTime = performance.now();
           await fetch(presignedUrl, {
             method: 'PUT',
             headers: {
@@ -57,12 +54,13 @@ export default function NextBtn({ imageList, onNavigateNext }: NextBtnProps) {
             body: blob
           });
 
+          // 이전에 localUri, width, height가 이미 저장되어 있었음.
           return {
             ...img,
             firebaseUri: fileUrl // 이미지 접근 URL
           };
         } catch (err) {
-          console.error(`GCS 업로드 실패:`, err);
+          console.error(`이미지 업로드 실패 (${img.localUri}):`, err);
           throw err;
         }
       }));
@@ -100,6 +98,12 @@ export default function NextBtn({ imageList, onNavigateNext }: NextBtnProps) {
       style={styles.nextBtn} 
       onPress={handleNextStep}
     >
+      {isAlertVisible && (
+        <AlertBox
+          value="이미지를 최소 1장 이상 업로드해주세요."
+          onClose={() => setIsAlertVisible(false)}
+        />
+      )}
       <Text style={styles.nextBtnText}>
         {isLoading ? '처리중...' : '다음단계'}
       </Text>

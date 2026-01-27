@@ -58,7 +58,6 @@ const EstimatedCard = ({ data, status, onNavigateNext }: EstimateCardProps) => {
       <View style={styles.headerContainer}>
         <Text style={styles.title}>견적표</Text>
         
-        {/* 상태 텍스트들을 절대 위치로 겹쳐놓고 투명도만 조절하여 자연스럽게 교체 */}
         <View style={styles.statusWrapper}>
           <Animated.Text style={[{ 
             opacity: updatingOpacity 

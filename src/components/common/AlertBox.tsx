@@ -1,6 +1,18 @@
 import { Text, View, Platform, StyleSheet } from "react-native";
+import { useEffect } from "react";
 
-export default function AlertBox({ value }: { value: string }) {
+interface AlertBoxProps {
+  value: string;
+  onClose: () => void;
+}
+
+export default function AlertBox({ value, onClose }: AlertBoxProps) {
+  useEffect(() => {
+    const timer = setTimeout(() => { onClose() }, 2000);
+    return () => clearTimeout(timer);
+  }, [onClose]);
+
+
   return(
     <View style={styles.container}>
       <View style={styles.iconContent}>
@@ -16,19 +28,23 @@ const styles = StyleSheet.create({
     height: 50,
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
+
     backgroundColor: '#ffffff',
     paddingHorizontal: 20,
     paddingVertical: 12,
     borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#f3f0e7ff',
     // 그림자 설정
-    elevation: 5,
+    elevation: 10,
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
       height: 0,
     },
-    shadowOpacity: 0.15,
-    shadowRadius: 3.84,
+    shadowOpacity: 0.12,
+    shadowRadius: 8,
     
     // 위치 고정 설정
     position: Platform.OS === 'web' ? ('fixed' as any) : 'absolute',
@@ -54,6 +70,8 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   iconText: {
+    paddingLeft: 1,
+    paddingBottom: 1,
     color: 'white',
     fontSize: 12,
     fontWeight: 'bold',
