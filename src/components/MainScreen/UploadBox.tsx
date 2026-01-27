@@ -60,7 +60,7 @@ export default function UploadBox({ onFilesSelected }: UploadBoxProps) {
   useEffect(() => {
     // uploadBoxRef에는 current가 있는데, 거기에 tagName, style, innerText같은 것들이 있음.
     if (Platform.OS === 'web' && uploadBoxRef.current) {
-      const element = uploadBoxRef.current as unknown as HTMLElement; //element를 HTMLElement로 쓰겠다는 말
+      const element = uploadBoxRef.current as unknown as HTMLElement; //element를 HTMLElement로 쓰겠다는 말 > div가 된댄다
 
       const handleDragEnter = (e: DragEvent) => {
         e.preventDefault(); // 기본 동작 막음
