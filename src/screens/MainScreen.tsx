@@ -1,116 +1,24 @@
 import React, { useState } from 'react';
 import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Image} from 'react-native';
-import * as ImagePicker from 'expo-image-picker';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { storage, BACKEND_DOMAIN } from '../utils/Server';
+
 import { commonStyles } from '../styles/commonStyles';
 import { UploadedImage } from '../utils/Server';
-import { v4 as uuidv4 } from 'uuid';
 import Header from '../components/common/Header';
+import UploadBox from '../components/MainScreen/UploadBox';
+import NextBtn from '../components/MainScreen/NextBtn';
 
-
-// app.tsx로부터 전달받을 함수의 자료형 정의
 interface MainProps {
-  onNavigateNext: (images: UploadedImage[], estimateId: number) => void; //app.tsx에 정의되어 있는 함수임. images를 갖고 이동하는 함수.
+  onNavigateNext: (images: UploadedImage[], estimateId: number) => void;
   onGoHome: () => void;
 }
 
 export default function Main({ onNavigateNext, onGoHome }: MainProps) {
-  const [imageList, setImageList] = useState<UploadedImage[]>([]); 
-  const [statusMessage, setStatusMessage] = useState(''); 
-  const [isProcessing, setIsProcessing] = useState(false);
+  const [imageList, setImageList] = useState<UploadedImage[]>([]);
 
-  // await을 쓸려면 부모 함수에 async이 있어야함.
-  const handleWebUpload = async () => {
-    // await: 사용자가 사진을 고를 때까지 다음 줄로 넘어가지 않음
-    // result는 사용자가 선택한 이미지들의 정보(assets, canceled)를 담은 객체
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ['images'], // 이미지 파일만
-      allowsMultipleSelection: true, // 다중 선택 활성화
-      quality: 1,
-    });
-  
-    // result의 가장 상위 속성은 assets, canceled가 있다고 보면 됨. assets는 이미지 하나의 정보이고, canceled는 이미지 선택을 취소했는지 여부를 나타냄
-    if (!result.canceled) { // 취소하지 않았다면~
-      // 로컬 이미지 추가
-      const newImages = result.assets.map(asset => ({
-        localUri: asset.uri,
-        width: asset.width,
-        height: asset.height,
-        // firebaseUri는 아직 없음
-      } as UploadedImage));
-
-      setImageList((prev) => [...prev, ...newImages]);
-      setStatusMessage(`${newImages.length + imageList.length}개의 파일 선택 완료`);
-    }
-  };
-
-  // '다음 단계' 버튼 눌렀을 때
-  const handleNextStep = async () => {
-    if (isProcessing) return; // '다음단계'버튼을 여러번 누르는 걸 대비
-
-    setIsProcessing(true); // 처리 중으로 상태 변경
-    setStatusMessage('서버에 이미지 전송 중...');
-
-    try {
-      const uploadedImages = await Promise.all(imageList.map(async (img) => {
-
-        try {
-           // 고유 ID 생성
-           const tempId = uuidv4();
-           
-           const response = await fetch(img.localUri);
-           const blob = await response.blob(); 
-
-           // firebase storage에 업로드
-           const storageRef = ref(storage, `web_uploads/${tempId}`);
-           await uploadBytes(storageRef, blob); 
-           const uri = await getDownloadURL(storageRef); // 업로드된 파일의 URL
-
-           return {
-             ...img, // 다른 것들은 그대로 놔두고
-             firebaseUri: uri // firebaseUri 만 변경해.
-           };
-        } catch (err) {
-          console.error(`firebase에 이미지 업로드 실패 (${img.localUri}):`, err);
-          throw err;
-        }
-      }));
-
-      // uploadedImages는 firebaseUri가 추가된 완전체임
-      setImageList(uploadedImages);
-
-      const BACKEND_URL = `${BACKEND_DOMAIN}/api/v1/estimates`; 
-
-      // response: 서버가 보낸 응답. 데이터 및 데이터 외적인 정보가 포함됨.
-      const response = await fetch(BACKEND_URL, { //fetch를 통해서 데이터를 보낸다.
-        method: 'POST', //Post방식 : 요청하는 형식대로 값 보내고, 값 받아오기
-        headers: { // headers: 보낼 데이터에 대한 메타데이터를 적는 곳임 
-          'Content-Type': 'application/json', 
-          // 보낼 데이터가 json임을 명시. 'content-type'은 사용자 지정 속성이 아님
-          // 데이터 형식을 표현할 때, json은 application/json으로 표기해야함.
-        },
-        body: JSON.stringify({ // 보내는 데이터의 내용물
-          imageUrls: uploadedImages.map(img => img.firebaseUri),  // imageList는 이전 값이므로 uploadedImages를 사용해야함
-        })
-      });
-      
-      const responseData = await response.json(); // 자동으로 자료형이 any라서 따로 자료형 설정 없어도 된다. 
-
-      if (responseData.data.estimateId) { 
-        // app.tsx로 이미지와 estimatedId를 보냄 (uploadedImages에는 이제 firebaseUri가 다 있음)
-        onNavigateNext(imageList as UploadedImage[], responseData.data.estimateId); 
-      } else {
-        console.error('estimateId를 받아오지 못함');
-        setStatusMessage('서버 전송 실패');
-      }
-    } catch (error) {
-      console.error('Network Error:', error);
-      setStatusMessage('서버 전송 중 오류 발생.');
-    } finally {
-      setIsProcessing(false);
-    }
-  };
+  // UploadBox에서 이미지 정보 가져오면 imageList업데이트 하라는거임.
+  const onFilesSelected = (newImages : UploadedImage[]) => {
+    setImageList((prev) => [...prev, ...newImages]); // 이전꺼에다가 받아온 이미지의 딕셔너리 배열을 더함.
+  }
 
   return (
     <View style={commonStyles.container}>
@@ -118,6 +26,7 @@ export default function Main({ onNavigateNext, onGoHome }: MainProps) {
       <Header onGoHome={onGoHome} />
 
       <ScrollView contentContainerStyle={commonStyles.scrollContent}>
+
         {/* Main Wrapper */}
         <View style={commonStyles.mainWrapper}>
 
@@ -126,35 +35,26 @@ export default function Main({ onNavigateNext, onGoHome }: MainProps) {
             <Text style={commonStyles.mainTitle}>사진을 찍어서 이사 견적내기</Text>
             <Text style={commonStyles.mainSubtitle}>간단한 견적내기 시작</Text>
 
-            <TouchableOpacity 
-              style={styles.uploadButton} 
-              onPress={handleWebUpload}
-            >
-              <Text style={styles.uploadButtonText}>파일 선택하기</Text>
-            </TouchableOpacity>
+            <UploadBox
+            // onFileSelected라는 함수는 newImages라는 매개변수가 있다는 점~
+              onFilesSelected={onFilesSelected}
+            />
 
-            <Text style={styles.statusText}>{statusMessage}</Text>
-
+            {/* 선택된 이미지 표시 */}
             <View style={styles.imageGrid}>
-              {/* 이미지가 다시 업로드 되면 imageList도 업데이트 되니까 선택한 이미지가 모두 드러나게 되어있음 */}
               {imageList.map((item) => (
                 <View style={styles.imageCard}>
                   <Image source={{ uri: item.localUri }} style={styles.thumbnail} />
                 </View>
               ))}
             </View>
+            
+            {/* 다음 단계 버튼 */}
+            <NextBtn 
+              imageList={imageList}
+              onNavigateNext={onNavigateNext}
+            />
 
-            {imageList.length > 0 && ( //&& 이후를 return문이라 생각하면 됨
-              <TouchableOpacity 
-                style={[styles.uploadButton, isProcessing && styles.disabledButton]} 
-                onPress={handleNextStep}
-                disabled={isProcessing} // 버튼 활성화를 처리 상태로 정함
-              >
-                <Text style={styles.uploadButtonText}>
-                  {isProcessing ? '처리 중...' : '다음단계'}
-                </Text>
-              </TouchableOpacity>
-            )}
           </View>
 
           {/* 왜 이삿짐인가요? 섹션 */}
@@ -227,30 +127,6 @@ export default function Main({ onNavigateNext, onGoHome }: MainProps) {
 }
 
 const styles = StyleSheet.create({
-  // --- 이미지 업로드 버튼 ---
-  uploadButton: {
-    backgroundColor: '#D97757', // New main color
-    paddingHorizontal: 24,
-    paddingVertical: 14,
-    borderRadius: 8,
-    marginTop: 10,
-  },
-  uploadButtonText: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: '500',
-  },
-  disabledButton: {
-    backgroundColor: '#666',
-
-    opacity: 0.7,
-  },
-  
-  statusText: {
-    marginTop: 10,
-    color: '#3D3D3A',
-    textAlign: 'center',
-  },
   imageGrid: {
     marginTop: 30,
     flexDirection: 'row',
