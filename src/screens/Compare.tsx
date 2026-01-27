@@ -53,7 +53,7 @@ export default function Compare({ onGoHome }: CompareProps) {
                   <View style={[styles.filterChip, { backgroundColor: 'rgba(202, 182, 159, 0.30)', width: 86 }]}>
                     <Text style={styles.filterChipText}>별점높은순</Text>
                   </View>
-                  <View style={[styles.filterChip, { backgroundColor: '#FAF9F5', width: 86 }]}>
+                  <View style={[styles.filterChip, { backgroundColor: '#ffffff', width: 86 }]}>
                     <Text style={styles.filterChipText}>별점낮은순</Text>
                   </View>
                 </View>
@@ -68,7 +68,7 @@ export default function Compare({ onGoHome }: CompareProps) {
                   <View style={[styles.filterChip, { backgroundColor: 'rgba(202, 182, 159, 0.30)', width: 86 }]}>
                     <Text style={styles.filterChipText}>가격높은순</Text>
                   </View>
-                  <View style={[styles.filterChip, { backgroundColor: '#FAF9F5', width: 86 }]}>
+                  <View style={[styles.filterChip, { backgroundColor: '#ffffff', width: 86 }]}>
                     <Text style={styles.filterChipText}>가격낮은순</Text>
                   </View>
                 </View>
@@ -86,10 +86,10 @@ export default function Compare({ onGoHome }: CompareProps) {
                   <View style={[styles.filterChip, { backgroundColor: 'rgba(202, 182, 159, 0.30)', width: 61 }]}>
                     <Text style={styles.filterChipText}>1~3년</Text>
                   </View>
-                  <View style={[styles.filterChip, { backgroundColor: '#FAF9F5', width: 67 }]}>
+                  <View style={[styles.filterChip, { backgroundColor: '#ffffff', width: 67 }]}>
                     <Text style={styles.filterChipText}>5~10년</Text>
                   </View>
-                  <View style={[styles.filterChip, { backgroundColor: '#FAF9F5', width: 80 }]}>
+                  <View style={[styles.filterChip, { backgroundColor: '#ffffff', width: 80 }]}>
                     <Text style={styles.filterChipText}>10년 이상</Text>
                   </View>
                 </View>
@@ -102,7 +102,7 @@ export default function Compare({ onGoHome }: CompareProps) {
               {/* Company 1 */}
               <View style={styles.companyCard}>
                 <Text style={styles.companyName}>백마익스프레스</Text>
-                <RNImage source={{ uri: "https://placehold.co/200x200" }} style={styles.companyImage} />
+                <RNImage source={require('../../assets/back.png')} style={styles.companyImage} />
                 <Text style={styles.companyInfo}>
                   이메일 : Back’sExpress@gmail.com{'\n'}
                   문의 : 010-1234-5678{'\n'}
@@ -119,7 +119,7 @@ export default function Compare({ onGoHome }: CompareProps) {
               {/* Company 2 */}
               <View style={styles.companyCard}>
                 <Text style={styles.companyName}>이사해드림</Text>
-                <RNImage source={{ uri: "https://placehold.co/200x200" }} style={styles.companyImage} />
+                <RNImage source={require('../../assets/smallisa.png')} style={styles.companyImage} />
                 <Text style={styles.companyInfo}>
                   이메일 : isaHae@naver.com{'\n'}
                   문의 : 010-1234-5678{'\n'}
@@ -133,23 +133,10 @@ export default function Compare({ onGoHome }: CompareProps) {
                 </TouchableOpacity>
               </View>
 
-              {/* Company 3 (2424) - Logo implementation simplified for RN but respecting user request about code structure */}
+              {/* Company 3  */}
               <View style={styles.companyCard}>
                 <Text style={styles.companyName}>2424</Text>
-                {/* 2424 Custom Logo mimicking the snippet's divs */}
-                <View style={{ width: 200, height: 200, position: 'absolute', left: 17, top: 21 }}>
-                   <View style={{ width: 3.08, height: 8.55, left: 182.60 - 17, top: 150.63 - 21, position: 'absolute', backgroundColor: '#008572' }} />
-                   <View style={{ width: 7.99, height: 23.24, left: 186.65 - 17, top: 136.42 - 21, position: 'absolute', backgroundColor: '#008572' }} />
-                   <View style={{ width: 8, height: 23.24, left: 195.23 - 17, top: 136.42 - 21, position: 'absolute', backgroundColor: '#008572' }} />
-                   <View style={{ width: 12.14, height: 22.75, left: 203.86 - 17, top: 136.42 - 21, position: 'absolute', backgroundColor: '#008572' }} />
-                   <View style={{ width: 33.99, height: 95.93, left: 44.26 - 17, top: 64.07 - 21, position: 'absolute', backgroundColor: '#008572' }} />
-                   <View style={{ width: 34, height: 95.93, left: 113.84 - 17, top: 64.07 - 21, position: 'absolute', backgroundColor: '#008572' }} />
-                   <View style={{ width: 34.03, height: 95.93, left: 78.79 - 17, top: 64.07 - 21, position: 'absolute', backgroundColor: '#008572' }} />
-                   <View style={{ width: 34.03, height: 95.93, left: 148.42 - 17, top: 64.07 - 21, position: 'absolute', backgroundColor: '#008572' }} />
-                   {/* Approx positions for remaining bits */}
-                   <View style={{ width: 10.39, height: 50.87, left: 20 - 17, top: 44 - 21, position: 'absolute', backgroundColor: '#008572' }} />
-                </View>
-
+                <RNImage source={require('../../assets/2424.png')} style={styles.companyImage} />
                 <Text style={styles.companyInfo}>
                   이메일 : Back’sExpress@gmail.com{'\n'}
                   문의 : 010-1234-5678{'\n'}
@@ -166,7 +153,7 @@ export default function Compare({ onGoHome }: CompareProps) {
                {/* Company 4 */}
                <View style={styles.companyCard}>
                 <Text style={styles.companyName}>개인 용달</Text>
-                <RNImage source={{ uri: "https://placehold.co/200x200" }} style={styles.companyImage} />
+                <RNImage source={require('../../assets/개인용달.png')} style={styles.companyImage} />
                 <Text style={styles.companyInfo}>
                   이메일 : Back’sExpress@gmail.com{'\n'}
                   문의 : 010-1234-5678{'\n'}
@@ -183,7 +170,7 @@ export default function Compare({ onGoHome }: CompareProps) {
                {/* Company 5 */}
                <View style={styles.companyCard}>
                 <Text style={styles.companyName}>김이사</Text>
-                <RNImage source={{ uri: "https://placehold.co/200x200" }} style={styles.companyImage} />
+                <RNImage source={require('../../assets/김이사.png')} style={styles.companyImage} />
                 <Text style={styles.companyInfo}>
                   이메일 : Back’sExpress@gmail.com{'\n'}
                   문의 : 010-1234-5678{'\n'}
@@ -223,7 +210,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: '500',
     color: '#3D3D3A',
-    marginBottom: 20,
+    marginBottom: 5,
     alignSelf: 'flex-start',
   },
   filterRow: {
@@ -232,8 +219,7 @@ const styles = StyleSheet.create({
     height: 40,
     borderTopWidth: 1,
     borderColor: '#D9D9D9',
-    // borderBottomWidth: 1, // handled by next row or explicit last row
-    backgroundColor: '#F1F0EC',
+    backgroundColor: '#E5E5E5',
   },
   filterLabelCol: {
     width: 114,
@@ -249,7 +235,7 @@ const styles = StyleSheet.create({
   filterContentCol: {
     width: 724,
     height: '100%',
-    backgroundColor: '#FAF9F5',
+    backgroundColor: '#ffffffff',
     borderLeftWidth: 1,
     borderLeftColor: '#D9D9D9', // Optional implicit border
     flexDirection: 'row',
@@ -263,7 +249,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#E5E5E5',
+    borderColor: 'rgba(202, 182, 159, 0.3)',
     overflow: 'hidden',
   },
   filterChipText: {
@@ -299,6 +285,7 @@ const styles = StyleSheet.create({
     top: 21,
     width: 200,
     height: 200,
+    resizeMode: 'contain',
   },
   companyInfo: {
     position: 'absolute',
