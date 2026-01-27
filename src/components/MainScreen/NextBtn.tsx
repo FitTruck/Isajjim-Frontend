@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { StyleSheet, TouchableOpacity, Text, Alert, Platform } from 'react-native';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { ref, uploadBytes } from 'firebase/storage';
 import { v4 as uuidv4 } from 'uuid';
 import { UploadedImage, storage, BACKEND_DOMAIN } from '../../utils/Server';
 import AlertBox from '../common/AlertBox';
@@ -20,7 +20,6 @@ export default function NextBtn({ imageList, onNavigateNext }: NextBtnProps) {
 
     if (imageList.length === 0) {
       setIsAlertVisible(true);
-      setTimeout(() => setIsAlertVisible(false), 2000); // 2초 뒤 자동으로 사라지게
       return;
     }
 
@@ -34,13 +33,15 @@ export default function NextBtn({ imageList, onNavigateNext }: NextBtnProps) {
           const blob = await response.blob(); 
           
           const storageRef = ref(storage, `web_uploads/${tempId}`);
-          await uploadBytes(storageRef, blob);
-          const uri = await getDownloadURL(storageRef);
+          const uploadResult = await uploadBytes(storageRef, blob);
+          const bucket = uploadResult.metadata.bucket;
+          const fullPath = uploadResult.metadata.fullPath;
+          const firebaseUri = "https://firebasestorage.googleapis.com/v0/b/" + bucket + "/o/" + fullPath;
 
           // 이전에 localUri, width, height가 이미 저장되어 있었음.
           return {
             ...img, // 이전꺼는 그대로
-            firebaseUri: uri
+            firebaseUri: firebaseUri
           };
         } catch (err) {
           console.error(`이미지 업로드 실패 (${img.localUri}):`, err);
@@ -81,12 +82,15 @@ export default function NextBtn({ imageList, onNavigateNext }: NextBtnProps) {
       style={styles.nextBtn} 
       onPress={handleNextStep}
     >
+      {isAlertVisible && (
+        <AlertBox 
+          value="이미지를 최소 1장 이상 업로드해주세요." 
+          onClose={() => setIsAlertVisible(false)}
+        />
+      )}
       <Text style={styles.nextBtnText}>
         {isLoading ? '처리중...' : '다음단계'}
       </Text>
-      {isAlertVisible && (
-        <AlertBox value="이미지를 최소 1장 이상 업로드해주세요." />
-      )}
     </TouchableOpacity>
   );
 }
