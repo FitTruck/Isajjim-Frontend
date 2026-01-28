@@ -1,18 +1,17 @@
 import React, { useState } from 'react';
-import { StyleSheet, TouchableOpacity, Text, Alert, Platform, useWindowDimensions } from 'react-native';
+import { StyleSheet, TouchableOpacity, Text,useWindowDimensions } from 'react-native';
 import { ref, uploadBytes } from 'firebase/storage';
 import { v4 as uuidv4 } from 'uuid';
 import { UploadedImage, BACKEND_DOMAIN } from '../../utils/Server';
-import AlertBox from '../common/AlertBox';
 
 interface NextBtnProps {
   imageList: UploadedImage[];
   onNavigateNext: (images: UploadedImage[], estimateId: number) => void;
+  onShowAlert: () => void;
 }
 
-export default function NextBtn({ imageList, onNavigateNext }: NextBtnProps) {
+export default function NextBtn({ imageList, onNavigateNext, onShowAlert }: NextBtnProps) {
   const [isLoading, setIsLoading] = useState(false);
-  const [isAlertVisible, setIsAlertVisible] = useState(false);
   const { width } = useWindowDimensions();
   const isMobile = width < 768;
 
@@ -21,7 +20,7 @@ export default function NextBtn({ imageList, onNavigateNext }: NextBtnProps) {
     if (isLoading) return;
 
     if (imageList.length === 0) {
-      setIsAlertVisible(true);
+      onShowAlert();
       return;
     }
 
@@ -101,18 +100,9 @@ export default function NextBtn({ imageList, onNavigateNext }: NextBtnProps) {
       style={[styles.nextBtn, isMobile && styles.mobileNextBtn]} 
       onPress={handleNextStep}
     >
-      {isAlertVisible && (
-        <AlertBox
-          value="이미지를 최소 1장 이상 업로드해주세요."
-          onClose={() => setIsAlertVisible(false)}
-        />
-      )}
       <Text style={[styles.nextBtnText, isMobile && styles.mobileNextBtnText]}>
         {isLoading ? '처리중...' : '다음단계'}
       </Text>
-      {isAlertVisible && (
-        <AlertBox value="이미지를 최소 1장 이상 업로드해주세요." />
-      )}
     </TouchableOpacity>
   );
 }

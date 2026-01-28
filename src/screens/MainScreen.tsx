@@ -6,6 +6,7 @@ import { UploadedImage } from '../utils/Server';
 import Header from '../components/common/Header';
 import UploadBox from '../components/MainScreen/UploadBox';
 import NextBtn from '../components/MainScreen/NextBtn';
+import AlertBox from '../components/common/AlertBox';
 
 interface MainProps {
   onNavigateNext: (images: UploadedImage[], estimateId: number) => void;
@@ -14,6 +15,7 @@ interface MainProps {
 
 export default function Main({ onNavigateNext, onGoHome }: MainProps) {
   const [imageList, setImageList] = useState<UploadedImage[]>([]);
+  const [isAlertVisible, setIsAlertVisible] = useState(false);
   const { width } = useWindowDimensions();
   const isMobile = width < 768; // Mobile breakpoint
 
@@ -26,6 +28,14 @@ export default function Main({ onNavigateNext, onGoHome }: MainProps) {
     <View style={commonStyles.container}>
       {/* Header */}
       <Header onGoHome={onGoHome} />
+
+      {/* 알림 박스 */}
+      {isAlertVisible && (
+        <AlertBox 
+          value="이미지를 최소 1장 이상 업로드해주세요." 
+          onClose={() => setIsAlertVisible(false)}
+        />
+      )}
 
       <ScrollView contentContainerStyle={[
         commonStyles.scrollContent,
@@ -67,6 +77,7 @@ export default function Main({ onNavigateNext, onGoHome }: MainProps) {
             <NextBtn 
               imageList={imageList}
               onNavigateNext={onNavigateNext}
+              onShowAlert={() => setIsAlertVisible(true)}
             />
 
           </View>

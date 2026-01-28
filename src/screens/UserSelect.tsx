@@ -1,5 +1,5 @@
 import React, { useState } from 'react'; // 상태를 저장하게 해줌
-import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Alert, Platform, Modal, ActivityIndicator } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Alert, Platform } from 'react-native';
 import { commonStyles } from '../styles/commonStyles';
 import { BACKEND_DOMAIN } from '../utils/Server';
 import FloorDetail from '../components/UserSelect/FloorDetail';
@@ -7,6 +7,7 @@ import RoomSizeDetail from '../components/UserSelect/RoomSizeDetail';
 import LoadingModal from '../components/UserSelect/LoadingModal';
 import Header from '../components/common/Header';
 import DetailSelectBtn from '../components/UserSelect/DetailSelectBtn';
+import AlertBox from '../components/common/AlertBox';
 
 // app.tsx로부터 전달받을 함수의 자료형 정의
 interface UserSelectProps {
@@ -26,6 +27,7 @@ export default function UserSelect({ estimatedId, onNavigateNext, onGoHome }: Us
   const [groundStair, setGroundStair] = useState<boolean | null>(null);
   const [parking, setParking] = useState<boolean | null>(null);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [isAlertVisible, setIsAlertVisible] = useState(false);
 
 
   // 백엔드 ENUM 값으로 매핑하는 함수
@@ -58,7 +60,7 @@ export default function UserSelect({ estimatedId, onNavigateNext, onGoHome }: Us
     ) {
       const msg = "모든 항목을 선택해주세요.";
       if (Platform.OS === 'web') {
-        window.alert(msg);
+        setIsAlertVisible(true);
       } else { // 앱인 경우인데, 일단 남겨둠
         Alert.alert("알림", msg);
       }
@@ -121,6 +123,14 @@ export default function UserSelect({ estimatedId, onNavigateNext, onGoHome }: Us
     <View style={commonStyles.container}>
       {/* 로딩 모달 */}
       <LoadingModal visible={isSubmitting} />
+
+      {/* 알림 박스 */}
+      {isAlertVisible && (
+        <AlertBox 
+          value="모든 항목을 선택해주세요." 
+          onClose={() => setIsAlertVisible(false)}
+        />
+      )}
 
       {/* 헤더 */}
       <Header onGoHome={onGoHome} />
