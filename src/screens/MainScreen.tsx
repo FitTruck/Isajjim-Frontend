@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Image} from 'react-native';
+import { View, Text, ScrollView, StyleSheet, Image, useWindowDimensions } from 'react-native';
 
 import { commonStyles } from '../styles/commonStyles';
 import { UploadedImage } from '../utils/Server';
@@ -14,6 +14,8 @@ interface MainProps {
 
 export default function Main({ onNavigateNext, onGoHome }: MainProps) {
   const [imageList, setImageList] = useState<UploadedImage[]>([]);
+  const { width } = useWindowDimensions();
+  const isMobile = width < 768; // Mobile breakpoint
 
   // UploadBox에서 이미지 정보 가져오면 imageList업데이트 하라는거임.
   const onFilesSelected = (newImages : UploadedImage[]) => {
@@ -25,15 +27,27 @@ export default function Main({ onNavigateNext, onGoHome }: MainProps) {
       {/* Header */}
       <Header onGoHome={onGoHome} />
 
-      <ScrollView contentContainerStyle={commonStyles.scrollContent}>
+      <ScrollView contentContainerStyle={[
+        commonStyles.scrollContent,
+        isMobile && { paddingTop: 20 }
+      ]}>
 
         {/* Main Wrapper */}
         <View style={commonStyles.mainWrapper}>
 
           {/* 메인 섹션 */}
-          <View style={commonStyles.mainSection}>
-            <Text style={commonStyles.mainTitle}>사진을 찍어서 이사 견적내기</Text>
-            <Text style={commonStyles.mainSubtitle}>간단한 견적내기 시작</Text>
+          <View style={[
+              commonStyles.mainSection, 
+              isMobile && styles.mobileMainSection
+            ]}>
+            <Text style={[
+              commonStyles.mainTitle,
+              isMobile && styles.mobileMainTitle
+            ]}>사진을 찍어서 이사 견적내기</Text>
+            <Text style={[
+              commonStyles.mainSubtitle,
+              isMobile && styles.mobileMainSubtitle
+            ]}>간단한 견적내기 시작</Text>
 
             <UploadBox
             // onFileSelected라는 함수는 newImages라는 매개변수가 있다는 점~
@@ -41,9 +55,9 @@ export default function Main({ onNavigateNext, onGoHome }: MainProps) {
             />
 
             {/* 선택된 이미지 표시 */}
-            <View style={styles.imageGrid}>
+            <View style={[styles.imageGrid, isMobile && styles.mobileImageGrid]}>
               {imageList.map((item) => (
-                <View style={styles.imageCard}>
+                <View style={[styles.imageCard, isMobile && styles.mobileImageCard]}>
                   <Image source={{ uri: item.localUri }} style={styles.thumbnail} />
                 </View>
               ))}
@@ -58,54 +72,54 @@ export default function Main({ onNavigateNext, onGoHome }: MainProps) {
           </View>
 
           {/* 왜 이삿짐인가요? 섹션 */}
-          <View style={styles.whyTitleSection}>
-            <Text style={styles.sectionTitle}>왜 이삿짐인가요?</Text>
+          <View style={[styles.whyTitleSection, isMobile && styles.mobileWhyTitleSection]}>
+            <Text style={[styles.sectionTitle, isMobile && styles.mobileSectionTitle]}>왜 이삿짐인가요?</Text>
           </View>
 
           {/* 카드 섹션 */}
-          <View style={styles.featuresSection}>
-            <View style={styles.card}>
-              <Text style={styles.cardTitle}>2D 사진 분석</Text>
-              <Text style={styles.cardDesc}>방 안의 짐을 사진으로 찍기만 하세요. AI가 물품의 크기와 수량을 자동으로 인식합니다.</Text>
+          <View style={[styles.featuresSection, isMobile && styles.mobileFeaturesSection]}>
+            <View style={[styles.card, isMobile && styles.mobileCard]}>
+              <Text style={[styles.cardTitle, isMobile && styles.mobileCardTitle]}>2D 사진 분석</Text>
+              <Text style={[styles.cardDesc, isMobile && styles.mobileCardDesc]}>방 안의 짐을 사진으로 찍기만 하세요. AI가 물품의 크기와 수량을 자동으로 인식합니다.</Text>
             </View>
 
-            <View style={styles.card}>
-              <Text style={styles.cardTitle}>AI 자동 견적</Text>
-              <Text style={styles.cardDesc}>수천 건의 데이터를 학습한 AI가 실제 이사 비용에 가장 근접한 견적을 산출합니다</Text>
+            <View style={[styles.card, isMobile && styles.mobileCard]}>
+              <Text style={[styles.cardTitle, isMobile && styles.mobileCardTitle]}>AI 자동 견적</Text>
+              <Text style={[styles.cardDesc, isMobile && styles.mobileCardDesc]}>수천 건의 데이터를 학습한 AI가 실제 이사 비용에 가장 근접한 견적을 산출합니다</Text>
             </View>
 
-            <View style={styles.card}>
-              <Text style={styles.cardTitle}>즉시 확인</Text>
-              <Text style={styles.cardDesc}>상담 대기 시간 없이, 즉시 견적을 받아보세요.</Text>
+            <View style={[styles.card, isMobile && styles.mobileCard]}>
+              <Text style={[styles.cardTitle, isMobile && styles.mobileCardTitle]}>즉시 확인</Text>
+              <Text style={[styles.cardDesc, isMobile && styles.mobileCardDesc]}>상담 대기 시간 없이, 즉시 견적을 받아보세요.</Text>
             </View>
           </View>
 
           {/* 3단계 견적 확인 */}
-          <View style={styles.stepSection}>
-            <View style={styles.stepTitleContainer}>
-              <Text style={styles.stepTitleText}>3단계로 끝나는 견적 확인</Text>
+          <View style={[styles.stepSection, isMobile && styles.mobileStepSection]}>
+            <View style={[styles.stepTitleContainer, isMobile && styles.mobileStepTitleContainer]}>
+              <Text style={[styles.stepTitleText, isMobile && styles.mobileStepTitleText]}>3단계로 끝나는 견적 확인</Text>
             </View>
           </View>
 
           {/* footer */}
-          <View style={commonStyles.footer}>
-            <View style={commonStyles.footerLine} />
-            <Text style={commonStyles.footerLogo}>Site name</Text>
+          <View style={[commonStyles.footer, isMobile && styles.mobileFooter]}>
+            <View style={[commonStyles.footerLine, isMobile && styles.mobileFooterLine]} />
+            <Text style={[commonStyles.footerLogo, isMobile && styles.mobileFooterLogo]}>Site name</Text>
 
-            <View style={commonStyles.footerLinksRow}>
-              <View style={commonStyles.footerColumn}>
+            <View style={[commonStyles.footerLinksRow, isMobile && styles.mobileFooterLinksRow]}>
+              <View style={[commonStyles.footerColumn, isMobile && styles.mobileFooterColumn]}>
                 <Text style={commonStyles.footerTopic}>Topic</Text>
                 <Text style={commonStyles.footerPage}>Page</Text>
                 <Text style={commonStyles.footerPage}>Page</Text>
                 <Text style={commonStyles.footerPage}>Page</Text>
               </View>
-              <View style={commonStyles.footerColumn}>
+              <View style={[commonStyles.footerColumn, isMobile && styles.mobileFooterColumn]}>
                 <Text style={commonStyles.footerTopic}>Topic</Text>
                 <Text style={commonStyles.footerPage}>Page</Text>
                 <Text style={commonStyles.footerPage}>Page</Text>
                 <Text style={commonStyles.footerPage}>Page</Text>
               </View>
-              <View style={commonStyles.footerColumn}>
+              <View style={[commonStyles.footerColumn, isMobile && styles.mobileFooterColumn]}>
                 <Text style={commonStyles.footerTopic}>Topic</Text>
                 <Text style={commonStyles.footerPage}>Page</Text>
                 <Text style={commonStyles.footerPage}>Page</Text>
@@ -113,7 +127,7 @@ export default function Main({ onNavigateNext, onGoHome }: MainProps) {
               </View>
             </View>
 
-            <View style={commonStyles.socialIcons}>
+            <View style={[commonStyles.socialIcons, isMobile && styles.mobileSocialIcons]}>
               {[1, 2, 3, 4].map((i: number) => (
                 <View key={i} style={commonStyles.socialIconPlaceholder} />
               ))}
@@ -133,6 +147,11 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     gap: 15,
   },
+  mobileImageGrid: {
+    marginTop: 20,
+    justifyContent: 'center',
+    gap: 10,
+  },
   imageCard: {
     width: 150,
     backgroundColor: '#f5f5f5',
@@ -140,6 +159,11 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     borderWidth: 1,
     borderColor: '#ddd',
+  },
+  mobileImageCard: {
+    width: 100,
+    height: 100,
+    borderRadius: 8,
   },
   thumbnail: {
     width: '100%',
@@ -152,11 +176,18 @@ const styles = StyleSheet.create({
     width: '100%',
     alignItems: 'center',
   },
+  mobileWhyTitleSection: {
+    marginTop: 60,
+    paddingHorizontal: 20,
+  },
   sectionTitle: {
     fontSize: 40,
     fontWeight: '600',
     color: '#3D3D3A',
     textAlign: 'center',
+  },
+  mobileSectionTitle: {
+    fontSize: 24,
   },
   featuresSection: {
     marginTop: 47,
@@ -167,6 +198,13 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     paddingHorizontal: 20,
     marginBottom: 523,
+  },
+  mobileFeaturesSection: {
+    marginTop: 30,
+    flexDirection: 'column',
+    alignItems: 'center',
+    marginBottom: 60,
+    gap: 16,
   },
   card: {
     width: 394,
@@ -183,6 +221,13 @@ const styles = StyleSheet.create({
     elevation: 5,
     alignItems: 'center'
   },
+  mobileCard: {
+    width: '100%',
+    height: 'auto',
+    padding: 24,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 5,
+  },
   cardTitle: {
     fontSize: 25,
     fontWeight: '600', //semibold
@@ -191,12 +236,22 @@ const styles = StyleSheet.create({
     marginBottom: 25,
     textAlign: 'center',
   },
+  mobileCardTitle: {
+    fontSize: 18,
+    marginTop: 0,
+    marginBottom: 12,
+  },
   cardDesc: {
     fontSize: 25,
     fontWeight: '500', //medium
     color: '#3D3D3A',
     textAlign: 'center',
     lineHeight: 30,
+  },
+  mobileCardDesc: {
+    fontSize: 14,
+    lineHeight: 22,
+    color: '#62625D',
   },
 
   // --- 3단계 견적 확인 ---
@@ -206,9 +261,17 @@ const styles = StyleSheet.create({
     backgroundColor: '#EAE7E4', // Slightly darker warm beige
     alignItems: 'center',
   },
+  mobileStepSection: {
+    height: 'auto',
+    paddingVertical: 60,
+    paddingHorizontal: 20,
+  },
   stepTitleContainer: {
     width: 764,
     alignItems: 'center',
+  },
+  mobileStepTitleContainer: {
+    width: '100%',
   },
   stepTitleText: {
     fontSize: 40,
@@ -217,5 +280,60 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 47,
     lineHeight: 44,
+  },
+  mobileStepTitleText: {
+    fontSize: 24,
+    lineHeight: 32,
+    marginTop: 0,
+  },
+
+  // --- Mobile ---
+  mobileMainSection: {
+    marginTop: 110,
+    width: '100%',
+    paddingHorizontal: 20,
+    gap: 16,
+  },
+  mobileMainTitle: {
+    fontSize: 28,
+  },
+  mobileMainSubtitle: {
+    fontSize: 16,
+    lineHeight: 24,
+  },
+
+  // --- Mobile Overrides for Footer (Local) ---
+  mobileFooter: {
+    height: 'auto',
+    paddingHorizontal: 20,
+    paddingVertical: 40,
+  },
+  mobileFooterLine: {
+    left: 20,
+    right: 20, // width 100% with absolute needs left/right
+    width: 'auto', // override 100%
+  },
+  mobileFooterLogo: {
+    fontSize: 20,
+    marginTop: 20,
+  },
+  mobileFooterLinksRow: {
+    position: 'relative', // un-float
+    right: 'auto',
+    top: 'auto',
+    flexDirection: 'column',
+    marginTop: 20,
+    gap: 20,
+  },
+  mobileFooterColumn: {
+    width: '100%',
+    alignItems: 'flex-start',
+    gap: 12,
+  },
+  mobileSocialIcons: {
+    position: 'relative',
+    left: 'auto',
+    top: 'auto',
+    marginTop: 30,
   },
 });

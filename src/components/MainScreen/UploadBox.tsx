@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { StyleSheet, View, Text, Platform, Image } from 'react-native';
+import { StyleSheet, View, Text, Platform, Image, useWindowDimensions } from 'react-native';
 import Icon from '@expo/vector-icons/Feather';
 import * as ImagePicker from 'expo-image-picker';
 import { UploadedImage } from '../../utils/Server';
@@ -8,22 +8,22 @@ interface UploadBoxProps {
   onFilesSelected: (newImages: UploadedImage[]) => void;
 }
 
-const UploadContent = ({ isDragging }: { isDragging: boolean }) => {
+const UploadContent = ({ isDragging, isMobile }: { isDragging: boolean, isMobile: boolean }) => {
   return (
     <View style={styles.contentWrapper}>
       {/* 드래그 아닐 때 */}
       <View style={[styles.contentLayer, { opacity: isDragging ? 0 : 1 }]}>
-        <View style={styles.iconContainer}>
-          <Icon name="upload" size={48} color="#F0893B" />
+        <View style={[styles.iconContainer, isMobile && styles.mobileIconContainer]}>
+          <Icon name="upload" size={isMobile ? 32 : 48} color="#F0893B" />
         </View>
-        <Text style={styles.uploadTitle}>클릭 또는 드롭하여 이미지 업로드</Text>
-        <Text style={styles.uploadSubTitle}>JPG, PNG, HEIC 형식 지원</Text>
+        <Text style={[styles.uploadTitle, isMobile && styles.mobileUploadTitle]}>클릭 또는 드롭하여 이미지 업로드</Text>
+        <Text style={[styles.uploadSubTitle, isMobile && styles.mobileUploadSubTitle]}>JPG, PNG, HEIC 형식 지원</Text>
       </View>
 
       {/* 드래그 했을 때 */}
       <View style={[styles.contentLayer, { opacity: isDragging ? 1 : 0 }]}>
-        <View style={styles.iconContainer}>
-          <Image source={require('../../../assets/drop.png')} style={styles.dropIcon} />
+        <View style={[styles.iconContainer, isMobile && styles.mobileIconContainer]}>
+          <Image source={require('../../../assets/drop.png')} style={isMobile ? styles.mobileDropIcon : styles.dropIcon} />
         </View>
       </View>
     </View>
@@ -35,6 +35,8 @@ export default function UploadBox({ onFilesSelected }: UploadBoxProps) {
   const [isDragging, setIsDragging] = useState(false);
   const dragCounter = useRef(0); // useState와 다르게 값이 바뀌어도 컴포넌트를 다시 그리지 않음.
   const uploadBoxRef = useRef<any>(null);
+  const { width } = useWindowDimensions();
+  const isMobile = width < 768;
 
   // 클릭시 : 이미지가 추가될 때마다 실행되니까 추가될 때마다 이미지 정보 main에 있는 imageList로 보냄
   const handleWebUpload = async () => {
@@ -147,6 +149,7 @@ export default function UploadBox({ onFilesSelected }: UploadBoxProps) {
       ref={uploadBoxRef}
       style={[
         styles.uploadContainer,
+        isMobile && styles.mobileUploadContainer,
         isHovered && styles.uploadContainerHover,
         isDragging && styles.uploadContainerDragging
       ]}
@@ -155,7 +158,7 @@ export default function UploadBox({ onFilesSelected }: UploadBoxProps) {
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <UploadContent isDragging={isDragging}/>
+      <UploadContent isDragging={isDragging} isMobile={isMobile}/>
     </View>
   );
 }
@@ -180,6 +183,11 @@ const styles = StyleSheet.create({
       },
     }) as any,
   },
+  mobileUploadContainer: {
+    height: 180,
+    borderRadius: 16,
+    padding: 16,
+  },
   uploadContainerHover: {
     borderColor: '#F0893B',
     ...Platform.select({
@@ -202,12 +210,21 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
   },
+  mobileDropIcon: {
+    width: 60,
+    height: 60,
+  },
   iconContainer: {
     width: 100,
     height: 100,
     padding: 20,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  mobileIconContainer: {
+    width: 60,
+    height: 60,
+    padding: 10,
   },
   uploadTitle: {
     fontSize: 20,
@@ -216,11 +233,18 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     textAlign: 'center',
   },
+  mobileUploadTitle: {
+    fontSize: 16,
+    marginBottom: 4,
+  },
   uploadSubTitle: {
     fontSize: 14,
     fontWeight: '400',
     color: '#9CA3AF',
     textAlign: 'center',
+  },
+  mobileUploadSubTitle: {
+    fontSize: 12,
   },
   contentWrapper: {
     width: '100%',
