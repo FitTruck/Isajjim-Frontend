@@ -93,21 +93,21 @@ export const BoxTypeTranslations: { [key: string]: string } = {
 }
 
 export function translateLabel(label: string): string {
-  if(label) return furnitureTranslations[label] || '번역되지 않음';
+  if(label) return furnitureTranslations[label] || '';
   else return '';
 }
 
 export function translateType(type: string): string {
-  if(type) return typeTranslations[type] || '번역되지 않음';
+  if(type) return typeTranslations[type] || '';
   else return '';
 }
 
 export function translateTruckType(truckType: string): string {
-  if(truckType) return truckTypeTranslations[truckType] || '번역되지 않음';
+  if(truckType) return truckTypeTranslations[truckType] || '';
   else return '';
 }
 
 export function translateBoxType(boxType: string): string {
-  if(boxType) return BoxTypeTranslations[boxType] || '번역되지 않음';
+  if(boxType) return BoxTypeTranslations[boxType] || '';
   else return '';
 }
