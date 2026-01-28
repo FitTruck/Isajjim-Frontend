@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { StyleSheet, TouchableOpacity, Text } from 'react-native';
+import { StyleSheet, TouchableOpacity, Text, Alert, Platform, useWindowDimensions } from 'react-native';
+import { ref, uploadBytes } from 'firebase/storage';
 import { v4 as uuidv4 } from 'uuid';
 import { UploadedImage, BACKEND_DOMAIN } from '../../utils/Server';
 import AlertBox from '../common/AlertBox';
@@ -12,6 +13,8 @@ interface NextBtnProps {
 export default function NextBtn({ imageList, onNavigateNext }: NextBtnProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [isAlertVisible, setIsAlertVisible] = useState(false);
+  const { width } = useWindowDimensions();
+  const isMobile = width < 768;
 
   const handleNextStep = async () => {
     // '다음단계' 중복 클릭 방지 : 이미 눌렀다면 isLoading = true이므로 리턴.
@@ -95,7 +98,7 @@ export default function NextBtn({ imageList, onNavigateNext }: NextBtnProps) {
 
   return (
     <TouchableOpacity 
-      style={styles.nextBtn} 
+      style={[styles.nextBtn, isMobile && styles.mobileNextBtn]} 
       onPress={handleNextStep}
     >
       {isAlertVisible && (
@@ -104,7 +107,7 @@ export default function NextBtn({ imageList, onNavigateNext }: NextBtnProps) {
           onClose={() => setIsAlertVisible(false)}
         />
       )}
-      <Text style={styles.nextBtnText}>
+      <Text style={[styles.nextBtnText, isMobile && styles.mobileNextBtnText]}>
         {isLoading ? '처리중...' : '다음단계'}
       </Text>
       {isAlertVisible && (
@@ -121,11 +124,22 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     borderRadius: 8,
     alignItems: 'center',
-    marginTop: -50,
+    marginTop: -10,
+  },
+  mobileNextBtn: {
+    backgroundColor: '#F0893B',
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginTop: -10,
   },
   nextBtnText: {
     color: 'white',
     fontSize: 16,
     fontWeight: '500',
+  },
+  mobileNextBtnText: {
+    fontSize: 15,
   }
 });
