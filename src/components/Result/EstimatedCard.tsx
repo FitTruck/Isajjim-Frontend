@@ -80,8 +80,8 @@ const EstimatedCard = ({ data, status, onNavigateNext }: EstimateCardProps) => {
       <View style={styles.infoSection}>
         <Text style={styles.sectionHeader}>용달 정보</Text>
         <View style={styles.row}>
-          <Text style={styles.truckType}>{translatedTruckType}</Text>
-          <Text style={styles.truckQuantity}>{data.truckQuantity || '값이 없음'}</Text>
+          <Text style={styles.truckType}>1톤</Text>
+          <Text style={styles.truckQuantity}>1대</Text>
         </View>
       </View>
 
