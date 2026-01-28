@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { StyleSheet, TouchableOpacity, Text, Alert, Platform, useWindowDimensions } from 'react-native';
 import { ref, uploadBytes } from 'firebase/storage';
 import { v4 as uuidv4 } from 'uuid';
-import { UploadedImage, storage, BACKEND_DOMAIN } from '../../utils/Server';
+import { UploadedImage, BACKEND_DOMAIN } from '../../utils/Server';
 import AlertBox from '../common/AlertBox';
 
 interface NextBtnProps {
@@ -27,23 +27,40 @@ export default function NextBtn({ imageList, onNavigateNext }: NextBtnProps) {
 
     setIsLoading(true);
     try {
-      // Firebase Storage에 이미지 업로드
-      const uploadedImages = await Promise.all(imageList.map(async (img) => {
+      // 이미지 업로드용 Presigned Url 발급
+      const presignedResponse = await fetch(`${BACKEND_DOMAIN}/api/v1/gcs/presigned`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          fileNames: imageList.map(img => img.fileName || `${uuidv4()}.jpg`)
+        })
+      });
+
+      const { data } = await presignedResponse.json();
+      const { urls } = data; // 백엔드에서 내려준 presignedUrl, fileUrl, key 목록
+
+      // GCS에 이미지 병렬 업로드 (Firebase SDK 대신 직접 PUT)
+      const uploadedImages = await Promise.all(imageList.map(async (img, index) => {
         try {
-          const tempId = uuidv4();
+          const { presignedUrl, fileUrl } = urls[index];
+
+          // 로컬 파일을 Blob으로 변환
           const response = await fetch(img.localUri);
           const blob = await response.blob(); 
           
-          const storageRef = ref(storage, `web_uploads/${tempId}`);
-          const uploadResult = await uploadBytes(storageRef, blob);
-          const bucket = uploadResult.metadata.bucket;
-          const fullPath = uploadResult.metadata.fullPath;
-          const firebaseUri = "https://firebasestorage.googleapis.com/v0/b/" + bucket + "/o/" + fullPath;
+          // GCS에 직접 PUT 요청
+          await fetch(presignedUrl, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': img.mimeType,
+            },
+            body: blob
+          });
 
           // 이전에 localUri, width, height가 이미 저장되어 있었음.
           return {
-            ...img, // 이전꺼는 그대로
-            firebaseUri: firebaseUri
+            ...img,
+            firebaseUri: fileUrl // 이미지 접근 URL
           };
         } catch (err) {
           console.error(`이미지 업로드 실패 (${img.localUri}):`, err);
@@ -85,14 +102,17 @@ export default function NextBtn({ imageList, onNavigateNext }: NextBtnProps) {
       onPress={handleNextStep}
     >
       {isAlertVisible && (
-        <AlertBox 
-          value="이미지를 최소 1장 이상 업로드해주세요." 
+        <AlertBox
+          value="이미지를 최소 1장 이상 업로드해주세요."
           onClose={() => setIsAlertVisible(false)}
         />
       )}
       <Text style={[styles.nextBtnText, isMobile && styles.mobileNextBtnText]}>
         {isLoading ? '처리중...' : '다음단계'}
       </Text>
+      {isAlertVisible && (
+        <AlertBox value="이미지를 최소 1장 이상 업로드해주세요." />
+      )}
     </TouchableOpacity>
   );
 }
