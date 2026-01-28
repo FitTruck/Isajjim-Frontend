@@ -26,6 +26,7 @@ export default function Result({ data, estimateId, ResultOfUserSelect, onNavigat
 
   // 첫 실행 시에 자동 실행됨.
   useEffect(() => {
+    
     if (ResultOfUserSelect.data.images) {
       // mappedResultCard : ResultCard에 필요한 이미지와 content객체
       const mappedResultCard = ResultOfUserSelect.data.images.map((imgResult: any, i: number) => ({
@@ -46,9 +47,11 @@ export default function Result({ data, estimateId, ResultOfUserSelect, onNavigat
       setResults(mappedResultCard);
       
       if (ResultOfUserSelect.data.items) {
+        const truckItem = ResultOfUserSelect.data.items.find((item: any) => item.category === "TRUCK");
+        
         setEstimateData({
-          truckType: ResultOfUserSelect.data.items.itemType,
-          truckQuantity: ResultOfUserSelect.data.items.quantity,
+          truckType: truckItem ? truckItem.itemType : null,
+          truckQuantity: truckItem ? truckItem.quantity : null,
         });
       }
 
@@ -75,7 +78,6 @@ export default function Result({ data, estimateId, ResultOfUserSelect, onNavigat
       )
     })));
 
-    // 프론트의 값이 변경되면, 견적서 또한 업데이트 되어야 한다. 그 동안의 status를 나타내는 변수(updateStatus)를 "updating"으로 설정!
     setUpdateStatus('updating');
 
     // 백엔드로 바뀐 정보를 보내는 부분
@@ -96,9 +98,11 @@ export default function Result({ data, estimateId, ResultOfUserSelect, onNavigat
 
       if (response.ok && resultOfUpdate.code === 'OK') {
         
-        setEstimateData({ // 여기서 받은 값을 견적서 컴포넌트에 전달해서 견적서 업데이트 할거임.
-          truckType: resultOfUpdate.data.items.itemType,
-          truckQuantity: resultOfUpdate.data.items.quantity,
+        const truckItem = resultOfUpdate.data.items.find((item: any) => item.category === "TRUCK");
+
+        setEstimateData({ 
+          truckType: truckItem ? truckItem.itemType : null,
+          truckQuantity: truckItem ? truckItem.quantity : null,
         });
 
         // 업데이트 상태를 done으로 변경
