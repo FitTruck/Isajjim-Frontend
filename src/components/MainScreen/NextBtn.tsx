@@ -104,7 +104,7 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     borderRadius: 8,
     alignItems: 'center',
-    marginTop: -50,
+    marginTop: -10,
   },
   mobileNextBtn: {
     backgroundColor: '#F0893B',
