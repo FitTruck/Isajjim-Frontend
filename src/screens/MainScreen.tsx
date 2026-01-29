@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, ScrollView, StyleSheet, Image, useWindowDimensions } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, Image, useWindowDimensions, Platform } from 'react-native';
 
 import { commonStyles } from '../styles/commonStyles';
 import { UploadedImage } from '../utils/Server';
@@ -7,6 +7,7 @@ import Header from '../components/common/Header';
 import UploadBox from '../components/MainScreen/UploadBox';
 import NextBtn from '../components/MainScreen/NextBtn';
 import AlertBox from '../components/common/AlertBox';
+import Space3D from '../components/Space3D';
 
 interface MainProps {
   onNavigateNext: (images: UploadedImage[], estimateId: number) => void;
@@ -81,6 +82,14 @@ export default function Main({ onNavigateNext, onGoHome }: MainProps) {
             />
 
           </View>
+
+           {/* 3D 적재 시뮬레이터 (Web & Mobile) */}
+             <View style={styles.loadingSection}>
+               <Text style={styles.loadingTitle}>3D 적재 시뮬레이션</Text>
+               <View style={styles.loadingContainer}>
+                 <Space3D />
+               </View>
+             </View>
 
           {/* 왜 이삿짐인가요? 섹션 */}
           <View style={[styles.whyTitleSection, isMobile && styles.mobileWhyTitleSection]}>
@@ -296,6 +305,26 @@ const styles = StyleSheet.create({
     fontSize: 24,
     lineHeight: 32,
     marginTop: 0,
+  },
+
+  // --- 3D Loading Simulation ---
+  loadingSection: {
+    width: '100%',
+    marginVertical: 40,
+    alignItems: 'center',
+  },
+  loadingTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 20, // 이 줄이 쉼표가 없어서 추가해야 함
+    color: '#1D1D1F',
+  },
+  loadingContainer: {
+    width: '50%',
+    height: 600,
+    backgroundColor: '#000',
+    borderRadius: 10,
+    overflow: 'hidden',
   },
 
   // --- Mobile ---
