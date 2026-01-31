@@ -9,14 +9,20 @@ import Header from '../components/common/Header';
 import DetailSelectBtn from '../components/UserSelect/DetailSelectBtn';
 import AlertBox from '../components/common/AlertBox';
 
-// app.tsx로부터 전달받을 함수의 자료형 정의
-interface UserSelectProps {
-  estimatedId: number | null;
-  onNavigateNext: (data: any) => void;
-  onGoHome: () => void;
-}
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../types/navigation';
 
-export default function UserSelect({ estimatedId, onNavigateNext, onGoHome }: UserSelectProps) {
+type Props = NativeStackScreenProps<RootStackParamList, 'UserSelect'>;
+
+export default function UserSelect({ navigation, route }: Props) {
+  const { images, estimateId } = route.params;
+
+  const onGoHome = () => {
+    navigation.reset({
+      index: 0,
+      routes: [{ name: 'Main' }],
+    });
+  };
   const [buildingType, setBuildingType] = useState<string | null>(null);
   const [roomSize, setRoomSize] = useState<string | null>(null);
   const [floor, setFloor] = useState<string | null>(null);
@@ -71,7 +77,7 @@ export default function UserSelect({ estimatedId, onNavigateNext, onGoHome }: Us
     setIsSubmitting(true);
 
     try {
-      const BACKEND_URL = `${BACKEND_DOMAIN}/api/v1/estimates/${estimatedId}`;
+      const BACKEND_URL = `${BACKEND_DOMAIN}/api/v1/estimates/${estimateId}`;
       const payload = mapToBackendValue();
 
       // PATCH 요청 보내기
@@ -86,7 +92,7 @@ export default function UserSelect({ estimatedId, onNavigateNext, onGoHome }: Us
       }
 
       // SSE 연결
-      const SSE_URL = `${BACKEND_DOMAIN}/api/v1/estimates/${estimatedId}/sse`;
+      const SSE_URL = `${BACKEND_DOMAIN}/api/v1/estimates/${estimateId}/sse`;
       const eventSource = new EventSource(SSE_URL);
 
       eventSource.addEventListener("sse", async (event) => {
@@ -100,7 +106,11 @@ export default function UserSelect({ estimatedId, onNavigateNext, onGoHome }: Us
 
           const ResultOfUserSelect = await response.json();
 
-          onNavigateNext(ResultOfUserSelect);
+          navigation.navigate('Result', {
+            data: images,
+            estimateId: estimateId,
+            ResultOfUserSelect: ResultOfUserSelect
+          });
           eventSource.close(); // 연결 종료
           setIsSubmitting(false);
         }

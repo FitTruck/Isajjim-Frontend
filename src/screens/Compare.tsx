@@ -1,13 +1,18 @@
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image as RNImage } from "react-native";
 import { commonStyles } from "../styles/commonStyles";
 import Header from "../components/common/Header";
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../types/navigation';
 
-// app.tsx로부터 전달받을 함수의 자료형 정의
-interface CompareProps {
-  onGoHome: () => void;
-}
+type Props = NativeStackScreenProps<RootStackParamList, 'Compare'>;
 
-export default function Compare({ onGoHome }: CompareProps) {
+export default function Compare({ navigation }: Props) {
+  const onGoHome = () => {
+    navigation.reset({
+      index: 0,
+      routes: [{ name: 'Main' }],
+    });
+  };
   return (
     <View style={commonStyles.container}>
       {/* Header */}

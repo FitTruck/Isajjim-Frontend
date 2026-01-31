@@ -7,16 +7,24 @@ import EstimatedCard from '../components/Result/EstimatedCard';
 import Header from '../components/common/Header';
 
 // app.tsx로부터 전달받을 함수의 자료형 정의
-interface ResultProps {
-  data: UploadedImage[];
-  estimateId: number | null;
-  ResultOfUserSelect: any;
-  onNavigateNext: () => void;
-  onGoHome: () => void;
-}
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../types/navigation';
 
-// ResultOfUserSelect : userselect에서 받은 resultCard에 들어갈 값과 estimateCard에 들어갈 값  
-export default function Result({ data, estimateId, ResultOfUserSelect, onNavigateNext, onGoHome }: ResultProps) {
+type Props = NativeStackScreenProps<RootStackParamList, 'Result'>;
+
+export default function Result({ navigation, route }: Props) {
+  const { data, estimateId, ResultOfUserSelect } = route.params;
+
+  const onGoHome = () => {
+    navigation.reset({
+      index: 0,
+      routes: [{ name: 'Main' }],
+    });
+  };
+
+  const onNavigateNext = () => {
+    navigation.navigate('Compare');
+  };
   // results: ResultCard컴포넌트의 속성으로 전달할 값임
   const [results, setResults] = useState<any[]>([]); 
   
@@ -27,7 +35,7 @@ export default function Result({ data, estimateId, ResultOfUserSelect, onNavigat
   // 첫 실행 시에 자동 실행됨.
   useEffect(() => {
     
-    if (ResultOfUserSelect.data.images) {
+    if (ResultOfUserSelect && ResultOfUserSelect.data.images) {
       // mappedResultCard : ResultCard에 필요한 이미지와 content객체
       const mappedResultCard = ResultOfUserSelect.data.images.map((imgResult: any, i: number) => ({
         // main에서 전달받은 이미지 url과 width, height 정보

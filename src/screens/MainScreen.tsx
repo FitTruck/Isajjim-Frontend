@@ -9,12 +9,20 @@ import NextBtn from '../components/MainScreen/NextBtn';
 import AlertBox from '../components/common/AlertBox';
 import Space3D from '../components/Space3D';
 
-interface MainProps {
-  onNavigateNext: (images: UploadedImage[], estimateId: number) => void;
-  onGoHome: () => void;
-}
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../types/navigation';
 
-export default function Main({ onNavigateNext, onGoHome }: MainProps) {
+type Props = NativeStackScreenProps<RootStackParamList, 'Main'>;
+
+export default function Main({ navigation }: Props) {
+  const onGoHome = () => {
+    // 이미 Main 화면이므로 새로고침 효과를 주거나 아무것도 안함.
+    // 여기서는 스택을 초기화하는 방식으로 구현
+    navigation.reset({
+      index: 0,
+      routes: [{ name: 'Main' }],
+    });
+  };
   const [imageList, setImageList] = useState<UploadedImage[]>([]);
   const [isAlertVisible, setIsAlertVisible] = useState(false);
   const { width } = useWindowDimensions();
@@ -77,7 +85,7 @@ export default function Main({ onNavigateNext, onGoHome }: MainProps) {
             {/* 다음 단계 버튼 */}
             <NextBtn 
               imageList={imageList}
-              onNavigateNext={onNavigateNext}
+              onNavigateNext={(images, id) => navigation.navigate('UserSelect', { images, estimateId: id })}
               onShowAlert={() => setIsAlertVisible(true)}
             />
 
