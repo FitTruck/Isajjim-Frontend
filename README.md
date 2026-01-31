@@ -1,4 +1,4 @@
-# 이삿짐 (ESatZZim)
+# 이삿짐 (isajjim)
 
 AI 기반 이사 견적 산출 서비스 프론트엔드 프로젝트입니다.
 
@@ -17,7 +17,7 @@ AI 기반 이사 견적 산출 서비스 프론트엔드 프로젝트입니다.
 
    ```bash
    git clone <repository-url>
-   cd ESatZZim
+   cd isajjim
    ```
 
 2. 의존성 패키지를 설치합니다.
