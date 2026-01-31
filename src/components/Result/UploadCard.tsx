@@ -1,9 +1,8 @@
-// React Hooks 및 Animated 추가 import
 import React, { useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Animated, Image } from 'react-native';
 import { translateTruckType } from '../../utils/Translator';
 
-interface EstimateCardProps {
+interface UploadCardProps {
   data: {
     truckType: string;
     truckQuantity: number;
@@ -12,7 +11,7 @@ interface EstimateCardProps {
   onNavigateNext: () => void;
 }
 
-const EstimatedCard = ({ data, status, onNavigateNext }: EstimateCardProps) => {
+const UploadCard = ({ data, status, onNavigateNext }: UploadCardProps) => {
   // useRef : Estimate 컴포넌트가 리렌더링 되어도 변수값 유지
   // useRef가 반환하는 값의 속성 중에 current가 있고 그 current값은 Animated.Value(0)의 값임
   // Animated.Value(x) -> 값을 자연스럽게 그라데이션으로 변경 
@@ -206,13 +205,13 @@ const styles = StyleSheet.create({
   },
   compareButton: {
     width: '100%',
-    height: 48,
+    height: 40,
     marginTop: 20,
     backgroundColor: '#ED8B3F',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.05,
-    borderRadius: 8,
+    borderRadius: 3,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -224,4 +223,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default EstimatedCard;
+export default UploadCard;
