@@ -1,4 +1,4 @@
-import { UploadedImage } from '../utils/Server';
+import { UploadedImage } from './common';
 
 // 각 화면으로 변동할 때의 매개변수들을 정의
 export type RootStackParamList = {
