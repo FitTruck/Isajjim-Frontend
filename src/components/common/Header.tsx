@@ -1,27 +1,49 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, useWindowDimensions } from 'react-native';
+import { View, Text, Image, TouchableOpacity, StyleSheet, useWindowDimensions } from 'react-native';
 
-interface HeaderProps {
-  onGoHome: () => void;
-}
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../../types/navigation';
 
-export default function Header({ onGoHome }: HeaderProps) {
+export default function Header() {
   const { width } = useWindowDimensions();
   const isMobile = width < 768;
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+
+  const onGoHome = () => {
+    navigation.reset({
+      index: 0,
+      routes: [{ name: 'Main' }],
+    });
+  };
+
+  const onGoMyEstimate = () => {
+    navigation.navigate('MyEstimate');
+  };
+
+  const onGoMyChat = () => {
+    navigation.navigate('MyChat');
+  };
+
 
   return (
     <View style={[styles.header, isMobile && styles.mobileHeader]}>
-      <TouchableOpacity onPress={onGoHome}>
-        <Text style={[styles.logoText, isMobile && styles.mobileLogoText]}>이삿찜</Text>
-      </TouchableOpacity>
+        <TouchableOpacity style={styles.logoContainer} onPress={onGoHome}>
+          <Image source={require('../../../assets/Logo.png')} style={styles.logoIcon} />
+          <Text style={[styles.logoText, isMobile && styles.mobileLogoText]}>이삿찜</Text>
+        </TouchableOpacity>
       <View style={[styles.headerRight, isMobile && styles.mobileHeaderRight]}>
+        <TouchableOpacity onPress={onGoMyEstimate}>
+          <Text style={[styles.mypageText, isMobile && styles.mobileMypageText]}>내 견적</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={onGoMyChat}>
+          <Text style={[styles.mypageText, isMobile && styles.mobileMypageText]}>채팅</Text>
+          {true && <View style={styles.Badge}></View>}
+        </TouchableOpacity>
         <TouchableOpacity>
-          <Text style={[styles.mypageText, isMobile && styles.mobileMypageText]}>마이페이지</Text>
+          <Text style={[styles.mypageText, isMobile && styles.mobileMypageText]}>문의하기</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={[styles.loginButton, isMobile && styles.mobileLoginButton]}>
-          <Text style={[styles.loginButtonText, isMobile && styles.mobileLoginButtonText]}>로그인</Text>
-        </TouchableOpacity>
-      </View>
+      </View> 
     </View>
   );
 }
@@ -36,7 +58,7 @@ const styles = StyleSheet.create({
     right: 0,
     zIndex: 100, 
     backgroundColor: 'rgb(255, 255, 255)', 
-    paddingHorizontal: '5%',
+    paddingHorizontal: '20%',
     flexDirection: 'row', 
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -46,6 +68,18 @@ const styles = StyleSheet.create({
   mobileHeader: {
     height: 50,
     paddingHorizontal: 16,
+  },
+  logoContainer: {
+    height: '100%',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  logoIcon: {
+    width: 40,
+    height: 40,
+    marginTop: 10,
+    resizeMode: 'contain',
   },
   logoText: {
     fontSize: 26, 
@@ -61,35 +95,27 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 24,
+    gap: 40,
   },
   mobileHeaderRight: {
     gap: 12,
   },
   mypageText: { 
-    fontSize: 15,
+    fontSize: 16,
     fontWeight: '500',
     color: '#3D3D3A', 
   },
   mobileMypageText: {
     fontSize: 13,
   },
-  loginButton: {
-    backgroundColor: '#F0893B', 
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 4, 
+  Badge: {
+    width: 8,
+    height: 8,
+    borderRadius: 6,
+    backgroundColor: '#FF8383',
+    position: 'absolute',
+    top: 5,
+    right: -11,
   },
-  mobileLoginButton: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-  },
-  loginButtonText: {
-    color: 'white',
-    fontSize: 14,
-    fontWeight: '500',
-  },
-  mobileLoginButtonText: {
-    fontSize: 12,
-  },
+  
 });
