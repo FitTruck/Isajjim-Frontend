@@ -133,13 +133,13 @@ export default function MyChat({ navigation }: Props) {
 
                   {/* 콘텐츠 */}
                   <View style={styles.chatContent}>
-                     <View style={styles.pinkLoader} />
+                    
                   </View>
 
                   {/* 푸터 입력창 */}
                   <View style={styles.chatFooter}>
-                     <Image source={{uri: 'https://placehold.co/20x20'}} style={styles.clipIcon} />
-                     <Image source={{uri: 'https://placehold.co/22x22'}} style={styles.sendIcon} />
+                    <Image source={{uri: 'https://placehold.co/20x20'}} style={styles.clipIcon} />
+                    <Image source={{uri: 'https://placehold.co/22x22'}} style={styles.sendIcon} />
                   </View>
                 </View>
               </View>
@@ -411,13 +411,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  pinkLoader: {
-    width: 20,
-    height: 20,
-    borderRadius: 10,
-    borderWidth: 2,
-    borderColor: '#FF00CC', // 이미지 중앙에 보이는 핑크색 링 
   },
 
   chatFooter: {
