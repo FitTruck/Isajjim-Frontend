@@ -54,31 +54,29 @@ const EstimatedCard = ({ data, status, onNavigateNext }: EstimateCardProps) => {
 
   return (
     <View style={styles.container}>
-      {/* '견적표' 타이틀 및 상태 */}
-      <View style={styles.headerContainer}>
-        <Text style={styles.title}>견적표</Text>
-        
-        <View style={styles.statusWrapper}>
-          <Animated.Text style={[{ 
-            opacity: updatingOpacity 
-          }, styles.updatingStatusText]}>
-            견적서 생성중...
-          </Animated.Text>
-          <Animated.View style={[{ 
-            opacity: doneOpacity 
-          }, styles.doneStatusIconWrapper]}>
-            <Image 
-              source={require('../../../assets/Check.png')} 
-              style={styles.checkIcon}
-              resizeMode="contain"
-            />
-          </Animated.View>
-        </View>
-      </View>
-
       {/* 용달 정보 섹션 */}
       <View style={styles.infoSection}>
-        <Text style={styles.sectionHeader}>용달 정보</Text>
+        <View style={styles.infoHeader}>
+          <Text style={styles.sectionHeader}>용달 정보</Text>
+          
+          <View style={styles.statusWrapper}>
+            <Animated.Text style={[{ 
+              opacity: updatingOpacity 
+            }, styles.updatingStatusText]}>
+              생성중...
+            </Animated.Text>
+            <Animated.View style={[{ 
+              opacity: doneOpacity 
+            }, styles.doneStatusIconWrapper]}>
+              <Image 
+                source={require('../../../assets/Check.png')} 
+                style={styles.checkIcon}
+                resizeMode="contain"
+              />
+            </Animated.View>
+          </View>
+        </View>
+
         <View style={styles.row}>
           <Text style={styles.truckType}>{translatedTruckType}</Text>
           <Text style={styles.truckQuantity}>{data.truckQuantity}대</Text>
@@ -88,15 +86,15 @@ const EstimatedCard = ({ data, status, onNavigateNext }: EstimateCardProps) => {
       {/* 구분선 */}
       <View style={styles.divider} />
 
-      {/* 가격 비교하기 섹션 */}
+      {/* 이사 정보 업로드 섹션 */}
       <View style={styles.compareSection}>
-        <Text style={styles.compareTitle}>가격 비교하기</Text>
-        <Text style={styles.subtitle}>AI 및 사용자 설정으로 산출된 견적 업로드 !</Text>
+        <Text style={styles.compareTitle}>이사 정보 업로드</Text>
+        <Text style={styles.subtitle}>사용자 설정 및 AI로 산출된 정보를 업로드</Text>
       </View>
 
-      {/* 비교하기 버튼 */}
+      {/* 업로드 버튼 */}
       <TouchableOpacity style={styles.compareButton} onPress={onNavigateNext}>
-        <Text style={styles.compareButtonText}>비교하기</Text>
+        <Text style={styles.compareButtonText}>업로드</Text>
       </TouchableOpacity>
     </View>
   );
@@ -117,56 +115,47 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-end',
     right: 80,
   },
-  headerContainer: {
+  infoSection: {
+    width: '100%',
+    marginTop: 5,
+  },
+  infoHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 20,
-    flexWrap: 'wrap',
+    width: '100%',
   },
-  title: {
+  sectionHeader: {
     color: '#3D3D3A',
-    fontSize: 24,
+    fontSize: 18,
     fontFamily: 'Inter',
-    fontWeight: '600',
-    lineHeight: 30,
+    fontWeight: '700',
+    lineHeight: 24,
   },
   statusWrapper: {
     justifyContent: 'center',
-    height: 30,
-    width: 28,
+    height: 24,
+    width: 24, // 아이콘 크기에 맞게 조정
     position: 'relative',
   },
   updatingStatusText: {
     position: 'absolute',
     fontSize: 12,
     color: '#3D3D3A',
-    width: 100, 
+    width: 80, 
     right: 0,
     textAlign: 'right',
   },
   doneStatusIconWrapper: {
     position: 'absolute',
     right: 0,
-    width: 20,
-    height: 20,
+    width: 24,
+    height: 24,
   },
   checkIcon: {
     width: '100%',
     height: '100%',
-  },
-  infoSection: {
-    width: '100%',
-    marginTop: 10,
-  },
-  sectionHeader: {
-    width: '100%',
-    marginBottom: 10,
-    color: '#3D3D3A',
-    fontSize: 18,
-    fontFamily: 'Inter',
-    fontWeight: '500',
-    lineHeight: 24,
   },
   row: {
     width: '100%',
@@ -175,18 +164,18 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
   truckType: {
-    color: '#3D3D3A',
+    color: '#828282',
     fontSize: 14,
     fontFamily: 'Inter',
-    fontWeight: '500',
+    fontWeight: '400',
     lineHeight: 20,
   },
   truckQuantity: {
     textAlign: 'right',
-    color: '#3D3D3A',
+    color: '#828282',
     fontSize: 14,
     fontFamily: 'Inter',
-    fontWeight: '500',
+    fontWeight: '400',
     lineHeight: 20,
   },
   divider: {
@@ -200,26 +189,26 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   compareTitle: {
-    color: '#3D3D3A',
+    color: '#000',
     fontSize: 20,
     fontFamily: 'Inter',
-    fontWeight: '600',
+    fontWeight: '700',
     lineHeight: 28,
   },
   subtitle: {
     width: '100%',
     marginTop: 8,
     color: '#828282',
-    fontSize: 14,
+    fontSize: 11,
     fontFamily: 'Inter',
     fontWeight: '400',
-    lineHeight: 20,
+    lineHeight: 16,
   },
   compareButton: {
     width: '100%',
-    height: 40,
+    height: 48,
     marginTop: 20,
-    backgroundColor: '#F0893B',
+    backgroundColor: '#ED8B3F',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.05,
@@ -229,9 +218,9 @@ const styles = StyleSheet.create({
   },
   compareButtonText: {
     color: 'white',
-    fontSize: 14,
+    fontSize: 16,
     fontFamily: 'Inter',
-    fontWeight: '500',
+    fontWeight: '600',
   },
 });
 
