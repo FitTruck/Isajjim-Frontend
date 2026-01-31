@@ -5,7 +5,8 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Main from './src/screens/MainScreen';
 import UserSelect from './src/screens/UserSelect';
 import Result from './src/screens/Result';
-import Compare from './src/screens/Compare';
+import MyEstimate from './src/screens/MyEstimate';
+import MyChat from './src/screens/MyChat';
 
 // 각 화면의 매개변수 타입들을 정의하고 있는 타입 import
 import { RootStackParamList } from './src/types/navigation';
@@ -19,9 +20,24 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export default function App() {
 
+  // 얘가 있어야 뒤로가기가 됨.
+  const linking = {
+    prefixes: ['http://localhost:8081', 'isajjim://'],
+    config: {
+      // 주소에 뜨는 경로
+      screens: {
+        Main: 'main',
+        UserSelect: 'user-select',
+        Result: 'result',
+        MyEstimate: 'my-estimate',
+        MyChat: 'my-chat',
+      },
+    },
+  };
+
   return (
     // NavigationContainer: 앱의 네비게이션 트리를 관리하는 최상위 컴포넌트
-    <NavigationContainer>
+    <NavigationContainer linking={linking}>
       {/* Stack.Navigator: 각 화면을 스택처럼 쌓아 관리 */}
       <Stack.Navigator 
         initialRouteName="Main" // 첫 화면의 name
@@ -61,7 +77,8 @@ export default function App() {
             }
           }}
         />
-        <Stack.Screen name="Compare" component={Compare} />
+        <Stack.Screen name="MyEstimate" component={MyEstimate} />
+        <Stack.Screen name="MyChat" component={MyChat} />
       </Stack.Navigator>
     </NavigationContainer>
   );
