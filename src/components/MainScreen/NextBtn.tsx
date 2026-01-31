@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { StyleSheet, TouchableOpacity, Text,useWindowDimensions } from 'react-native';
 import { ref, uploadBytes } from 'firebase/storage';
 import { v4 as uuidv4 } from 'uuid';
-import { UploadedImage, BACKEND_DOMAIN } from '../../utils/Server';
+import { UploadedImage } from '../../types/common';
+import { BACKEND_DOMAIN } from '../../utils/Server';
 
 interface NextBtnProps {
   imageList: UploadedImage[];
