@@ -5,10 +5,17 @@
     "version": "1.0.0",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
-    "platforms": ["web"],
+    "platforms": [
+      "web",
+      "android",
+      "ios"
+    ],
     "web": {
       "favicon": "./assets/Logo.png",
       "bundler": "metro"
-    }
+    },
+    "plugins": [
+      "expo-asset"
+    ]
   }
 }
