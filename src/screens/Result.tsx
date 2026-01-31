@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
 import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { commonStyles } from '../styles/commonStyles';
-import { UploadedImage, BACKEND_DOMAIN } from '../utils/Server';
+import { UploadedImage } from '../types/common';
+import { BACKEND_DOMAIN } from '../utils/Server';
 import ResultCard from '../components/Result/ResultCard';
-import EstimatedCard from '../components/Result/EstimatedCard';
+import UploadCard from '../components/Result/UploadCard';
 import Header from '../components/common/Header';
 
 // app.tsx로부터 전달받을 함수의 자료형 정의
@@ -13,17 +14,10 @@ import { RootStackParamList } from '../types/navigation';
 type Props = NativeStackScreenProps<RootStackParamList, 'Result'>;
 
 export default function Result({ navigation, route }: Props) {
-  const { data, estimateId, ResultOfUserSelect } = route.params;
-
-  const onGoHome = () => {
-    navigation.reset({
-      index: 0,
-      routes: [{ name: 'Main' }],
-    });
-  };
+  const { data, estimateId, ResultOfUserSelect } = route.params
 
   const onNavigateNext = () => {
-    navigation.navigate('Compare');
+    navigation.navigate('MyEstimate');
   };
   // results: ResultCard컴포넌트의 속성으로 전달할 값임
   const [results, setResults] = useState<any[]>([]); 
@@ -135,7 +129,7 @@ export default function Result({ navigation, route }: Props) {
   return (
     <View style={commonStyles.container}>
       {/* Header */}
-      <Header onGoHome={onGoHome} />
+      <Header />
 
       <ScrollView contentContainerStyle={commonStyles.scrollContent}>
         {/* Main Wrapper */}
@@ -147,7 +141,7 @@ export default function Result({ navigation, route }: Props) {
               <Text style={commonStyles.mainSubtitle}>이미지 분석 결과</Text>
           </View>
 
-          {/* 결과 및 견적표 카드 컨테이너 */}
+          {/* 결과 및 업로드 카드 컨테이너 */}
           <View style={styles.resultEstimateCardContainer}>
             {/* 결과 섹션 컨테이너 */}
             <View style={styles.resultSectionContainer}>
@@ -163,9 +157,9 @@ export default function Result({ navigation, route }: Props) {
 
             </View>
 
-            {/* 견적표 컨테이너 */}
+            {/* 업로드 컨테이너 */}
             <View style={styles.estimateCardContainer}>
-              <EstimatedCard 
+              <UploadCard 
                 data={estimateData} 
                 status={updateStatus} 
                 onNavigateNext={handleNextStep}

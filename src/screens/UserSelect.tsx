@@ -17,12 +17,6 @@ type Props = NativeStackScreenProps<RootStackParamList, 'UserSelect'>;
 export default function UserSelect({ navigation, route }: Props) {
   const { images, estimateId } = route.params;
 
-  const onGoHome = () => {
-    navigation.reset({
-      index: 0,
-      routes: [{ name: 'Main' }],
-    });
-  };
   const [buildingType, setBuildingType] = useState<string | null>(null);
   const [roomSize, setRoomSize] = useState<string | null>(null);
   const [floor, setFloor] = useState<string | null>(null);
@@ -143,7 +137,7 @@ export default function UserSelect({ navigation, route }: Props) {
       )}
 
       {/* 헤더 */}
-      <Header onGoHome={onGoHome} />
+      <Header />
 
       <ScrollView contentContainerStyle={commonStyles.scrollContent}>
         <View style={commonStyles.mainWrapper}>

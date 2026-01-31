@@ -2,12 +2,13 @@ import React, { useState } from 'react';
 import { View, Text, ScrollView, StyleSheet, Image, useWindowDimensions, Platform } from 'react-native';
 
 import { commonStyles } from '../styles/commonStyles';
-import { UploadedImage } from '../utils/Server';
+import { UploadedImage } from '../types/common';
+
 import Header from '../components/common/Header';
 import UploadBox from '../components/MainScreen/UploadBox';
 import NextBtn from '../components/MainScreen/NextBtn';
 import AlertBox from '../components/common/AlertBox';
-import Space3D from '../components/Space3D';
+import Space3D from '../components/Space/Space3D';
 
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types/navigation';
@@ -15,14 +16,7 @@ import { RootStackParamList } from '../types/navigation';
 type Props = NativeStackScreenProps<RootStackParamList, 'Main'>;
 
 export default function Main({ navigation }: Props) {
-  const onGoHome = () => {
-    // 이미 Main 화면이므로 새로고침 효과를 주거나 아무것도 안함.
-    // 여기서는 스택을 초기화하는 방식으로 구현
-    navigation.reset({
-      index: 0,
-      routes: [{ name: 'Main' }],
-    });
-  };
+
   const [imageList, setImageList] = useState<UploadedImage[]>([]);
   const [isAlertVisible, setIsAlertVisible] = useState(false);
   const { width } = useWindowDimensions();
@@ -36,7 +30,7 @@ export default function Main({ navigation }: Props) {
   return (
     <View style={commonStyles.container}>
       {/* Header */}
-      <Header onGoHome={onGoHome} />
+      <Header />
 
       {/* 알림 박스 */}
       {isAlertVisible && (
