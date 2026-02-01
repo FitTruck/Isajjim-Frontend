@@ -91,7 +91,7 @@ const styles = StyleSheet.create({
   container: {
     marginBottom: 20,
     width: '100%',
-    position: 'relative', // Necessary for absolute positioning of the list
+    position: 'relative',
   },
   label: {
     fontSize: 16,
@@ -126,7 +126,6 @@ const styles = StyleSheet.create({
     color: '#999',
   },
   
-  // New Inline Dropdown Styles
   dropdownListContainer: {
     position: 'absolute',
     top: '100%', 
