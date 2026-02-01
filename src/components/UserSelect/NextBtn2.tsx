@@ -8,7 +8,19 @@ interface Props {
   estimateId: number;
   images: any;
   onShowAlert: () => void;
-  data: {
+  movingDate: string | null;
+  data1: {
+    buildingType: string | null;
+    roomSize: string | null;
+    floor: string | null;
+    elevator: boolean | null;
+    ladderTruck: string | null;
+    roomType: string | null;
+    duplex: boolean | null;
+    groundStair: boolean | null;
+    parking: boolean | null;
+  };
+  data2: {
     buildingType: string | null;
     roomSize: string | null;
     floor: string | null;
@@ -21,48 +33,45 @@ interface Props {
   };
 }
 
-export default function NextBtn2({ navigation, estimateId, images, onShowAlert, data }: Props) {
+export default function NextBtn2({ navigation, estimateId, images, onShowAlert, movingDate, data1, data2 }: Props) {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const {
-      buildingType,
-      roomSize,
-      floor,
-      elevator,
-      ladderTruck,
-      roomType,
-      duplex,
-      groundStair,
-      parking
-  } = data;
-
-  const mapToBackendValue = () => {
+  const mapToBackendValue1 = (data: any) => {
     return {
-      buildingType: buildingType,
-      roomSize: roomSize,
-      floor: floor,
-      elevator: elevator,
-      ladderTruck: ladderTruck,
-      roomType: roomType,
-      duplex: duplex,
-      groundStair: groundStair, 
-      parking: parking,
+      // 여기서 buildingType1 같이 안 쓴 이유는 위에 Props정의할 때, 숫자를 뺏기 때문임.
+      "buildingType": data.buildingType,
+      "roomSize": data.roomSize,
+      "floor": data.floor,
+      "elevator": data.elevator,
+      "ladderTruck": data.ladderTruck,
+      "roomType": data.roomType,
+      "duplex": data.duplex,
+      "groundStair": data.groundStair, 
+      "parking": data.parking,
     };
   };
 
+  const mapToBackendValue2 = (data: any) => {
+    return {
+      "buildingType": data.buildingType,
+      "roomSize": data.roomSize,
+      "floor": data.floor,
+      "elevator": data.elevator,
+      "ladderTruck": data.ladderTruck,
+      "roomType": data.roomType,
+      "duplex": data.duplex,
+      "groundStair": data.groundStair, 
+      "parking": data.parking,
+    };
+  };
+
+  const validateData = (data: any) => {
+    return Object.values(data).every(value => value !== null && value !== "");
+  };
+
   const handlePressNext = async () => {
-    // 유효성 검사
-    if (
-      !buildingType || 
-      !roomSize || 
-      !floor || 
-      !roomType || 
-      !ladderTruck ||
-      elevator === null ||
-      duplex === null ||
-      groundStair === null ||
-      parking === null
-    ) {
+    // 유효성 검사 (출발지 & 도착지 모두 체크)
+    if (!validateData(data1) || !validateData(data2)) {
       const msg = "모든 항목을 선택해주세요.";
       if (Platform.OS === 'web') {
         onShowAlert();
@@ -76,7 +85,12 @@ export default function NextBtn2({ navigation, estimateId, images, onShowAlert, 
 
     try {
       const BACKEND_URL = `${BACKEND_DOMAIN}/api/v1/estimates/${estimateId}`;
-      const payload = mapToBackendValue();
+      
+      const payload = {
+        "date": movingDate,
+        "startLocation": mapToBackendValue1(data1),
+        "endLocation": mapToBackendValue2(data2)
+      };
 
       const response = await fetch(BACKEND_URL, {
         method: 'PATCH',

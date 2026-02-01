@@ -1,12 +1,11 @@
-import React, { useState } from 'react'; // 상태를 저장하게 해줌
-import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Alert, Platform } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, ScrollView, StyleSheet } from 'react-native';
 import { commonStyles } from '../styles/commonStyles';
-import FloorDetail from '../components/UserSelect/FloorDetail';
-import RoomSizeDetail from '../components/UserSelect/RoomSizeDetail';
 import Header from '../components/common/Header';
-import DetailSelectBtn from '../components/UserSelect/DetailSelectBtn';
-import NextBtn2 from '../components/UserSelect/NextBtn2';
+import NextBtn from '../components/UserSelect/NextBtn2'; 
 import AlertBox from '../components/common/AlertBox';
+import Dropdown from '../components/UserSelect/Dropdown';
+import DateSelector from '../components/UserSelect/DateSelector';
 
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types/navigation';
@@ -14,20 +13,111 @@ import { RootStackParamList } from '../types/navigation';
 type Props = NativeStackScreenProps<RootStackParamList, 'UserSelect'>;
 
 export default function UserSelect({ navigation, route }: Props) {
+  // 이미지 정보를 계속 들고 있어야 result에서 보여줄 수가 있다. 따로 다른 곳에 저장하고 있지 않음
   const { images, estimateId } = route.params;
 
-  const [buildingType, setBuildingType] = useState<string | null>(null);
-  const [roomSize, setRoomSize] = useState<string | null>(null);
-  const [floor, setFloor] = useState<string | null>(null);
-  const [elevator, setElevator] = useState<boolean | null>(null);
-  const [ladderTruck, setLadderTruck] = useState<string | null>(null);
-  const [roomType, setRoomType] = useState<string | null>(null);
-  const [duplex, setDuplex] = useState<boolean | null>(null);
-  const [groundStair, setGroundStair] = useState<boolean | null>(null);
-  const [parking, setParking] = useState<boolean | null>(null);
+  // 이사 희망 날짜
+  const [movingDate, setMovingDate] = useState<string | null>(null);
+
+  // 드롭다운 제어
+  const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
+  const handleToggle = (id: string) => {
+    setActiveDropdown(prev => prev === id ? null : id);
+  };
+
+  // 출발지 정보
+  const [adress1, setAdress1] = useState<string | null>(null);
+  const [detailAddress1, setDetailAddress1] = useState<string | null>(null);
+  const [buildingType1, setBuildingType1] = useState<string | null>(null);
+  const [roomSize1, setRoomSize1] = useState<string | null>(null);
+  const [floor1, setFloor1] = useState<string | null>(null);
+  const [elevator1, setElevator1] = useState<boolean | null>(null);
+  const [ladderTruck1, setLadderTruck1] = useState<string | null>(null);
+  const [roomType1, setRoomType1] = useState<string | null>(null);
+  const [duplex1, setDuplex1] = useState<boolean | null>(null);
+  const [groundStair1, setGroundStair1] = useState<boolean | null>(null);
+  const [parking1, setParking1] = useState<boolean | null>(null);
+
+  // 도착지 정보
+  const [adress2, setAdress2] = useState<string | null>(null);
+  const [detailAddress2, setDetailAddress2] = useState<string | null>(null);
+  const [buildingType2, setBuildingType2] = useState<string | null>(null);
+  const [roomSize2, setRoomSize2] = useState<string | null>(null);
+  const [floor2, setFloor2] = useState<string | null>(null);
+  const [elevator2, setElevator2] = useState<boolean | null>(null);
+  const [ladderTruck2, setLadderTruck2] = useState<string | null>(null);
+  const [roomType2, setRoomType2] = useState<string | null>(null);
+  const [duplex2, setDuplex2] = useState<boolean | null>(null);
+  const [groundStair2, setGroundStair2] = useState<boolean | null>(null);
+  const [parking2, setParking2] = useState<boolean | null>(null);
+
   const [isAlertVisible, setIsAlertVisible] = useState(false);
 
-  
+  // 각 옵션 정의
+  const buildingTypeOptions = [
+    { label: '빌라/연립', value: "VILLA" },
+    { label: '오피스텔', value: "OFFICETEL" },
+    { label: '주택', value: "HOUSE" },
+    { label: '아파트', value: "APARTMENT" },
+    { label: '상가/ 사무실', value: "COMMERCIAL" },
+  ];
+
+  const roomSizeOptions = [
+    { label: '10평 이하', value: "UNDER_10" },
+    { label: '10~15평', value: "BETWEEN_10_15" },
+    { label: '15~20평', value: "BETWEEN_15_20" },
+    { label: '20~25평', value: "BETWEEN_20_25" },
+    { label: '25~30평', value: "BETWEEN_25_30" },
+    { label: '30~40평', value: "BETWEEN_30_40" }, 
+    { label: '40~50평', value: "BETWEEN_40_50" },
+    { label: '50평 이상', value: "OVER_50" },
+  ];
+
+  const floorOptions = [
+    { label: '반지하', value: "SEMI_BASEMENT" },
+    ...Array.from({ length: 29 }, (_, i) => ({ 
+      label: `${i + 1}층`, 
+      value: `FL_${i + 1}` 
+    })),
+    { label: '30층 이상', value: "FL_30_OR_MORE" }
+  ];
+
+  const elevatorOptions = [
+    { label: '있음', value: true },
+    { label: '없음', value: false },
+  ];
+
+  const ladderTruckOptions = [
+    { label: '필요', value: "REQUIRED" },
+    { label: '필요없음', value: "NOT_REQUIRED" },
+    { label: '확인 필요', value: "NEED_CONFIRM" },
+  ];
+
+  const roomTypeOptions = [
+    { label: '원룸', value: "STUDIO" },
+    { label: '1.5룸', value: "ONE_AND_HALF" },
+    { label: '2룸', value: "TWO_ROOM" },
+    { label: '3룸', value: "THREE_ROOM" },
+    { label: '4룸', value: "FOUR_ROOM" },
+    { label: '5룸 이상', value: "FIVE_PLUS" },
+  ];
+
+  const duplexOptions = [
+    { label: '있음', value: true },
+    { label: '없음', value: false },
+  ];
+
+  const groundStairOptions = [
+    { label: '있음', value: true },
+    { label: '없음', value: false },
+  ];
+
+  const parkingOptions = [
+    { label: '있음', value: true },
+    { label: '없음', value: false },
+  ];
+
+
   return (
     <View style={commonStyles.container}>
       {/* 알림 박스 */}
@@ -42,355 +132,252 @@ export default function UserSelect({ navigation, route }: Props) {
         contentContainerStyle={commonStyles.scrollContent}
         stickyHeaderIndices={[0]}
       >
-        {/* 헤더 */}
         <Header />
 
         <View style={commonStyles.mainWrapper}>
-
-          {/* 메인 섹션 */}
+          
+          {/* 타이틀 */}
           <View style={commonStyles.mainSection}>
-              <Text style={commonStyles.mainTitle}>필수 기재 사항</Text>
-              <Text style={commonStyles.mainSubtitle}>정확한 견적을 위해 필요한 사항입니다</Text>
+            <Text style={commonStyles.mainTitle}>상세 기재 사항</Text>
+            <Text style={commonStyles.mainSubtitle}>정확한 견적을 위해 필요한 사항입니다</Text>
+            <Text> 전체 항목 필수 입력 사항입니다.</Text>
           </View>
 
-          {/* 선택 섹션 컨테이너 */}
-          <View style={styles.selectSectionContainer}>
-            
-            {/* Row 1: 건물 종류 & 방 구조 */}
-            <View style={[styles.selectSectionRow, {height: 324}]}>
-              {/* 건물 종류 */}
-              <View style={{ width: 477, height: 324 }}>
-                <Text style={styles.sectionTitle}>건물종류</Text>
-                <View style={{ 
-                  position: 'absolute', 
-                  top: 43, left: 0, 
-                  width: 476, height: 281, 
-                }}>
-                  <DetailSelectBtn
-                    x={0} 
-                    y={0} 
-                    width={238} 
-                    height={94} 
-                    label="빌라/연립" 
-                    value="VILLA" 
-                    selectedValue={buildingType} 
-                    onSelect={setBuildingType} // onSelect라는 것은 setBuildingType을 실행하는 것.
-                  />
-                  <DetailSelectBtn 
-                    x={238} 
-                    y={0} 
-                    width={238} 
-                    height={94} 
-                    label="오피스텔" 
-                    value="OFFICETEL" 
-                    selectedValue={buildingType} 
-                    onSelect={setBuildingType} 
-                  />
-                  <DetailSelectBtn 
-                    x={0} 
-                    y={93} 
-                    width={238} 
-                    height={94} 
-                    label="주택" 
-                    value="HOUSE" 
-                    selectedValue={buildingType} 
-                    onSelect={setBuildingType} 
-                  />
-                  <DetailSelectBtn 
-                    x={238} 
-                    y={93} 
-                    width={238} 
-                    height={94} 
-                    label="아파트" 
-                    value="APARTMENT" 
-                    selectedValue={buildingType} 
-                    onSelect={setBuildingType} 
-                  />
-                  <DetailSelectBtn 
-                    x={0} 
-                    y={186} 
-                    width={238} 
-                    height={94} 
-                    label="상가/ 사무실" 
-                    value="COMMERCIAL" 
-                    selectedValue={buildingType} 
-                    onSelect={setBuildingType} 
-                  />
-                </View>
-              </View>
+          
+          <DateSelector date={movingDate} onSelect={setMovingDate} />
+          
+          {/* 양쪽 카드 컨테이너 */}
+          <View style={styles.cardsContainer}>
 
-              {/* 방 구조 */}
-              <View style={{ width: 477, height: 324 }}>
-                <Text style={styles.sectionTitle}>방 구조</Text>
-                <View style={{ position: 'absolute', top: 43, left: 0 }}>
-                  <DetailSelectBtn 
-                    x={0} 
-                    y={0} 
-                    width={238} 
-                    height={94} 
-                    label="원룸" 
-                    value="STUDIO" 
-                    selectedValue={roomType} 
-                    onSelect={setRoomType} 
-                  />
-                  <DetailSelectBtn 
-                    x={238} 
-                    y={0} 
-                    width={238} 
-                    height={94} 
-                    label="1.5룸" 
-                    value="ONE_AND_HALF" 
-                    selectedValue={roomType} 
-                    onSelect={setRoomType} 
-                  />
-                  <DetailSelectBtn 
-                    x={0} 
-                    y={93} 
-                    width={238} 
-                    height={94} 
-                    label="2룸" 
-                    value="TWO_ROOM" 
-                    selectedValue={roomType} 
-                    onSelect={setRoomType} 
-                  />
-                  <DetailSelectBtn 
-                    x={238} 
-                    y={93} 
-                    width={238} 
-                    height={94} 
-                    label="3룸" 
-                    value="THREE_ROOM" 
-                    selectedValue={roomType} 
-                    onSelect={setRoomType} 
-                  />
-                  <DetailSelectBtn 
-                    x={0} 
-                    y={186} 
-                    width={238} 
-                    height={94} 
-                    label="4룸" 
-                    value="FOUR_ROOM" 
-                    selectedValue={roomType} 
-                    onSelect={setRoomType} 
-                  />
-                  <DetailSelectBtn 
-                    x={238} 
-                    y={186} 
-                    width={238} 
-                    height={94} 
-                    label="5룸 이상" 
-                    value="FIVE_PLUS" 
-                    selectedValue={roomType} 
-                    onSelect={setRoomType} 
-                  />
-                </View>
+            {/* 출발지 카드 영역 */}
+            <View style={styles.cardColumn}>
+              <Text style={styles.cardTitle}>출발지 정보</Text>
+              <View style={styles.card}>
+                
+                <Dropdown
+                  label="건물 유형"
+                  value={buildingType1}
+                  options={buildingTypeOptions} 
+                  onSelect={setBuildingType1}
+                  isOpen={activeDropdown === 'buildingType1'}
+                  onToggle={() => handleToggle('buildingType1')}
+                  zIndex={100}
+                />
+
+                <Dropdown 
+                  label="층수"
+                  value={floor1}
+                  options={floorOptions}
+                  onSelect={setFloor1}
+                  isOpen={activeDropdown === 'floor1'}
+                  onToggle={() => handleToggle('floor1')}
+                  zIndex={90}
+                />
+
+                <Dropdown 
+                  label="평수"
+                  value={roomSize1}
+                  options={roomSizeOptions}
+                  onSelect={setRoomSize1}
+                  isOpen={activeDropdown === 'roomSize1'}
+                  onToggle={() => handleToggle('roomSize1')}
+                  zIndex={80}
+                />
+
+                <Dropdown 
+                  label="방 구조"
+                  value={roomType1}
+                  options={roomTypeOptions}
+                  onSelect={setRoomType1}
+                  isOpen={activeDropdown === 'roomType1'}
+                  onToggle={() => handleToggle('roomType1')}
+                  zIndex={70}
+                />
+
+                <Dropdown 
+                  label="주차 공간"
+                  value={parking1}
+                  options={parkingOptions}
+                  onSelect={setParking1}
+                  isOpen={activeDropdown === 'parking1'}
+                  onToggle={() => handleToggle('parking1')}
+                  zIndex={60}
+                />
+
+                <Dropdown 
+                  label="엘리베이터"
+                  value={elevator1}
+                  options={elevatorOptions}
+                  onSelect={setElevator1}
+                  isOpen={activeDropdown === 'elevator1'}
+                  onToggle={() => handleToggle('elevator1')}
+                  zIndex={50}
+                />
+
+                <Dropdown 
+                  label="사다리차 사용"
+                  value={ladderTruck1}
+                  options={ladderTruckOptions}
+                  onSelect={setLadderTruck1}
+                  isOpen={activeDropdown === 'ladderTruck1'}
+                  onToggle={() => handleToggle('ladderTruck1')}
+                  zIndex={40}
+                />
+
+                 <Dropdown 
+                  label="복층 여부"
+                  value={duplex1}
+                  options={duplexOptions}
+                  onSelect={setDuplex1}
+                  isOpen={activeDropdown === 'duplex1'}
+                  onToggle={() => handleToggle('duplex1')}
+                  zIndex={30}
+                />
+
+                 <Dropdown 
+                  label="1층 별도 계단"
+                  value={groundStair1}
+                  options={groundStairOptions}
+                  onSelect={setGroundStair1}
+                  isOpen={activeDropdown === 'groundStair1'}
+                  onToggle={() => handleToggle('groundStair1')}
+                  zIndex={20}
+                />
+
               </View>
             </View>
 
-            {/* Row 2: 집 평수 & 복층 */}
-            <View style={[styles.selectSectionRow, {height: 150}]}>
-              {/* 집 평수 */}
-              <View style={{ width: 477, height: 150 }}>
-                <Text style={styles.sectionTitle}>집 평수</Text>
-                <RoomSizeDetail value={roomSize} onSelect={setRoomSize} />
-              </View>
+            {/* 도착지 카드 영역 */}
+            <View style={styles.cardColumn}>
+              <Text style={styles.cardTitle}>도착지 정보</Text>
+              <View style={styles.card}>
 
-              {/* 복층 */}
-              <View style={{ width: 477, height: 150 }}>
-                <Text style={styles.sectionTitle}>복층</Text>
-                <View style={{ position: 'absolute', top: 43, left: 0 }}>
-                  <DetailSelectBtn 
-                    x={0} 
-                    y={0} 
-                    width={238} 
-                    height={94} 
-                    label="있음" 
-                    value={true} 
-                    selectedValue={duplex} 
-                    onSelect={setDuplex} 
-                  />
-                  <DetailSelectBtn 
-                    x={238} 
-                    y={0} 
-                    width={238} 
-                    height={94} 
-                    label="없음" 
-                    value={false} 
-                    selectedValue={duplex} 
-                    onSelect={setDuplex} 
-                  />
-                </View>
-              </View>
-            </View>
+                <Dropdown
+                  label="건물 유형"
+                  value={buildingType2}
+                  options={buildingTypeOptions} 
+                  onSelect={setBuildingType2}
+                  isOpen={activeDropdown === 'buildingType2'}
+                  onToggle={() => handleToggle('buildingType2')}
+                  zIndex={100}
+                />
 
-            {/* Row 3: 층 & 1층 별도 계단 */}
-            <View style={[styles.selectSectionRow, {height: 150}]}>
-              {/* 층 */}
-              <View style={{ width: 477, height: 150 }}>
-                <Text style={styles.sectionTitle}>층</Text>
-                <FloorDetail value={floor} onSelect={setFloor} />
-              </View>
+                <Dropdown 
+                  label="층수"
+                  value={floor2}
+                  options={floorOptions}
+                  onSelect={setFloor2}
+                  isOpen={activeDropdown === 'floor2'}
+                  onToggle={() => handleToggle('floor2')}
+                  zIndex={90}
+                />
 
-              {/* 1층 별도 계단 */}
-              <View style={{ width: 477, height: 150 }}>
-                <Text style={styles.sectionTitle}>1층 별도 계단</Text>
-                <View style={{ 
-                  position: 'absolute', 
-                  top: 43, 
-                  left: 0 
-                }}>
-                  <DetailSelectBtn 
-                    x={0} 
-                    y={0} 
-                    width={238} 
-                    height={94} 
-                    label="있음" 
-                    value={true} 
-                    selectedValue={groundStair} 
-                    onSelect={setGroundStair} 
-                  />
-                  <DetailSelectBtn 
-                    x={238} 
-                    y={0} 
-                    width={238} 
-                    height={94} 
-                    label="없음" 
-                    value={false} 
-                    selectedValue={groundStair} 
-                    onSelect={setGroundStair} 
-                  />
-                </View>
-              </View>
-            </View>
+                <Dropdown 
+                  label="평수"
+                  value={roomSize2}
+                  options={roomSizeOptions}
+                  onSelect={setRoomSize2}
+                  isOpen={activeDropdown === 'roomSize2'}
+                  onToggle={() => handleToggle('roomSize2')}
+                  zIndex={80}
+                />
 
-            {/* Row 4: 엘리베이터 & 주차 공간 */}
-            <View style={[styles.selectSectionRow, {height: 150}]}>
-              {/* 엘리베이터 */}
-              <View style={{ width: 477, height: 150 }}>
-                <Text style={styles.sectionTitle}>엘리베이터</Text>
-                <View style={{ 
-                  position: 'absolute', 
-                  top: 43, 
-                  left: 0 
-                }}>
-                  <DetailSelectBtn 
-                    x={0} 
-                    y={0} 
-                    width={238} 
-                    height={94} 
-                    label="있음" 
-                    value={true} 
-                    selectedValue={elevator} 
-                    onSelect={setElevator} 
-                  />
-                  <DetailSelectBtn 
-                    x={238} 
-                    y={0} 
-                    width={238} 
-                    height={94} 
-                    label="없음" 
-                    value={false} 
-                    selectedValue={elevator} 
-                    onSelect={setElevator} 
-                  />
-                </View>
-              </View>
+                <Dropdown 
+                  label="방 구조"
+                  value={roomType2}
+                  options={roomTypeOptions}
+                  onSelect={setRoomType2}
+                  isOpen={activeDropdown === 'roomType2'}
+                  onToggle={() => handleToggle('roomType2')}
+                  zIndex={70}
+                />
 
-              {/* 주차 공간 */}
-              <View style={{ width: 477, height: 150 }}>
-                <Text style={styles.sectionTitle}>주차 공간</Text>
-                <View style={{ 
-                  position: 'absolute', 
-                  top: 43, left: 0 
-                }}>
-                  <DetailSelectBtn 
-                    x={0} 
-                    y={0} 
-                    width={238} 
-                    height={94} 
-                    label="있음" 
-                    value={true} 
-                    selectedValue={parking} 
-                    onSelect={setParking} 
-                  />
-                  <DetailSelectBtn 
-                    x={238} 
-                    y={0} 
-                    width={238} 
-                    height={94} 
-                    label="없음" 
-                    value={false} 
-                    selectedValue={parking} 
-                    onSelect={setParking} 
-                  />
-                </View>
+                <Dropdown 
+                  label="주차 공간"
+                  value={parking2}
+                  options={parkingOptions}
+                  onSelect={setParking2}
+                  isOpen={activeDropdown === 'parking2'}
+                  onToggle={() => handleToggle('parking2')}
+                  zIndex={60}
+                />
+
+                <Dropdown 
+                  label="엘리베이터"
+                  value={elevator2}
+                  options={elevatorOptions}
+                  onSelect={setElevator2}
+                  isOpen={activeDropdown === 'elevator2'}
+                  onToggle={() => handleToggle('elevator2')}
+                  zIndex={50}
+                />
+
+                <Dropdown 
+                  label="사다리차 사용"
+                  value={ladderTruck2}
+                  options={ladderTruckOptions}
+                  onSelect={setLadderTruck2}
+                  isOpen={activeDropdown === 'ladderTruck2'}
+                  onToggle={() => handleToggle('ladderTruck2')}
+                  zIndex={40}
+                />
+
+                 <Dropdown 
+                  label="복층 여부"
+                  value={duplex2}
+                  options={duplexOptions}
+                  onSelect={setDuplex2}
+                  isOpen={activeDropdown === 'duplex2'}
+                  onToggle={() => handleToggle('duplex2')}
+                  zIndex={30}
+                />
+
+                 <Dropdown 
+                  label="1층 별도 계단"
+                  value={groundStair2}
+                  options={groundStairOptions}
+                  onSelect={setGroundStair2}
+                  isOpen={activeDropdown === 'groundStair2'}
+                  onToggle={() => handleToggle('groundStair2')}
+                  zIndex={20}
+                />
+
               </View>
             </View>
+          </View>
 
-            {/* Row 5: 사다리차 */}
-            <View style={[styles.selectSectionRow, {height: 230}]}>
-              <View style={{ width: 477, height: 230 }}>
-                <Text style={styles.sectionTitle}>사다리차</Text>
-                <View style={{ 
-                  position: 'absolute', 
-                  top: 43, left: 0, 
-                  width: 476, height: 187, 
-                  backgroundColor: '#EBEBEB' 
-                }}>
-                  <DetailSelectBtn 
-                    x={0} 
-                    y={0} 
-                    width={238} 
-                    height={94} 
-                    label="필요" 
-                    value="REQUIRED" 
-                    selectedValue={ladderTruck} 
-                    onSelect={setLadderTruck} 
-                  />
-                  <DetailSelectBtn 
-                    x={238} 
-                    y={0} 
-                    width={238} 
-                    height={94} 
-                    label="필요없음" 
-                    value="NOT_REQUIRED" 
-                    selectedValue={ladderTruck} 
-                    onSelect={setLadderTruck} 
-                  />
-                  <DetailSelectBtn 
-                    x={0} 
-                    y={93} 
-                    width={238} 
-                    height={94} 
-                    label="확인 필요" 
-                    value="NEED_CONFIRM" 
-                    selectedValue={ladderTruck} 
-                    onSelect={setLadderTruck} 
-                  />
-                </View>
-              </View>
-            </View>
-
-            {/* 다음 단계 버튼 */}
-            <NextBtn2
+          {/* 다음단계 버튼 */}
+          <NextBtn 
               navigation={navigation}
               estimateId={estimateId}
               images={images}
               onShowAlert={() => setIsAlertVisible(true)}
-              data={{
-                buildingType,
-                roomSize,
-                floor,
-                elevator,
-                ladderTruck,
-                roomType,
-                duplex,
-                groundStair,
-                parking
+              movingDate={movingDate}
+              // 출발지 데이터
+              data1={{
+                buildingType: buildingType1, 
+                roomSize: roomSize1,
+                floor: floor1,
+                elevator: elevator1,
+                ladderTruck: ladderTruck1,
+                roomType: roomType1,
+                duplex: duplex1,
+                groundStair: groundStair1,
+                parking: parking1
               }} 
-            />            
-          </View>
-
+              // 도착지 데이터
+              data2={{
+                buildingType: buildingType2, 
+                roomSize: roomSize2,
+                floor: floor2,
+                elevator: elevator2,
+                ladderTruck: ladderTruck2,
+                roomType: roomType2,
+                duplex: duplex2,
+                groundStair: groundStair2,
+                parking: parking2
+              }}
+            />   
 
           {/* footer */}
           <View style={commonStyles.footer}>
@@ -427,66 +414,38 @@ export default function UserSelect({ navigation, route }: Props) {
 
         </View>
       </ScrollView>
-
     </View>
-    
   );
 }
 
 const styles = StyleSheet.create({
-  selectSectionContainer: {
-    marginTop: 150,
-    width: '100%', 
-    alignItems: 'center',
-    paddingBottom: 100 // 하단 여백 추가
+  cardsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 40,
+    width: '100%',
+    paddingHorizontal: 40,
   },
-  selectSectionRow: {
-    width: '60%', 
-    flexDirection: 'row', 
-    justifyContent: 'space-between', 
-    marginBottom: 65
+  cardColumn: {
+    flex: 1,
+    flexDirection: 'column',
+    maxWidth: 600,
   },
-
-  // 공통 카드 스타일
-  sectionTitle: {
-    fontSize: 25, 
-    fontWeight: '700', 
-    color: '#3D3D3A', 
-    marginBottom: 10
-  },
-
-
-  // 사용자 지정 입력 박스 스타일
-  customInputBox: {
-    width: 476, 
-    height: 86,
+  card: {
+    width: '100%',
     backgroundColor: 'white',
-    borderWidth: 1, 
-    borderColor: '#E0E0E0', 
-    borderRadius: 8,
-    position: 'absolute',
-    flexDirection: 'row', 
-    alignItems: 'center', 
-    justifyContent: 'space-between',
-    paddingLeft: 30, 
-    paddingRight: 10
+    borderRadius: 12,
+    padding: 30,
+    borderWidth: 1,
+    borderColor: '#E0E0E0',
+    elevation: 3,
+    marginBottom: 40,
   },
-  customInputValue: {
-    fontSize: 25, 
-    fontWeight: '500', 
-    color: '#3D3D3A'
+  cardTitle: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    marginBottom: 20,
+    color: '#3D3D3A',
+    textAlign: 'left',
   },
-  selectButtonInline: {
-    backgroundColor: '#F0893B', 
-    borderRadius: 8, 
-    paddingHorizontal: 32, 
-    paddingVertical: 14
-  },
-  selectButtonInlineText: {
-    color: 'white',
-    fontWeight: '500' // 수정 전 코드의 selectButtonInlineText 안에서 실수로 닫는 괄호가 없을 수도 있으므로 확인 필요, 앞선 코드 참고하여 닫음.
-  },
-
-  // 다음 단계 버튼 스타일
-
 });
