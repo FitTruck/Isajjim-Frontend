@@ -19,6 +19,7 @@ export default function Main({ navigation }: Props) {
 
   const [imageList, setImageList] = useState<UploadedImage[]>([]);
   const [isAlertVisible, setIsAlertVisible] = useState(false);
+  const [msg, setAlertMsg] = useState(''); // 이 부분 해결.
   const { width } = useWindowDimensions();
   const isMobile = width < 768; // Mobile breakpoint
 
@@ -29,11 +30,9 @@ export default function Main({ navigation }: Props) {
 
   return (
     <View style={commonStyles.container}>
-      {/* Header */}
-      <Header />
-
       {/* 알림 박스 */}
       {isAlertVisible && (
+        // 이런 식으로 쓰면 경고 메세지를 하나 밖에 못 띄움. 차리리 함수화 하던가, value를 변수로 해서 useState로 관리해줘도 됨. 아니면 함수로 만들어서 쓰면 될듯.
         <AlertBox 
           value="이미지를 최소 1장 이상 업로드해주세요." 
           onClose={() => setIsAlertVisible(false)}
@@ -43,7 +42,11 @@ export default function Main({ navigation }: Props) {
       <ScrollView contentContainerStyle={[
         commonStyles.scrollContent,
         isMobile && { paddingTop: 20 }
-      ]}>
+      ]}
+      stickyHeaderIndices={[0]} // 자식 컴포넌트들 중 첫 번째 컴포넌트를 고정시키겠다.
+      >
+        {/* Header */}
+        <Header />
 
         {/* Main Wrapper */}
         <View style={commonStyles.mainWrapper}>
@@ -126,26 +129,26 @@ export default function Main({ navigation }: Props) {
           {/* footer */}
           <View style={[commonStyles.footer, isMobile && styles.mobileFooter]}>
             <View style={[commonStyles.footerLine, isMobile && styles.mobileFooterLine]} />
-            <Text style={[commonStyles.footerLogo, isMobile && styles.mobileFooterLogo]}>Site name</Text>
+            <Text style={[commonStyles.footerLogo, isMobile && styles.mobileFooterLogo]}>이삿찜</Text>
 
             <View style={[commonStyles.footerLinksRow, isMobile && styles.mobileFooterLinksRow]}>
               <View style={[commonStyles.footerColumn, isMobile && styles.mobileFooterColumn]}>
-                <Text style={commonStyles.footerTopic}>Topic</Text>
-                <Text style={commonStyles.footerPage}>Page</Text>
-                <Text style={commonStyles.footerPage}>Page</Text>
-                <Text style={commonStyles.footerPage}>Page</Text>
+                <Text style={commonStyles.footerTopic}>안내</Text>
+                <Text style={commonStyles.footerPage}>서비스 소개</Text>
+                <Text style={commonStyles.footerPage}>이용 방법</Text>
+                <Text style={commonStyles.footerPage}>요금 안내</Text>
               </View>
               <View style={[commonStyles.footerColumn, isMobile && styles.mobileFooterColumn]}>
-                <Text style={commonStyles.footerTopic}>Topic</Text>
-                <Text style={commonStyles.footerPage}>Page</Text>
-                <Text style={commonStyles.footerPage}>Page</Text>
-                <Text style={commonStyles.footerPage}>Page</Text>
+                <Text style={commonStyles.footerTopic}>고객센터</Text>
+                <Text style={commonStyles.footerPage}>공지사항</Text>
+                <Text style={commonStyles.footerPage}>자주 묻는 질문</Text>
+                <Text style={commonStyles.footerPage}>1:1 문의</Text>
               </View>
               <View style={[commonStyles.footerColumn, isMobile && styles.mobileFooterColumn]}>
-                <Text style={commonStyles.footerTopic}>Topic</Text>
-                <Text style={commonStyles.footerPage}>Page</Text>
-                <Text style={commonStyles.footerPage}>Page</Text>
-                <Text style={commonStyles.footerPage}>Page</Text>
+                <Text style={commonStyles.footerTopic}>정책</Text>
+                <Text style={commonStyles.footerPage}>이용약관</Text>
+                <Text style={commonStyles.footerPage}>개인정보처리방침</Text>
+                <Text style={commonStyles.footerPage}>위치기반서비스 이용약관</Text>
               </View>
             </View>
 
