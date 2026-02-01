@@ -10,6 +10,8 @@ interface Props {
   onShowAlert: () => void;
   movingDate: string | null;
   data1: {
+    address: string | null;
+    detailAddress: string | null;
     buildingType: string | null;
     roomSize: string | null;
     floor: string | null;
@@ -21,6 +23,8 @@ interface Props {
     parking: boolean | null;
   };
   data2: {
+    address: string | null;
+    detailAddress: string | null;
     buildingType: string | null;
     roomSize: string | null;
     floor: string | null;
@@ -38,7 +42,9 @@ export default function NextBtn2({ navigation, estimateId, images, onShowAlert, 
 
   const mapToBackendValue1 = (data: any) => {
     return {
-      // 여기서 buildingType1 같이 안 쓴 이유는 위에 Props정의할 때, 숫자를 뺏기 때문임.
+      // 여기서 buildingType'1' 같이 안 쓴 이유는 위에 Props정의할 때, 숫자를 뺏기 때문임.
+      "address": data.address,
+      "detailAddress": data.detailAddress || " ",
       "buildingType": data.buildingType,
       "roomSize": data.roomSize,
       "floor": data.floor,
@@ -53,6 +59,8 @@ export default function NextBtn2({ navigation, estimateId, images, onShowAlert, 
 
   const mapToBackendValue2 = (data: any) => {
     return {
+      "address": data.address,
+      "detailAddress": data.detailAddress || " ",
       "buildingType": data.buildingType,
       "roomSize": data.roomSize,
       "floor": data.floor,
@@ -70,8 +78,11 @@ export default function NextBtn2({ navigation, estimateId, images, onShowAlert, 
   };
 
   const handlePressNext = async () => {
-    // 유효성 검사 (출발지 & 도착지 모두 체크)
-    if (!validateData(data1) || !validateData(data2)) {
+    // 상세주소가 비어 있을 수도 있어서 값 변환을 먼저 함.
+    const startLocation = mapToBackendValue1(data1);
+    const endLocation = mapToBackendValue2(data2);
+
+    if (!validateData(startLocation) || !validateData(endLocation) || !movingDate) {
       const msg = "모든 항목을 선택해주세요.";
       if (Platform.OS === 'web') {
         onShowAlert();
@@ -88,9 +99,11 @@ export default function NextBtn2({ navigation, estimateId, images, onShowAlert, 
       
       const payload = {
         "date": movingDate,
-        "startLocation": mapToBackendValue1(data1),
-        "endLocation": mapToBackendValue2(data2)
+        "startLocation": startLocation,
+        "endLocation": endLocation
       };
+
+      console.log("payload", payload);
 
       const response = await fetch(BACKEND_URL, {
         method: 'PATCH',
@@ -159,15 +172,17 @@ export default function NextBtn2({ navigation, estimateId, images, onShowAlert, 
 
 const styles = StyleSheet.create({
   nextBtnContainer: {
-    width: '60%', 
-    alignItems: 'flex-end', 
-    marginTop: 40
+    width: '100%', 
+    alignItems: 'flex-end',
+    position: 'relative',
+    right: 330,
+    marginBottom: 250
   },
   nextBtn: {
-    width: 124, 
-    height: 62, 
+    width: 100, 
+    height: 50, 
     backgroundColor: '#F0893B', 
-    borderRadius: 8,
+    borderRadius: 7,
     justifyContent: 'center', 
     alignItems: 'center',
   },
@@ -177,7 +192,7 @@ const styles = StyleSheet.create({
   },
   nextBtnText: {
     color: 'white', 
-    fontSize: 20, 
-    fontWeight: '500'
+    fontSize: 18, 
+    fontWeight: 400
   }
 });
