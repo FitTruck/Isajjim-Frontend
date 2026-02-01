@@ -9,11 +9,12 @@ type Props = NativeStackScreenProps<RootStackParamList, 'MyChat'>;
 export default function MyChat({ navigation }: Props) {
   return (
     <View style={commonStyles.container}>
-      {/* Header */}
-      <Header />
+      <ScrollView 
+        contentContainerStyle={commonStyles.scrollContent}
+        stickyHeaderIndices={[0]}
+      >
+        <Header />
 
-      <ScrollView contentContainerStyle={commonStyles.scrollContent}>
-        {/* 메인 Wrapper */}
         <View style={styles.mainWrapper}>
           
           {/* Page Content: 기준점 */}
@@ -24,11 +25,11 @@ export default function MyChat({ navigation }: Props) {
 
               {/* 타이틀 섹션 */}
               <View style={styles.titleSection}>
-                <Text style={styles.pageTitle}>내 견적</Text>
+                <Text style={styles.pageTitle}>채팅</Text>
                 <View style={styles.subtitleRow}>
                   <View style={styles.subtitleBar} />
-                  <Text style={styles.pageSubtitle}>업체에게 받은 견적서를 확인하세요</Text>
-                </View>
+                  <Text style={styles.pageSubtitle}>나의 상황에 대해 상의해 보세요 AI가 요약하여 견적서에 반영합니다</Text>
+                </View> 
               </View>
             </View>
 
@@ -90,7 +91,7 @@ export default function MyChat({ navigation }: Props) {
                    {/* 아이템 3 */}
                    <View style={styles.chatItem}>
                     <View style={styles.avatarPlaceholder}>
-                         <Text style={{fontSize: 10}}>Logo</Text> 
+                         <Text style={{fontSize: 10}}>로고</Text> 
                     </View>
                     <View style={styles.chatItemContent}>
                       <View style={styles.chatItemHeader}>
@@ -162,12 +163,14 @@ const styles = StyleSheet.create({
     paddingTop: 80,
     position: 'relative', 
     alignItems: 'center',
+    marginHorizontal: 'auto',
   },
   
   // 중앙 컨텐츠 컨테이너 
   centerContainer: {
     width: 900, 
     alignSelf: 'center',
+    marginHorizontal: 'auto',
   },
 
   titleSection: {
@@ -203,19 +206,19 @@ const styles = StyleSheet.create({
   chatSection: {
     flexDirection: 'row',
     width: 1050,
-    height: 611,
-    borderWidth: 1,
-    borderColor: '#E6E6E6',
-    backgroundColor: 'white',
+    height: 700,
+    backgroundColor: 'transparent',
     overflow: 'visible',
     // 필요시 컨테이너 오버플로우 허용 또는 자체 중앙 정렬
     alignSelf: 'center',
+    marginHorizontal: 'auto',
     position: 'relative',
   },
   leftPanel: {
     width: 279,
-    borderRightWidth: 1,
-    borderRightColor: '#E6E6E6',
+    borderWidth: 1,
+    borderColor: '#E6E6E6',
+    backgroundColor: 'white',
     position: 'relative',
   },
   rightPanel: {
@@ -223,6 +226,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFF6EF',
     position: 'relative',
     zIndex: 99,
+    marginLeft: 10,
+    borderWidth: 1,
+    borderColor: '#E6E6E6',
   },
 
   // 왼쪽 패널 요소
