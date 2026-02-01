@@ -6,6 +6,7 @@ import NextBtn from '../components/UserSelect/NextBtn2';
 import AlertBox from '../components/common/AlertBox';
 import Dropdown from '../components/UserSelect/Dropdown';
 import DateSelector from '../components/UserSelect/DateSelector';
+import AddressInput from '../components/UserSelect/AddressInput';
 
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types/navigation';
@@ -16,14 +17,14 @@ export default function UserSelect({ navigation, route }: Props) {
   // 이미지 정보를 계속 들고 있어야 result에서 보여줄 수가 있다. 따로 다른 곳에 저장하고 있지 않음
   const { images, estimateId } = route.params;
 
-  // 이사 희망 날짜
-  const [movingDate, setMovingDate] = useState<string | null>(null);
-
   // 드롭다운 제어
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const handleToggle = (id: string) => {
     setActiveDropdown(prev => prev === id ? null : id);
   };
+
+  // 이사 희망 날짜
+  const [movingDate, setMovingDate] = useState<string | null>(null);
 
   // 출발지 정보
   const [adress1, setAdress1] = useState<string | null>(null);
@@ -144,7 +145,12 @@ export default function UserSelect({ navigation, route }: Props) {
           </View>
 
           
-          <DateSelector date={movingDate} onSelect={setMovingDate} />
+          <DateSelector 
+            date={movingDate} 
+            onSelect={setMovingDate} 
+            isOpen={activeDropdown === 'dateSelector'}
+            onToggle={() => handleToggle('dateSelector')}
+          />
           
           {/* 양쪽 카드 컨테이너 */}
           <View style={styles.cardsContainer}>
@@ -154,6 +160,14 @@ export default function UserSelect({ navigation, route }: Props) {
               <Text style={styles.cardTitle}>출발지 정보</Text>
               <View style={styles.card}>
                 
+                <AddressInput 
+                  label="출발지 주소"
+                  value={adress1}
+                  detailValue={detailAddress1}
+                  onSelect={(addr) => setAdress1(addr)}
+                  onChangeDetail={setDetailAddress1}
+                />
+
                 <Dropdown
                   label="건물 유형"
                   value={buildingType1}
@@ -161,7 +175,6 @@ export default function UserSelect({ navigation, route }: Props) {
                   onSelect={setBuildingType1}
                   isOpen={activeDropdown === 'buildingType1'}
                   onToggle={() => handleToggle('buildingType1')}
-                  zIndex={100}
                 />
 
                 <Dropdown 
@@ -171,7 +184,6 @@ export default function UserSelect({ navigation, route }: Props) {
                   onSelect={setFloor1}
                   isOpen={activeDropdown === 'floor1'}
                   onToggle={() => handleToggle('floor1')}
-                  zIndex={90}
                 />
 
                 <Dropdown 
@@ -181,7 +193,6 @@ export default function UserSelect({ navigation, route }: Props) {
                   onSelect={setRoomSize1}
                   isOpen={activeDropdown === 'roomSize1'}
                   onToggle={() => handleToggle('roomSize1')}
-                  zIndex={80}
                 />
 
                 <Dropdown 
@@ -191,7 +202,6 @@ export default function UserSelect({ navigation, route }: Props) {
                   onSelect={setRoomType1}
                   isOpen={activeDropdown === 'roomType1'}
                   onToggle={() => handleToggle('roomType1')}
-                  zIndex={70}
                 />
 
                 <Dropdown 
@@ -201,7 +211,6 @@ export default function UserSelect({ navigation, route }: Props) {
                   onSelect={setParking1}
                   isOpen={activeDropdown === 'parking1'}
                   onToggle={() => handleToggle('parking1')}
-                  zIndex={60}
                 />
 
                 <Dropdown 
@@ -211,7 +220,6 @@ export default function UserSelect({ navigation, route }: Props) {
                   onSelect={setElevator1}
                   isOpen={activeDropdown === 'elevator1'}
                   onToggle={() => handleToggle('elevator1')}
-                  zIndex={50}
                 />
 
                 <Dropdown 
@@ -221,7 +229,6 @@ export default function UserSelect({ navigation, route }: Props) {
                   onSelect={setLadderTruck1}
                   isOpen={activeDropdown === 'ladderTruck1'}
                   onToggle={() => handleToggle('ladderTruck1')}
-                  zIndex={40}
                 />
 
                  <Dropdown 
@@ -231,7 +238,6 @@ export default function UserSelect({ navigation, route }: Props) {
                   onSelect={setDuplex1}
                   isOpen={activeDropdown === 'duplex1'}
                   onToggle={() => handleToggle('duplex1')}
-                  zIndex={30}
                 />
 
                  <Dropdown 
@@ -241,7 +247,6 @@ export default function UserSelect({ navigation, route }: Props) {
                   onSelect={setGroundStair1}
                   isOpen={activeDropdown === 'groundStair1'}
                   onToggle={() => handleToggle('groundStair1')}
-                  zIndex={20}
                 />
 
               </View>
@@ -252,6 +257,14 @@ export default function UserSelect({ navigation, route }: Props) {
               <Text style={styles.cardTitle}>도착지 정보</Text>
               <View style={styles.card}>
 
+                <AddressInput 
+                  label="도착지 주소"
+                  value={adress2}
+                  detailValue={detailAddress2}
+                  onSelect={(addr) => setAdress2(addr)}
+                  onChangeDetail={setDetailAddress2}
+                />
+
                 <Dropdown
                   label="건물 유형"
                   value={buildingType2}
@@ -259,7 +272,6 @@ export default function UserSelect({ navigation, route }: Props) {
                   onSelect={setBuildingType2}
                   isOpen={activeDropdown === 'buildingType2'}
                   onToggle={() => handleToggle('buildingType2')}
-                  zIndex={100}
                 />
 
                 <Dropdown 
@@ -269,7 +281,6 @@ export default function UserSelect({ navigation, route }: Props) {
                   onSelect={setFloor2}
                   isOpen={activeDropdown === 'floor2'}
                   onToggle={() => handleToggle('floor2')}
-                  zIndex={90}
                 />
 
                 <Dropdown 
@@ -279,7 +290,6 @@ export default function UserSelect({ navigation, route }: Props) {
                   onSelect={setRoomSize2}
                   isOpen={activeDropdown === 'roomSize2'}
                   onToggle={() => handleToggle('roomSize2')}
-                  zIndex={80}
                 />
 
                 <Dropdown 
@@ -289,7 +299,6 @@ export default function UserSelect({ navigation, route }: Props) {
                   onSelect={setRoomType2}
                   isOpen={activeDropdown === 'roomType2'}
                   onToggle={() => handleToggle('roomType2')}
-                  zIndex={70}
                 />
 
                 <Dropdown 
@@ -299,7 +308,6 @@ export default function UserSelect({ navigation, route }: Props) {
                   onSelect={setParking2}
                   isOpen={activeDropdown === 'parking2'}
                   onToggle={() => handleToggle('parking2')}
-                  zIndex={60}
                 />
 
                 <Dropdown 
@@ -309,7 +317,6 @@ export default function UserSelect({ navigation, route }: Props) {
                   onSelect={setElevator2}
                   isOpen={activeDropdown === 'elevator2'}
                   onToggle={() => handleToggle('elevator2')}
-                  zIndex={50}
                 />
 
                 <Dropdown 
@@ -319,7 +326,6 @@ export default function UserSelect({ navigation, route }: Props) {
                   onSelect={setLadderTruck2}
                   isOpen={activeDropdown === 'ladderTruck2'}
                   onToggle={() => handleToggle('ladderTruck2')}
-                  zIndex={40}
                 />
 
                  <Dropdown 
@@ -329,7 +335,6 @@ export default function UserSelect({ navigation, route }: Props) {
                   onSelect={setDuplex2}
                   isOpen={activeDropdown === 'duplex2'}
                   onToggle={() => handleToggle('duplex2')}
-                  zIndex={30}
                 />
 
                  <Dropdown 
@@ -339,7 +344,6 @@ export default function UserSelect({ navigation, route }: Props) {
                   onSelect={setGroundStair2}
                   isOpen={activeDropdown === 'groundStair2'}
                   onToggle={() => handleToggle('groundStair2')}
-                  zIndex={20}
                 />
 
               </View>
@@ -348,36 +352,40 @@ export default function UserSelect({ navigation, route }: Props) {
 
           {/* 다음단계 버튼 */}
           <NextBtn 
-              navigation={navigation}
-              estimateId={estimateId}
-              images={images}
-              onShowAlert={() => setIsAlertVisible(true)}
-              movingDate={movingDate}
-              // 출발지 데이터
-              data1={{
-                buildingType: buildingType1, 
-                roomSize: roomSize1,
-                floor: floor1,
-                elevator: elevator1,
-                ladderTruck: ladderTruck1,
-                roomType: roomType1,
-                duplex: duplex1,
-                groundStair: groundStair1,
-                parking: parking1
-              }} 
-              // 도착지 데이터
-              data2={{
-                buildingType: buildingType2, 
-                roomSize: roomSize2,
-                floor: floor2,
-                elevator: elevator2,
-                ladderTruck: ladderTruck2,
-                roomType: roomType2,
-                duplex: duplex2,
-                groundStair: groundStair2,
-                parking: parking2
-              }}
-            />   
+            navigation={navigation}
+            estimateId={estimateId}
+            images={images}
+            onShowAlert={() => setIsAlertVisible(true)}
+            movingDate={movingDate}
+            // 출발지 데이터
+            data1={{
+              "address": adress1,
+              "detailAddress": detailAddress1,
+              "buildingType": buildingType1, 
+              "roomSize": roomSize1,
+              "floor": floor1,
+              "elevator": elevator1,
+              "ladderTruck": ladderTruck1,
+              "roomType": roomType1,
+              "duplex": duplex1,
+              "groundStair": groundStair1,
+              "parking": parking1
+            }} 
+            // 도착지 데이터
+            data2={{
+              "address": adress2,
+              "detailAddress": detailAddress2,
+              "buildingType": buildingType2, 
+              "roomSize": roomSize2,
+              "floor": floor2,
+              "elevator": elevator2,
+              "ladderTruck": ladderTruck2,
+              "roomType": roomType2,
+              "duplex": duplex2,
+              "groundStair": groundStair2,
+              "parking": parking2
+            }}
+          />   
 
           {/* footer */}
           <View style={commonStyles.footer}>
@@ -425,6 +433,7 @@ const styles = StyleSheet.create({
     gap: 40,
     width: '100%',
     paddingHorizontal: 40,
+    zIndex: 10,
   },
   cardColumn: {
     flex: 1,
