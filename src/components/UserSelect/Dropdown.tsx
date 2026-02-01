@@ -12,12 +12,12 @@ interface DropdownProps {
   value: string | boolean | number | null;
   options: Option[];
   onSelect: (value: any) => void;
-  zIndex?: number;
+  // zIndex property removed
   isOpen?: boolean;
   onToggle?: (isOpen: boolean) => void;
 }
 
-export default function Dropdown({ label, placeholder = '선택해주세요', value, options, onSelect, zIndex = 1, isOpen: controlledOpen, onToggle }: DropdownProps) {
+export default function Dropdown({ label, placeholder = '선택해주세요', value, options, onSelect, isOpen: controlledOpen, onToggle }: DropdownProps) {
   const [internalOpen, setInternalOpen] = useState(false);
   const isControlled = controlledOpen !== undefined;
   const isOpen = isControlled ? controlledOpen : internalOpen;
@@ -42,7 +42,7 @@ export default function Dropdown({ label, placeholder = '선택해주세요', va
   };
 
   return (
-    <View style={[styles.container, { zIndex: isOpen ? 1000 : zIndex }]}>
+    <View style={[styles.container, { zIndex: isOpen ? 2000 : 1 }]}>
       {label && <Text style={styles.label}>{label}</Text>}
       
       <TouchableOpacity 
