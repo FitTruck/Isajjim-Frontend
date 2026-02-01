@@ -28,7 +28,7 @@ export default function MyChat({ navigation }: Props) {
                 <Text style={styles.pageTitle}>채팅</Text>
                 <View style={styles.subtitleRow}>
                   <View style={styles.subtitleBar} />
-                  <Text style={styles.pageSubtitle}>나의 상황에 대해 상의해 보세요 AI가 요약하여 견적서에 반영합니다</Text>
+                  <Text style={styles.pageSubtitle}>나의 상황에 대해 상의해 보세요 확정을 하면 AI가 요약하여 견적서에 반영합니다</Text>
                 </View> 
               </View>
             </View>
