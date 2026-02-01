@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { StyleSheet, View, Text, Platform, Image, useWindowDimensions } from 'react-native';
 import Icon from '@expo/vector-icons/Feather';
 import * as ImagePicker from 'expo-image-picker';
-import { UploadedImage } from '../../utils/Server';
+import { UploadedImage } from '../../types/common';
 
 interface UploadBoxProps {
   onFilesSelected: (newImages: UploadedImage[]) => void;

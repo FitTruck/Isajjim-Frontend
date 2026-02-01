@@ -19,9 +19,10 @@ export const commonStyles = StyleSheet.create({
   },
 
 
-  // --- Main Section Styles ---
+  // --- 타이틀 ---
   mainSection: {
-    marginTop: 140,
+    marginTop: 170,
+    marginBottom: 80,
     width: 837,
     alignItems: 'center',
     alignSelf: 'center',

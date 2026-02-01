@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, Alert } from 'react-native';
 import { commonStyles } from '../styles/commonStyles';
 import { UploadedImage } from '../types/common';
 import { BACKEND_DOMAIN } from '../utils/Server';

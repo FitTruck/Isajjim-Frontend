@@ -91,7 +91,7 @@ export default function NextBtn1({ imageList, onNavigateNext, onShowAlert }: Nex
 
       // 다음 페이지로 넘어가기
       if (responseData.data.estimateId) { 
-        // 이게 잘 실행되면 밑의 코드들은 실행 안됨
+        // 넘어갈 때, 이미지 정보, estimatedId가 같이 넘어감
         onNavigateNext(uploadedImages, responseData.data.estimateId);
       } else {
         console.error('estimateId 또는 uploadedImages배열을 받아오지 못함');

@@ -156,12 +156,6 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     justifyContent: 'center', 
     alignItems: 'center',
-    // 그림자 추가 (선택사항)
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
   },
   nextBtnDisabled: {
     backgroundColor: '#666',

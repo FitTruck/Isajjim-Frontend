@@ -82,6 +82,7 @@ export default function Main({ navigation }: Props) {
             {/* 다음 단계 버튼 */}
             <NextBtn1
               imageList={imageList}
+              // 넘어갈 때, 이미지 정보, estimatedId가 같이 넘어감
               onNavigateNext={(images, id) => navigation.navigate('UserSelect', { images, estimateId: id })}
               onShowAlert={() => setIsAlertVisible(true)}
             />
