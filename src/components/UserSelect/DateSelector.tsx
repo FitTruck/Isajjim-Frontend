@@ -1,14 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Modal, Platform } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
 interface Props {
   date: string | null;
   onSelect: (date: string) => void;
+  isOpen?: boolean;
+  onToggle?: (isOpen: boolean) => void;
 }
 
-export default function DateSelector({ date, onSelect }: Props) {
-  const [modalVisible, setModalVisible] = useState(false);
+export default function DateSelector({ date, onSelect, isOpen: controlledOpen, onToggle }: Props) {
+  const [internalOpen, setInternalOpen] = useState(false);
+  const isControlled = controlledOpen !== undefined;
+  const isOpen = isControlled ? controlledOpen : internalOpen;
+
   const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
   const [currentMonth, setCurrentMonth] = useState(new Date().getMonth());
 
@@ -20,7 +25,24 @@ export default function DateSelector({ date, onSelect }: Props) {
         setCurrentMonth(d.getMonth());
       }
     }
-  }, [modalVisible]);
+  }, [isOpen]);
+
+  const toggleCalendar = () => {
+    if (isControlled) {
+      onToggle && onToggle(!isOpen);
+    } else {
+      setInternalOpen(!isOpen);
+    }
+  };
+
+  const handleSelect = (dateStr: string) => {
+    onSelect(dateStr);
+    if (isControlled) {
+      onToggle && onToggle(false);
+    } else {
+      setInternalOpen(false);
+    }
+  };
 
   const weekDays = ['일', '월', '화', '수', '목', '금', '토'];
 
@@ -29,11 +51,9 @@ export default function DateSelector({ date, onSelect }: Props) {
     const lastDate = new Date(year, month + 1, 0).getDate();
     
     const days = [];
-    // Empty slots for previous month
     for (let i = 0; i < firstDay; i++) {
       days.push(null);
     }
-    // Days of current month
     for (let i = 1; i <= lastDate; i++) {
       days.push(i);
     }
@@ -58,46 +78,28 @@ export default function DateSelector({ date, onSelect }: Props) {
     }
   };
 
-  const handleDaySelect = (day: number) => {
-    const monthStr = String(currentMonth + 1).padStart(2, '0');
-    const dayStr = String(day).padStart(2, '0');
-    const dateStr = `${currentYear}-${monthStr}-${dayStr}`;
-    onSelect(dateStr);
-    setModalVisible(false);
-  };
-
   const days = getDaysArray(currentYear, currentMonth);
 
   const formattedDate = date ? date : '날짜를 선택해주세요';
   const isSelected = !!date;
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { zIndex: isOpen ? 2000 : 1 }]}>
       <Text style={styles.label}>이사 희망 날짜</Text>
       
       <TouchableOpacity 
-        style={styles.inputBox}
-        onPress={() => setModalVisible(true)}
+        style={[styles.inputBox, isOpen && styles.inputBoxOpen]}
+        onPress={toggleCalendar}
         activeOpacity={0.8}
       >
         <Text style={[styles.dateText, !isSelected && styles.placeholderText]}>
           {formattedDate}
         </Text>
-        <Ionicons name="calendar-outline" size={20} color="#666" />
+        <Ionicons name="calendar-outline" size={20} color={isOpen ? "#F0893B" : "#666"} />
       </TouchableOpacity>
 
-      <Modal
-        animationType="fade"
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={() => setModalVisible(false)}
-      >
-        <TouchableOpacity 
-          style={styles.modalOverlay}
-          activeOpacity={1}
-          onPress={() => setModalVisible(false)}
-        >
-          <View style={styles.modalContent} onStartShouldSetResponder={() => true}>
+      {isOpen && (
+        <View style={styles.calendarContainer}>
             {/* Header */}
             <View style={styles.header}>
               <TouchableOpacity onPress={handlePrevMonth} style={styles.arrowButton}>
@@ -142,13 +144,20 @@ export default function DateSelector({ date, onSelect }: Props) {
                       isSelectedDay && styles.selectedDayCell
                     ]}
                     disabled={isPlaceholder}
-                    onPress={() => day && handleDaySelect(day)}
+                    onPress={() => {
+                        if (day) {
+                             const monthStr = String(currentMonth + 1).padStart(2, '0');
+                             const dayStr = String(day).padStart(2, '0');
+                             const dateStr = `${currentYear}-${monthStr}-${dayStr}`;
+                             handleSelect(dateStr);
+                        }
+                    }}
                   >
                     {!isPlaceholder && (
                       <Text style={[
                         styles.dayText,
-                        index % 7 === 0 && styles.sundayText, // Sunday column
-                        index % 7 === 6 && styles.saturdayText, // Saturday column
+                        index % 7 === 0 && styles.sundayText,
+                        index % 7 === 6 && styles.saturdayText, 
                         isSelectedDay && styles.selectedDayText
                       ]}>
                         {day}
@@ -158,9 +167,8 @@ export default function DateSelector({ date, onSelect }: Props) {
                 );
               })}
             </View>
-          </View>
-        </TouchableOpacity>
-      </Modal>
+        </View>
+      )}
     </View>
   );
 }
@@ -172,6 +180,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 40,
     maxWidth: 1280,
     alignSelf: 'center',
+    position: 'relative',
   },
   label: {
     fontSize: 22,
@@ -187,11 +196,14 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     borderWidth: 1,
     borderColor: '#DDD',
-    borderRadius: 6,
+    borderRadius: 8,
     paddingHorizontal: 15,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+  },
+  inputBoxOpen: {
+    borderColor: '#F0893B',
   },
   dateText: {
     fontSize: 16,
@@ -201,23 +213,23 @@ const styles = StyleSheet.create({
     color: '#999',
   },
   
-  // Modal Styles
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  modalContent: {
+  calendarContainer: {
+    position: 'absolute',
+    top: '100%',
+    left: 40, 
+    marginTop: 4,
     width: 320,
     backgroundColor: 'white',
     borderRadius: 16,
-    padding: 20,
+    padding: 10,
     elevation: 5,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.25,
-    shadowRadius: 10,
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    zIndex: 1000,
+    borderWidth: 1,
+    borderColor: '#E0E0E0',
   },
   header: {
     flexDirection: 'row',
@@ -253,10 +265,9 @@ const styles = StyleSheet.create({
   daysGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    // justifyContent: 'flex-start',
   },
   dayCell: {
-    width: '14.28%', // 7 days in a row
+    width: '14.28%',
     aspectRatio: 1,
     justifyContent: 'center',
     alignItems: 'center',
