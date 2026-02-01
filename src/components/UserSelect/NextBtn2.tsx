@@ -21,7 +21,7 @@ interface Props {
   };
 }
 
-export default function NextBtn({ navigation, estimateId, images, onShowAlert, data }: Props) {
+export default function NextBtn2({ navigation, estimateId, images, onShowAlert, data }: Props) {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const {
@@ -125,17 +125,17 @@ export default function NextBtn({ navigation, estimateId, images, onShowAlert, d
   };
 
   return (
-    <View style={styles.nextButtonContainer}>
+    <View style={styles.nextBtnContainer}>
       <LoadingModal visible={isSubmitting} />
       <TouchableOpacity 
         style={[
-          styles.nextButton, 
-          isSubmitting && styles.nextButtonDisabled
+          styles.nextBtn, 
+          isSubmitting && styles.nextBtnDisabled
         ]}
         onPress={handlePressNext}
         disabled={isSubmitting}
       >
-          <Text style={styles.nextButtonText}>
+          <Text style={styles.nextBtnText}>
             {isSubmitting ? '저장 중...' : '다음단계'}
           </Text>
       </TouchableOpacity>
@@ -144,12 +144,12 @@ export default function NextBtn({ navigation, estimateId, images, onShowAlert, d
 }
 
 const styles = StyleSheet.create({
-  nextButtonContainer: {
+  nextBtnContainer: {
     width: '60%', 
     alignItems: 'flex-end', 
     marginTop: 40
   },
-  nextButton: {
+  nextBtn: {
     width: 124, 
     height: 62, 
     backgroundColor: '#F0893B', 
@@ -163,11 +163,11 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 3,
   },
-  nextButtonDisabled: {
+  nextBtnDisabled: {
     backgroundColor: '#666',
     opacity: 0.7
   },
-  nextButtonText: {
+  nextBtnText: {
     color: 'white', 
     fontSize: 20, 
     fontWeight: '500'

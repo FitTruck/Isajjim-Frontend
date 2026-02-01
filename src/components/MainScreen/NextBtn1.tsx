@@ -11,7 +11,7 @@ interface NextBtnProps {
   onShowAlert: () => void;
 }
 
-export default function NextBtn({ imageList, onNavigateNext, onShowAlert }: NextBtnProps) {
+export default function NextBtn1({ imageList, onNavigateNext, onShowAlert }: NextBtnProps) {
   const [isLoading, setIsLoading] = useState(false);
   const { width } = useWindowDimensions();
   const isMobile = width < 768;

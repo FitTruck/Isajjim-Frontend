@@ -5,7 +5,7 @@ import FloorDetail from '../components/UserSelect/FloorDetail';
 import RoomSizeDetail from '../components/UserSelect/RoomSizeDetail';
 import Header from '../components/common/Header';
 import DetailSelectBtn from '../components/UserSelect/DetailSelectBtn';
-import NextBtn from '../components/UserSelect/NextBtn';
+import NextBtn2 from '../components/UserSelect/NextBtn2';
 import AlertBox from '../components/common/AlertBox';
 
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -372,7 +372,7 @@ export default function UserSelect({ navigation, route }: Props) {
             </View>
 
             {/* 다음 단계 버튼 */}
-            <NextBtn 
+            <NextBtn2
               navigation={navigation}
               estimateId={estimateId}
               images={images}
