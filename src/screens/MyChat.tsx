@@ -11,7 +11,7 @@ export default function MyChat({ navigation }: Props) {
     <View style={commonStyles.container}>
       <ScrollView 
         contentContainerStyle={commonStyles.scrollContent}
-        stickyHeaderIndices={[0]}
+        stickyHeaderIndices={[0]} // 자식 컴포넌트들 중 첫 번째 컴포넌트를 고정시키겠다.
       >
         <Header />
 
@@ -153,6 +153,7 @@ export default function MyChat({ navigation }: Props) {
 
 const styles = StyleSheet.create({
   mainWrapper: {
+    marginTop: 50,
     width: '100%',
     alignItems: 'center',
     marginBottom: 100,
