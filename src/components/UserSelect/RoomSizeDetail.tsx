@@ -85,36 +85,43 @@ export default function RoomSizeDetail({ value, onSelect }: RoomSizeDetailProps)
 
 const styles = StyleSheet.create({
   // 사용자 지정 입력 박스 스타일 (UserSelect에서 가져옴)
+  // 사용자 지정 입력 박스 스타일
   customInputBox: {
     width: 476, 
     height: 86,
     backgroundColor: 'white',
     borderWidth: 1, 
-    borderColor: '#E0E0E0', 
-    borderRadius: 8,
+    borderColor: '#E6E6E6', 
+    borderRadius: 12, // 더 둥글게
     position: 'absolute',
     flexDirection: 'row', 
     alignItems: 'center', 
     justifyContent: 'space-between',
     paddingLeft: 30, 
-    paddingRight: 10,
-    top: 48
+    paddingRight: 15, // 여백 조정
+    top: 48,
+    // 그림자 추가
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 5,
+    elevation: 2,
   },
   customInputValue: {
-    fontSize: 25, 
-    fontWeight: '500', 
+    fontSize: 24, 
+    fontWeight: '600', 
     color: '#3D3D3A'
   },
   selectButtonInline: {
     backgroundColor: '#F0893B', 
-    borderRadius: 8, 
-    paddingHorizontal: 32, 
-    paddingVertical: 14
+    borderRadius: 20, // 캡슐 형태
+    paddingHorizontal: 28, 
+    paddingVertical: 12
   },
   selectButtonInlineText: {
     color: 'white', 
-    fontSize: 20, 
-    fontWeight: '500'
+    fontSize: 18, 
+    fontWeight: '600'
   },
 
   // 모달 스타일

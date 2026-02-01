@@ -1,4 +1,4 @@
-import React from 'react';
+  import React from 'react';
 import { TouchableOpacity, Text, StyleSheet } from 'react-native';
 
 interface DetailSelectBtnProps {
@@ -39,19 +39,30 @@ const styles = StyleSheet.create({
   absoluteCard: {
     position: 'absolute',
     borderWidth: 1, 
-    borderColor: '#AFAFAF',
+    borderColor: '#E6E6E6', // 더 연한 회색
     justifyContent: 'center', 
-    alignItems: 'center'
-  },
-  cardSelected: {
-    backgroundColor: '#F0893B'
-  },
-  cardUnselected: {
+    alignItems: 'center',
+    borderRadius: 8, // 둥근 모서리 추가
+    // 약한 그림자 추가
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 3,
+    elevation: 2,
     backgroundColor: 'white'
   },
+  cardSelected: {
+    backgroundColor: '#F0893B',
+    borderColor: '#F0893B',
+    zIndex: 1, // 선택된 카드가 위로 올라오도록
+  },
+  cardUnselected: {
+    backgroundColor: 'white',
+    borderColor: '#E6E6E6'
+  },
   cardText: {
-    fontSize: 22, 
-    fontWeight: '500'
+    fontSize: 20, // 폰트 사이즈 약간 조정
+    fontWeight: '600'
   },
   textSelected: { 
     color: 'white' 
