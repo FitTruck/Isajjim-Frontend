@@ -128,10 +128,13 @@ export default function Result({ navigation, route }: Props) {
 
   return (
     <View style={commonStyles.container}>
-      {/* Header */}
-      <Header />
+      <ScrollView 
+        contentContainerStyle={commonStyles.scrollContent}
+        stickyHeaderIndices={[0]}
+      >
+        {/* Header */}
+        <Header />
 
-      <ScrollView contentContainerStyle={commonStyles.scrollContent}>
         {/* Main Wrapper */}
         <View style={commonStyles.mainWrapper}>
 
@@ -172,26 +175,26 @@ export default function Result({ navigation, route }: Props) {
           {/* footer */}
           <View style={commonStyles.footer}>
             <View style={commonStyles.footerLine} />
-            <Text style={commonStyles.footerLogo}>Site name</Text>
+            <Text style={commonStyles.footerLogo}>이삿짐</Text>
 
             <View style={commonStyles.footerLinksRow}>
               <View style={commonStyles.footerColumn}>
-                <Text style={commonStyles.footerTopic}>Topic</Text>
-                <Text style={commonStyles.footerPage}>Page</Text>
-                <Text style={commonStyles.footerPage}>Page</Text>
-                <Text style={commonStyles.footerPage}>Page</Text>
+                <Text style={commonStyles.footerTopic}>안내</Text>
+                <Text style={commonStyles.footerPage}>서비스 소개</Text>
+                <Text style={commonStyles.footerPage}>이용 방법</Text>
+                <Text style={commonStyles.footerPage}>요금 안내</Text>
               </View>
               <View style={commonStyles.footerColumn}>
-                <Text style={commonStyles.footerTopic}>Topic</Text>
-                <Text style={commonStyles.footerPage}>Page</Text>
-                <Text style={commonStyles.footerPage}>Page</Text>
-                <Text style={commonStyles.footerPage}>Page</Text>
+                <Text style={commonStyles.footerTopic}>고객센터</Text>
+                <Text style={commonStyles.footerPage}>공지사항</Text>
+                <Text style={commonStyles.footerPage}>자주 묻는 질문</Text>
+                <Text style={commonStyles.footerPage}>1:1 문의</Text>
               </View>
               <View style={commonStyles.footerColumn}>
-                <Text style={commonStyles.footerTopic}>Topic</Text>
-                <Text style={commonStyles.footerPage}>Page</Text>
-                <Text style={commonStyles.footerPage}>Page</Text>
-                <Text style={commonStyles.footerPage}>Page</Text>
+                <Text style={commonStyles.footerTopic}>정책</Text>
+                <Text style={commonStyles.footerPage}>이용약관</Text>
+                <Text style={commonStyles.footerPage}>개인정보처리방침</Text>
+                <Text style={commonStyles.footerPage}>위치기반서비스 이용약관</Text>
               </View>
             </View>
 
