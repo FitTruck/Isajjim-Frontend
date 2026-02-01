@@ -176,7 +176,7 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
     position: 'relative',
     right: 330,
-    marginBottom: 250
+    marginBottom: 250,
   },
   nextBtn: {
     width: 100, 
