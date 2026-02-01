@@ -10,7 +10,7 @@ export const commonStyles = StyleSheet.create({
   },
   scrollContent: {
     flexGrow: 1,
-    paddingTop: 80,
+    paddingTop: 0,
   },
   mainWrapper: {
     width: '100%',
