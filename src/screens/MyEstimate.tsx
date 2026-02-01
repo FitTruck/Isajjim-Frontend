@@ -12,10 +12,13 @@ export default function MyEstimate({ navigation }: Props) {
 
   return (
     <View style={commonStyles.container}>
-      {/* Header */}
-      <Header />
+      <ScrollView 
+        contentContainerStyle={commonStyles.scrollContent}
+        stickyHeaderIndices={[0]}
+      >
+        {/* Header */}
+        <Header />
 
-      <ScrollView contentContainerStyle={commonStyles.scrollContent}>
         {/* 메인 Wrapper */}
         <View style={styles.mainWrapper}>
           
@@ -98,6 +101,7 @@ export default function MyEstimate({ navigation }: Props) {
 
 const styles = StyleSheet.create({
   mainWrapper: {
+    marginTop: 50,
     width: '100%',
     alignItems: 'center',
     marginBottom: 100,
@@ -150,8 +154,8 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
   },
   filterButton: {
-    width: 110,
-    height: 40,
+    width: 85,
+    height: 33,
     borderRadius: 20,
     borderWidth: 1,
     borderColor: '#B5B5B5',
@@ -163,7 +167,7 @@ const styles = StyleSheet.create({
     paddingLeft: 8,
   },
   filterText: {
-    fontSize: 20,
+    fontSize: 16,
     fontWeight: '500',
     color: '#434343',
     marginRight: 5,
@@ -171,8 +175,8 @@ const styles = StyleSheet.create({
     marginBottom: 2,
   },
   filterIcon: {
-    width: 21,
-    height: 21,
+    width: 17,
+    height: 17,
     opacity: 0.6,
   },
   
