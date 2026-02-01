@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { StyleSheet, TouchableOpacity, Text,useWindowDimensions } from 'react-native';
+import { StyleSheet, TouchableOpacity, Text,useWindowDimensions, Platform, Alert } from 'react-native';
 import { ref, uploadBytes } from 'firebase/storage';
 import { v4 as uuidv4 } from 'uuid';
 import { UploadedImage } from '../../types/common';
@@ -21,7 +21,12 @@ export default function NextBtn({ imageList, onNavigateNext, onShowAlert }: Next
     if (isLoading) return;
 
     if (imageList.length === 0) {
-      onShowAlert();
+      if(Platform.OS === 'web') {
+        onShowAlert();
+      } else {
+        Alert.alert('알림', '이미지를 최소 1장 이상 업로드해주세요.');
+      }
+      
       return;
     }
 

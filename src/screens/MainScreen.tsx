@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, ScrollView, StyleSheet, Image, useWindowDimensions, Platform } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, Image, useWindowDimensions } from 'react-native';
 
 import { commonStyles } from '../styles/commonStyles';
 import { UploadedImage } from '../types/common';
