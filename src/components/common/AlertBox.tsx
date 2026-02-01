@@ -29,7 +29,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-
     backgroundColor: '#ffffff',
     paddingHorizontal: 20,
     paddingVertical: 12,
@@ -47,18 +46,10 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     
     // 위치 고정 설정
-    position: Platform.OS === 'web' ? ('fixed' as any) : 'absolute',
+    position: 'absolute',
     zIndex: 9999,
-    ...Platform.select({
-      web: {
-        bottom: 30,
-        right: 30,
-      },
-      default: {
-        bottom: 30,
-        right: 30,
-      }
-    })
+    bottom: 30,
+    right: 30,
   },
   iconContent: {
     width: 20,
