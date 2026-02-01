@@ -12,7 +12,6 @@ interface DropdownProps {
   value: string | boolean | number | null;
   options: Option[];
   onSelect: (value: any) => void;
-  // zIndex property removed
   isOpen?: boolean;
   onToggle?: (isOpen: boolean) => void;
 }
