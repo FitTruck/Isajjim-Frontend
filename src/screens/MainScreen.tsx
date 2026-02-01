@@ -6,7 +6,7 @@ import { UploadedImage } from '../types/common';
 
 import Header from '../components/common/Header';
 import UploadBox from '../components/MainScreen/UploadBox';
-import NextBtn from '../components/MainScreen/NextBtn';
+import NextBtn1 from '../components/MainScreen/NextBtn1';
 import AlertBox from '../components/common/AlertBox';
 import Space3D from '../components/Space/Space3D';
 
@@ -80,7 +80,7 @@ export default function Main({ navigation }: Props) {
             </View>
             
             {/* 다음 단계 버튼 */}
-            <NextBtn 
+            <NextBtn1
               imageList={imageList}
               onNavigateNext={(images, id) => navigation.navigate('UserSelect', { images, estimateId: id })}
               onShowAlert={() => setIsAlertVisible(true)}
