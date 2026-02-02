@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react';
-import { View, Text, ScrollView, StyleSheet, Alert } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, Alert, Modal, TouchableOpacity } from 'react-native';
 import { commonStyles } from '../styles/commonStyles';
 import { UploadedImage } from '../types/common';
 import { BACKEND_DOMAIN } from '../utils/Server';
 import ResultCard from '../components/Result/ResultCard';
 import UploadCard from '../components/Result/UploadCard';
 import Header from '../components/common/Header';
+import Space3D from '../components/Space/Space3D';
+import { Ionicons } from '@expo/vector-icons';
 
 // app.tsx로부터 전달받을 함수의 자료형 정의
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -25,6 +27,7 @@ export default function Result({ navigation, route }: Props) {
   // 견적서 컴포넌트에 전달할 값임
   const [estimateData, setEstimateData] = useState<any>({}); // 딕셔너리값임
   const [updateStatus, setUpdateStatus] = useState<'prev' | 'updating' | 'done'>('prev');
+  const [isSpaceModalVisible, setIsSpaceModalVisible] = useState(false);
 
   // 첫 실행 시에 자동 실행됨.
   useEffect(() => {
@@ -140,8 +143,8 @@ export default function Result({ navigation, route }: Props) {
 
           {/* 메인 섹션 */}
           <View style={commonStyles.mainSection}>
-              <Text style={commonStyles.mainTitle}>AI 결과 확인하기</Text>
-              <Text style={commonStyles.mainSubtitle}>이미지 분석 결과</Text>
+            <Text style={commonStyles.mainTitle}>AI 결과 확인하기</Text>
+            <Text style={commonStyles.mainSubtitle}>이미지 분석 결과</Text>
           </View>
 
           {/* 결과 및 업로드 카드 컨테이너 */}
@@ -161,7 +164,19 @@ export default function Result({ navigation, route }: Props) {
             </View>
 
             {/* 업로드 컨테이너 */}
-            <View style={styles.estimateCardContainer}>
+            <View style={[
+              styles.estimateCardContainer,
+              isSpaceModalVisible && { position: 'relative', zIndex: 10000 }
+            ]}>
+              <View style={[styles.space3DContainer, isSpaceModalVisible && styles.expandedContainer]}>
+                <Space3D />
+                <TouchableOpacity 
+                  style={isSpaceModalVisible ? styles.closeButtonFixed : styles.expandButton}
+                  onPress={() => setIsSpaceModalVisible(!isSpaceModalVisible)}
+                >
+                  <Ionicons name={isSpaceModalVisible ? "close" : "expand"} size={isSpaceModalVisible ? 30 : 20} color={isSpaceModalVisible ? "black" : "#555"} />
+                </TouchableOpacity>
+              </View>
               <UploadCard 
                 data={estimateData} 
                 status={updateStatus} 
@@ -219,12 +234,13 @@ const styles = StyleSheet.create({
   },
   resultSectionContainer: {
     marginTop: 150,
+    minHeight: 1200,
     width: '75%',
     maxWidth: 1740,
     alignSelf: 'flex-start',
     justifyContent: 'center',
     paddingBottom: 100,
-    paddingHorizontal: 0, // 화면이 아주 작을 때를 위한 최소한의 여백만 남김
+    paddingHorizontal: 0,
     flexDirection: 'row',
     flexWrap: 'wrap',
     rowGap: 70,
@@ -240,5 +256,94 @@ const styles = StyleSheet.create({
     height: 'auto',
     marginBottom: 200, 
     alignItems: 'center',
+  },
+  space3DContainer: {
+    width: 307,
+    height: 307,
+    marginBottom: 5,
+    borderRadius: 4,
+    overflow: 'hidden',
+    backgroundColor: '#F5F5F5',
+    borderWidth: 1,
+    borderColor: '#D8D8D8',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.25,
+    shadowRadius: 1,
+    elevation: 2,
+    right: 80, 
+    position: 'relative', // 버튼 배치를 위해
+  },
+  expandButton: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+    padding: 5,
+    borderRadius: 4,
+    zIndex: 10,
+  },
+  
+  // Modal Styles
+  modalContainer: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContent: {
+    width: '90%',
+    height: '90%',
+    backgroundColor: 'white',
+    borderRadius: 8,
+    overflow: 'hidden',
+    position: 'relative',
+  },
+  closeModalButton: {
+    position: 'absolute',
+    top: 20,
+    right: 20,
+    backgroundColor: 'white',
+    borderRadius: 20,
+    width: 40,
+    height: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  
+  expandedContainer: {
+    position: 'fixed' as any, 
+    top: 0, 
+    left: 0, 
+    right: 0, 
+    bottom: 0,
+    width: '100vw' as any,
+    height: '100vh' as any,
+    zIndex: 9999,
+    margin: 0,
+    borderRadius: 0,
+    backgroundColor: '#020617', 
+  },
+  closeButtonFixed: {
+    position: 'absolute',
+    top: 40,
+    right: 40,
+    backgroundColor: 'white',
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 10000,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
 });
