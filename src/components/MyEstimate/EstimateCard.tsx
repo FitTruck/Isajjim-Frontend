@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 
 interface EstimateCardProps {
-  status: 'active' | 'moving' | 'cancelled'; // active=견적 받는 중, moving=이사 진행 중
+  status: 'pending' | 'active' | 'moving' | 'completed'| 'cancelled' ;
   date: string;
   locations: { start: string; end: string };
   
@@ -19,7 +19,9 @@ interface EstimateCardProps {
 export default function EstimateCard({ status, date, locations, quoteInfo, timelineStep = 2 }: EstimateCardProps) {
   
   const isCancelled = status === 'cancelled';
+  const isCompletedStatus = status === 'completed';
   const isMoving = status === 'moving';
+  const isWaitingForQuotes = timelineStep === 2 || (quoteInfo && quoteInfo.companyCount === 0);
 
   // 상태 배지
   const renderStatusBadge = () => {
@@ -30,10 +32,24 @@ export default function EstimateCard({ status, date, locations, quoteInfo, timel
         </View>
       );
     }
+    if (isCompletedStatus) {
+      return (
+        <View style={[styles.statusBadge, { borderColor: '#BDBDBD' }]}>
+          <Text style={[styles.statusBadgeText, { color: '#ADADAD' }]}>완료된 이사</Text>
+        </View>
+      );
+    }
     if (isMoving) {
       return (
         <View style={[styles.statusBadge, { borderColor: '#94E3B8', backgroundColor: '#F0FFF7' }]}>
           <Text style={[styles.statusBadgeText, { color: '#009443' }]}>이사 진행 중</Text>
+        </View>
+      );
+    }
+    if (status === 'pending') {
+      return (
+        <View style={[styles.statusBadge, { borderColor: '#EA6500' }]}>
+          <Text style={[styles.statusBadgeText, { color: '#EA6500' }]}>견적 대기 중</Text>
         </View>
       );
     }
@@ -53,7 +69,7 @@ export default function EstimateCard({ status, date, locations, quoteInfo, timel
       { num: 4, label: '이사' }
     ];
 
-    const currentStep = timelineStep ?? (isMoving ? 3 : 2);
+    const currentStep = timelineStep ?? (isCompletedStatus ? 5 : (isMoving ? 4 : 2));
 
     return (
       <View style={styles.timelineContainer}>
@@ -113,8 +129,8 @@ export default function EstimateCard({ status, date, locations, quoteInfo, timel
       <View style={styles.leftSection}>
         {/* 헤더: 상태 배지 & 등록일 */}
         <View style={styles.headerRow}>
-            <View>{renderStatusBadge()}</View>
-            <Text style={styles.regDateText}>2026.01.29 등록</Text>
+          <View>{renderStatusBadge()}</View>
+          <Text style={styles.regDateText}>2026.01.29 등록</Text>
         </View>
 
         {/* 날짜 행 */}
@@ -125,10 +141,10 @@ export default function EstimateCard({ status, date, locations, quoteInfo, timel
 
         {/* 위치 정보 */}
         <View style={styles.locationRow}>
-            <Image source={require('../../../assets/mapsflag.png')} style={styles.mapIcon} resizeMode="contain" />
-            <Text style={styles.locationText}>{locations.start}</Text>
-            <Image source={require('../../../assets/arrow.png')} style={styles.arrowIcon} resizeMode="contain" />
-            <Text style={styles.locationText}>{locations.end}</Text>
+          <Image source={require('../../../assets/mapsflag.png')} style={styles.mapIcon} resizeMode="contain" />
+          <Text style={styles.locationText}>{locations.start}</Text>
+          <Image source={require('../../../assets/right.png')} style={styles.arrowIcon} resizeMode="contain" />
+          <Text style={styles.locationText}>{locations.end}</Text>
         </View>
 
         {/* 타임라인 */}
@@ -143,7 +159,7 @@ export default function EstimateCard({ status, date, locations, quoteInfo, timel
             <Text style={styles.requestButtonText}>내 요청사항</Text>
           </TouchableOpacity>
 
-          {!isMoving && !isCancelled && (
+          {(status === 'active' || status === 'pending') && (
             <TouchableOpacity style={styles.stopButton}>
               <Image source={require('../../../assets/stop.png')} style={styles.btnIcon} resizeMode="contain" />
               <Text style={styles.stopButtonText}>견적 그만 받기</Text>
@@ -153,50 +169,80 @@ export default function EstimateCard({ status, date, locations, quoteInfo, timel
       </View>
 
       {/* 오른쪽 섹션 (견적 정보) */}
-      <View style={[styles.rightSection, isCancelled && { backgroundColor: '#F4F4F4' }]}>
-          {isCancelled ? (
-              <View style={styles.cancelledContent}>
-                  <Text style={styles.cancelledText}>상담이 취소된 내역입니다.</Text>
+      <View style={[
+        styles.rightSection, 
+        (isCancelled || isCompletedStatus) && { backgroundColor: '#F4F4F4' },
+        isMoving && { backgroundColor: '#F0FFF7' },
+        isWaitingForQuotes && { justifyContent: 'center', alignItems: 'center' }
+      ]}>
+        {isCancelled ? (
+          // 취소된 이사
+          <View style={styles.rightTextContent}>
+            <Text style={styles.cancelledText}>상담이 취소된 내역입니다.</Text>
+          </View>
+        ) : isCompletedStatus ? (
+          // 완료된 이사
+          <View style={styles.rightTextContent}>
+            <Text style={styles.cancelledText}>완료된 이사입니다.</Text>
+          </View>
+        ) : isMoving && quoteInfo ? (
+          // Step 4: 이사 진행 중
+          <View style={styles.rightTextContent}>
+            <Text style={styles.movingText}>이사 진행 중입니다.</Text>
+          </View>
+        ) : quoteInfo ? (
+          isWaitingForQuotes ? (
+            // Step2 : 견적 대기 중
+            <View style={[styles.receivedInfo, { marginRight: 12 }]}>
+              <View style={styles.receivedIcon}>
+                <Image source={require('../../../assets/chat.png')} style={{ width: 30, height: 30 }} resizeMode="contain" />
               </View>
-          ) : quoteInfo ? (
-              <>
-                  {/* 받은 견적서 개수 헤더 */}
-                  <View style={styles.receivedInfo}>
-                         <View style={styles.receivedIcon}>
-                            <Image source={require('../../../assets/chat.png')} style={{ width: 30, height: 30 }} resizeMode="contain" />
-                         </View>
-                         <View style={{marginLeft: 14}}>
-                            <Text style={styles.receivedLabel}>받은 견적서</Text>
-                            <Text style={styles.receivedCount}>{quoteInfo.companyCount}개 업체</Text>
-                         </View>
-                  </View>
+              <View style={{marginLeft: 14}}>
+                <Text style={styles.receivedLabel}>받은 견적서</Text>
+                <Text style={styles.receivedCount}>{quoteInfo.companyCount}개 업체</Text>
+              </View>
+            </View>
+          ) : (
+            // Step 3 : 견적 받는 중
+            <>
+              {/* 받은 견적서 개수 헤더 */}
+              <View style={[styles.receivedInfo, { marginBottom: 12 }]}>
+                <View style={styles.receivedIcon}>
+                  <Image source={require('../../../assets/chat.png')} style={{ width: 30, height: 30 }} resizeMode="contain" />
+                </View>
+                <View style={{marginLeft: 14}}>
+                  <Text style={styles.receivedLabel}>받은 견적서</Text>
+                  <Text style={styles.receivedCount}>{quoteInfo.companyCount}개 업체</Text>
+                </View>
+              </View>
 
-                  {/* 태그들 (견적 박스 위로 이동) */}
-                  <View style={styles.tagsRow}>
-                    {quoteInfo.tags.map((tag, idx) => (
-                      <View key={idx} style={styles.tag}>
-                        <Text style={styles.tagText}>{tag}</Text>
-                      </View>
-                    ))}
+              {/* 태그들 (견적 박스 위로 이동) */}
+              <View style={styles.tagsRow}>
+                {quoteInfo.tags.map((tag, idx) => (
+                  <View key={idx} style={styles.tag}>
+                    <Text style={styles.tagText}>{tag}</Text>
                   </View>
+                ))}
+              </View>
 
-                  {/* 최저가 / 가격 표시 */}
-                  <View style={styles.quoteBox}>
-                      <View style={styles.quoteBoxHeader}>
-                        {quoteInfo.isLowest ? (
-                            <Text style={styles.lowestLabel}>최저가 업체</Text>
-                        ) : <View />}
-                        
-                        <View style={styles.ratingRow}>
-                          <Image source={require('../../../assets/star.png')} style={{ width: 14, height: 14 }} resizeMode="contain" />
-                          <Text style={styles.ratingText}>{quoteInfo.rating}</Text>
-                        </View>
-                      </View>
-                      
-                      <Text style={styles.priceText}>{quoteInfo.price}</Text> 
+              {/* 최저가 / 가격 표시 */}
+              <View style={styles.quoteBox}>
+                <View style={styles.quoteBoxHeader}>
+                  {quoteInfo.isLowest ? (
+                      <Text style={styles.lowestLabel}>최저가 업체</Text>
+                  ) : <View />}
+                  
+                  <View style={styles.ratingRow}>
+                    <Image source={require('../../../assets/star.png')} style={{ width: 14, height: 14 }} resizeMode="contain" />
+                    <Text style={styles.ratingText}>{quoteInfo.rating}</Text>
                   </View>
-              </>
-          ) : null}
+                </View>
+                
+                <Text style={styles.priceText}>{quoteInfo.price}</Text> 
+              </View>
+            </>
+          )
+        ) : null}
       </View>
     </View>
   );
@@ -204,23 +250,22 @@ export default function EstimateCard({ status, date, locations, quoteInfo, timel
 
 const styles = StyleSheet.create({
   cardContainer: {
-    width: 900,
-    height: 280,
+    width: 700,
+    height: 260,
     backgroundColor: 'white',
     borderRadius: 8,
     borderWidth: 1,
     borderColor: '#D9D9D9',
     flexDirection: 'row',
-    overflow: 'hidden',
     marginBottom: 20,
   },
   leftSection: {
     flex: 1,
-    padding: 24,
+    padding: 28,
     position: 'relative',
   },
   rightSection: {
-    width: 350,
+    width: 250,
     borderLeftWidth: 1,
     borderLeftColor: '#D9D9D9',
     padding: 28,
@@ -231,7 +276,7 @@ const styles = StyleSheet.create({
   headerRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 12,
+    marginBottom: 8,
   },
   statusBadge: {
     paddingHorizontal: 10,
@@ -245,54 +290,55 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   regDateText: {
-    fontSize: 13,
+    fontSize: 12,
     color: '#B2B2B2',
-    marginLeft: 8,
+    marginLeft: 6,
   },
   dateRow: {
     flexDirection: 'row',
     alignItems: 'flex-end',
-    marginBottom: 16,
+    marginBottom: 10,
+    gap: 3,
   },
   mainDateText: {
-    fontSize: 22,
+    fontSize: 20,
     fontWeight: '700',
     color: 'black',
-    marginRight: 8,
-    lineHeight: 26,
+    marginRight: 6,
+    lineHeight: 24,
   },
   subDateText: {
-    fontSize: 14,
+    fontSize: 15,
     color: '#B2B2B2',
-    marginBottom: 2,
+    marginBottom: 1
   },
 
   // Location
   locationRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 20, 
+    marginBottom: 15, 
     justifyContent: 'flex-start',
   },
   mapIcon: {
     width: 14, 
     height: 14,
-    marginRight: 8,
+    marginRight: 6,
     opacity: 0.5,
   },
   locationText: {
-    fontSize: 16,
+    fontSize: 15,
     color: '#3D3D3A',
   },
   arrowIcon: {
     width: 10,
     height: 10,
-    marginHorizontal: 12,
+    marginHorizontal: 10,
     opacity: 0.5,
   },
   // Timeline
   timelineWrapper: {
-    marginBottom: 20,
+    marginBottom: 15,
     marginTop: 0,
     width: '100%',
   },
@@ -363,12 +409,14 @@ const styles = StyleSheet.create({
     marginRight: 6,
   },
   requestButton: {
+    flex: 1,
     paddingHorizontal: 16,
-    paddingVertical: 10,
+    paddingVertical: 7,
     borderRadius: 6,
     backgroundColor: '#F5F5F5',
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
   },
   requestButtonText: {
     color: '#555555',
@@ -376,14 +424,16 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   stopButton: {
+    flex: 1,
     paddingHorizontal: 16,
-    paddingVertical: 10,
+    paddingVertical: 7,
     borderRadius: 6,
     borderWidth: 1,
     borderColor: '#FF6B6B',
     backgroundColor: 'white',
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
   },
   stopButtonText: {
     color: '#FF6B6B',
@@ -395,18 +445,17 @@ const styles = StyleSheet.create({
   tagsRow: {
     flexDirection: 'row',
     gap: 6,
-    justifyContent: 'flex-end', // Right align tags
+    justifyContent: 'flex-end',
     marginBottom: 8,
   },
   quoteBox: {
     padding: 16,
+    paddingBottom: 10,
     borderRadius: 8,
     borderWidth: 1,
     borderColor: '#FFE0D5',
     backgroundColor: '#FFF6EF',
-    marginTop: 'auto', 
-    height: 100,
-    justifyContent: 'space-between',
+    marginTop: 5,
   },
   quoteBoxHeader: {
     flexDirection: 'row',
@@ -436,11 +485,9 @@ const styles = StyleSheet.create({
     color: '#323232',
   },
   
-  // Received Info
   receivedInfo: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 20,
   },
   receivedIcon: {
     width: 60,
@@ -475,12 +522,16 @@ const styles = StyleSheet.create({
   },
 
   // 취소됨 상태 전용
-  cancelledContent: {
+  rightTextContent: {
     alignItems: 'center',
     justifyContent: 'center',
     flex: 1
   },
   cancelledText: {
+    color: '#606060',
+    fontSize: 13,
+  },
+  movingText: {
     color: '#606060',
     fontSize: 13,
   },
