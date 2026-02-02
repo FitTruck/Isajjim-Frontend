@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet, useWindowDimensions } from 'react-native';
 
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../types/navigation';
 
@@ -9,6 +9,7 @@ export default function Header() {
   const { width } = useWindowDimensions();
   const isMobile = width < 768;
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const route = useRoute();
 
   const onGoHome = () => {
     navigation.reset({
@@ -32,18 +33,39 @@ export default function Header() {
         <Image source={require('../../../assets/Logo.png')} style={styles.logoIcon} />
         <Text style={[styles.logoText, isMobile && styles.mobileLogoText]}>이삿찜</Text>
       </TouchableOpacity>
-      <View style={[styles.headerRight, isMobile && styles.mobileHeaderRight]}>
-        <TouchableOpacity onPress={onGoMyEstimate}>
-          <Text style={[styles.mypageText, isMobile && styles.mobileMypageText]}>내 견적</Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={onGoMyChat}>
-          <Text style={[styles.mypageText, isMobile && styles.mobileMypageText]}>채팅</Text>
-          {true && <View style={styles.Badge}></View>}
-        </TouchableOpacity>
-        <TouchableOpacity>
+
+      <View style={[styles.headerRight, isMobile && styles.mobileHeaderRight]}>  
+        {/* 내 견적: 조건부 렌더링 */}
+        {route.name === 'MyEstimate' ? (
+          <TouchableOpacity onPress={onGoMyEstimate} style={styles.menuItem}>
+            <Text style={[styles.mypageText, isMobile && styles.mobileMypageText, { color: '#EA6500', fontWeight: '700' }]}>내 견적</Text>
+            <View style={styles.activeBar} />
+          </TouchableOpacity>
+        ) : (
+          <TouchableOpacity onPress={onGoMyEstimate} style={styles.menuItem}>
+            <Text style={[styles.mypageText, isMobile && styles.mobileMypageText]}>내 견적</Text>
+          </TouchableOpacity>
+        )}
+
+        {/* 채팅: 조건부 렌더링 */}
+        {route.name === 'MyChat' ? (
+          <TouchableOpacity onPress={onGoMyChat} style={styles.menuItem}>
+            <Text style={[styles.mypageText, isMobile && styles.mobileMypageText, { color: '#EA6500', fontWeight: '700' }]}>채팅</Text>
+            {true && <View style={styles.Badge} />}
+            <View style={styles.activeBar} />
+          </TouchableOpacity>
+        ) : (
+          <TouchableOpacity onPress={onGoMyChat} style={styles.menuItem}>
+            <Text style={[styles.mypageText, isMobile && styles.mobileMypageText]}>채팅</Text>
+            {true && <View style={styles.Badge} />}
+          </TouchableOpacity>
+        )}
+
+        <TouchableOpacity style={styles.menuItem}>
           <Text style={[styles.mypageText, isMobile && styles.mobileMypageText]}>문의하기</Text>
         </TouchableOpacity>
       </View> 
+      
     </View>
   );
 }
@@ -74,6 +96,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
+    zIndex: 10, 
   },
   logoIcon: {
     width: 40,
@@ -92,6 +115,10 @@ const styles = StyleSheet.create({
     fontSize: 20,
   },
   headerRight: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    height: '100%',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
@@ -114,8 +141,21 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     backgroundColor: '#FF8383',
     position: 'absolute',
-    top: 5,
+    top: 23,
     right: -11,
+  },
+  menuItem: {
+    position: 'relative',
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: '100%', 
+  },
+  activeBar: {
+    position: 'absolute',
+    bottom: 0,
+    width: 70,
+    height: 5,
+    backgroundColor: '#EA6500',
   },
   
 });
