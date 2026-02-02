@@ -1,8 +1,9 @@
-import { View, Text, ScrollView, StyleSheet, Image } from "react-native";
+import { View, Text, ScrollView, StyleSheet, Image, TouchableOpacity } from "react-native";
 import { commonStyles } from "../styles/commonStyles";
 import Header from "../components/common/Header";
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types/navigation';
+import { Ionicons } from '@expo/vector-icons';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'MyChat'>;
 
@@ -20,16 +21,11 @@ export default function MyChat({ navigation }: Props) {
           {/* Page Content: 기준점 */}
           <View style={styles.pageContent}>
 
-            {/* 중앙정렬 컨테이너*/}
+            {/* 중앙정렬 컨테이너 */}
             <View style={styles.centerContainer}>
-
-              {/* 타이틀 섹션 */}
-              <View style={styles.titleSection}>
+              <View>
                 <Text style={styles.pageTitle}>채팅</Text>
-                <View style={styles.subtitleRow}>
-                  <View style={styles.subtitleBar} />
-                  <Text style={styles.pageSubtitle}>나의 상황에 대해 상의해 보세요 확정을 하면 AI가 요약하여 견적서에 반영합니다</Text>
-                </View> 
+                <Text style={styles.pageSubtitle}>나의 상황에 대해 상의해 보세요 AI가 요약하여 견적서에 반영합니다.</Text>
               </View>
             </View>
 
@@ -40,7 +36,7 @@ export default function MyChat({ navigation }: Props) {
                   {/* 검색 바 */}
                   <View style={styles.searchBar}>
                     <Text style={styles.searchTextPlaceholder}>대화방 검색</Text>
-                    <Image source={{uri: 'https://placehold.co/31x31'}} style={{width: 31, height: 31}} />
+                    <Ionicons name="search" size={20} color="#999" />
                   </View>
 
                   {/* 필터 바 */}
@@ -169,39 +165,28 @@ const styles = StyleSheet.create({
   
   // 중앙 컨텐츠 컨테이너 
   centerContainer: {
-    width: 900, 
+    width: 1050, 
     alignSelf: 'center',
     marginHorizontal: 'auto',
+    marginBottom: 50,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'baseline',
   },
 
-  titleSection: {
-    marginBottom: 60,
-    width: '100%', 
-  },
   pageTitle: {
-    fontSize: 60,
+    fontSize: 30, 
     fontWeight: '700',
-    color: '#3D3D3A',
-    marginBottom: 20,
-  },
-  subtitleRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginLeft: 22, 
-  },
-  subtitleBar: {
-    width: 7,
-    height: 27,
-    backgroundColor: '#FADDC3',
-    marginRight: 15,
-    position: 'absolute',
-    left: -22,
+    color: '#323232',
+    lineHeight: 34,
+    marginBottom: 5,
   },
   pageSubtitle: {
-    fontSize: 20,
-    color: '#62625D',
+    fontSize: 15,
+    color: '#999999',
     fontWeight: '400',
   },
+
 
   // 채팅 레이아웃 스타일
   chatSection: {
@@ -210,7 +195,6 @@ const styles = StyleSheet.create({
     height: 700,
     backgroundColor: 'transparent',
     overflow: 'visible',
-    // 필요시 컨테이너 오버플로우 허용 또는 자체 중앙 정렬
     alignSelf: 'center',
     marginHorizontal: 'auto',
     position: 'relative',

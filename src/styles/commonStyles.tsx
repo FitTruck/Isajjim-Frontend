@@ -29,7 +29,7 @@ export const commonStyles = StyleSheet.create({
     gap: 23,
   },
   mainTitle: {
-    fontSize: 64,
+    fontSize: 45,
     fontWeight: '700',
     color: '#3D3D3A',
     textAlign: 'center',
