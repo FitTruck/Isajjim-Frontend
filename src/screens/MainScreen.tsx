@@ -8,7 +8,6 @@ import Header from '../components/common/Header';
 import UploadBox from '../components/MainScreen/UploadBox';
 import NextBtn1 from '../components/MainScreen/NextBtn1';
 import AlertBox from '../components/common/AlertBox';
-import Space3D from '../components/Space/Space3D';
 
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types/navigation';
@@ -86,16 +85,7 @@ export default function Main({ navigation }: Props) {
               onNavigateNext={(images, id) => navigation.navigate('UserSelect', { images, estimateId: id })}
               onShowAlert={() => setIsAlertVisible(true)}
             />
-
           </View>
-
-           {/* 3D 적재 시뮬레이터 (Web & Mobile) */}
-             <View style={styles.loadingSection}>
-               <Text style={styles.loadingTitle}>3D 적재 시뮬레이션</Text>
-               <View style={styles.loadingContainer}>
-                 <Space3D />
-               </View>
-             </View>
 
           {/* 왜 이삿짐인가요? 섹션 */}
           <View style={[styles.whyTitleSection, isMobile && styles.mobileWhyTitleSection]}>
