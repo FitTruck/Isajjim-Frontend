@@ -28,10 +28,10 @@ export default function Header() {
 
   return (
     <View style={[styles.header, isMobile && styles.mobileHeader]}>
-        <TouchableOpacity style={styles.logoContainer} onPress={onGoHome}>
-          <Image source={require('../../../assets/Logo.png')} style={styles.logoIcon} />
-          <Text style={[styles.logoText, isMobile && styles.mobileLogoText]}>이삿찜</Text>
-        </TouchableOpacity>
+      <TouchableOpacity style={styles.logoContainer} onPress={onGoHome}>
+        <Image source={require('../../../assets/Logo.png')} style={styles.logoIcon} />
+        <Text style={[styles.logoText, isMobile && styles.mobileLogoText]}>이삿찜</Text>
+      </TouchableOpacity>
       <View style={[styles.headerRight, isMobile && styles.mobileHeaderRight]}>
         <TouchableOpacity onPress={onGoMyEstimate}>
           <Text style={[styles.mypageText, isMobile && styles.mobileMypageText]}>내 견적</Text>
@@ -63,7 +63,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     borderBottomWidth: 1,
-    borderBottomColor: 'rgb(233, 227, 220)', 
+    borderBottomColor: 'rgba(233, 237, 243, 1)', 
   },
   mobileHeader: {
     height: 50,
