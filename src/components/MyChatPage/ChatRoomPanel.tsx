@@ -41,8 +41,8 @@ export default function ChatRoomPanel({ data }: ChatRoomPanelProps) {
 
       {/* 푸터 입력창 */}
       <View style={styles.chatFooter}>
-        <Image source={{uri: 'https://placehold.co/20x20'}} style={styles.clipIcon} />
-        <Image source={{uri: 'https://placehold.co/22x22'}} style={styles.sendIcon} />
+        <Image source={require('../../../assets/file.png')} style={styles.clipIcon} />
+        <Image source={require('../../../assets/plane.png')} style={styles.sendIcon} />
       </View>
     </View>
   );
@@ -100,8 +100,10 @@ const styles = StyleSheet.create({
     color: '#333333',
   },
   confirmButton: {
-    backgroundColor: '#F0893B',
-    borderRadius: 8,
+    backgroundColor: '#EA6500',
+    borderRadius: 7,
+    borderWidth: 1,
+    borderColor: '#FF8A32',
     paddingHorizontal: 17,
     paddingVertical: 5,
     marginLeft: 10,
@@ -129,9 +131,11 @@ const styles = StyleSheet.create({
   clipIcon: {
     width: 20,
     height: 20,
+    tintColor: '#4e4e4e', 
   },
   sendIcon: {
     width: 22,
     height: 22,
+    tintColor: '#4e4e4e', 
   },
 });
