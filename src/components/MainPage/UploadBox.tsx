@@ -233,7 +233,7 @@ const styles = StyleSheet.create({
   uploadTitle: {
     fontSize: 20,
     fontWeight: '600',
-    color: '#3D3D3A',
+    color: '#333333',
     marginBottom: 8,
     textAlign: 'center',
   },

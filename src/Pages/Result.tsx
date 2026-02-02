@@ -174,7 +174,7 @@ export default function Result({ navigation, route }: Props) {
                   style={isSpaceModalVisible ? styles.closeButtonFixed : styles.expandButton}
                   onPress={() => setIsSpaceModalVisible(!isSpaceModalVisible)}
                 >
-                  <Ionicons name={isSpaceModalVisible ? "close" : "expand"} size={isSpaceModalVisible ? 30 : 20} color={isSpaceModalVisible ? "black" : "#555"} />
+                  <Ionicons name={isSpaceModalVisible ? "close" : "expand"} size={isSpaceModalVisible ? 30 : 20} color={isSpaceModalVisible ? "#333333" : "#555"} />
                 </TouchableOpacity>
               </View>
               <UploadCard 

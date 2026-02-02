@@ -199,7 +199,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 40,
     fontWeight: '600',
-    color: '#3D3D3A',
+    color: '#333333',
     textAlign: 'center',
   },
   mobileSectionTitle: {
@@ -247,7 +247,7 @@ const styles = StyleSheet.create({
   cardTitle: {
     fontSize: 25,
     fontWeight: '600', //semibold
-    color: '#3D3D3A',
+    color: '#333333',
     marginTop: 10,
     marginBottom: 25,
     textAlign: 'center',
@@ -260,7 +260,7 @@ const styles = StyleSheet.create({
   cardDesc: {
     fontSize: 25,
     fontWeight: '500', //medium
-    color: '#3D3D3A',
+    color: '#333333',
     textAlign: 'center',
     lineHeight: 30,
   },
@@ -292,7 +292,7 @@ const styles = StyleSheet.create({
   stepTitleText: {
     fontSize: 40,
     fontWeight: '600',
-    color: '#3D3D3A',
+    color: '#333333',
     textAlign: 'center',
     marginTop: 47,
     lineHeight: 44,

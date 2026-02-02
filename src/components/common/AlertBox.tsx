@@ -55,7 +55,7 @@ const styles = StyleSheet.create({
     width: 20,
     height: 20,
     borderRadius: 10,
-    backgroundColor: '#3D3D3A',
+    backgroundColor: '#333333',
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 10,
@@ -70,6 +70,6 @@ const styles = StyleSheet.create({
   text: {
     fontSize: 14,
     fontWeight: '500',
-    color: '#3D3D3A',
+    color: '#333333',
   },
 })

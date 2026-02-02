@@ -99,7 +99,7 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#3D3D3A',
+    color: '#333333',
     marginBottom: 8,
   },
   inputBox: {
@@ -119,7 +119,7 @@ const styles = StyleSheet.create({
   },
   inputValue: {
     fontSize: 16,
-    color: '#3D3D3A',
+    color: '#333333',
   },
   placeholder: {
     color: '#999',

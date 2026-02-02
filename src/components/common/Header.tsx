@@ -84,7 +84,7 @@ const styles = StyleSheet.create({
   logoText: {
     fontSize: 26, 
     fontWeight: '700', 
-    color: '#3D3D3A', 
+    color: '#333333',  
     fontFamily: 'sans-serif', 
     letterSpacing: -0.5,
   },
@@ -103,7 +103,7 @@ const styles = StyleSheet.create({
   mypageText: { 
     fontSize: 16,
     fontWeight: '500',
-    color: '#3D3D3A', 
+    color: '#333333',  
   },
   mobileMypageText: {
     fontSize: 13,

@@ -303,7 +303,7 @@ const styles = StyleSheet.create({
   mainDateText: {
     fontSize: 20,
     fontWeight: '700',
-    color: 'black',
+    color: '#333333',
     marginRight: 6,
     lineHeight: 24,
   },
@@ -328,7 +328,7 @@ const styles = StyleSheet.create({
   },
   locationText: {
     fontSize: 15,
-    color: '#3D3D3A',
+    color: '#333333',
   },
   arrowIcon: {
     width: 10,
@@ -469,7 +469,7 @@ const styles = StyleSheet.create({
     gap: 4
   },
     lowestLabel: {
-    color: 'black',
+    color: '#333333',
     fontSize: 15,
     fontWeight: '600',
   },
@@ -507,7 +507,7 @@ const styles = StyleSheet.create({
   receivedCount: {
     fontSize: 18,
     fontWeight: '600',
-    color: 'black',
+    color: '#333333',
   },
   tag: {
     paddingHorizontal: 10,

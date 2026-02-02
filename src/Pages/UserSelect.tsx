@@ -454,7 +454,7 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontWeight: 'bold',
     marginBottom: 20,
-    color: '#3D3D3A',
+    color: '#333333',
     textAlign: 'left',
   },
 });

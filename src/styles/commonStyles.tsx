@@ -31,7 +31,7 @@ export const commonStyles = StyleSheet.create({
   mainTitle: {
     fontSize: 45,
     fontWeight: '700',
-    color: '#3D3D3A',
+    color: '#333333',
     textAlign: 'center',
   },
   mainSubtitle: {
@@ -60,7 +60,7 @@ export const commonStyles = StyleSheet.create({
   },
   footerLogo: {
     fontSize: 24,
-    color: '#3D3D3A',
+    color: '#333333',
     marginTop: 52,
   },
   footerLinksRow: {
@@ -78,12 +78,12 @@ export const commonStyles = StyleSheet.create({
   footerTopic: {
     fontSize: 16,
     fontWeight: '500',
-    color: '#3D3D3A',
+    color: '#333333',
   },
   footerPage: {
     fontSize: 16,
     fontWeight: '500',
-    color: '#3D3D3A',
+    color: '#333333',
   },
   socialIcons: {
     position: 'absolute',

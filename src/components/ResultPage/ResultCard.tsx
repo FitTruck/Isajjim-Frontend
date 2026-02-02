@@ -138,7 +138,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontFamily : 'inter',
     fontWeight: 600,
-    color: '#3D3D3A',
+    color: '#333333',
   },
   itemSubtitle: {
     fontSize: 15,
@@ -190,7 +190,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 28,
     fontWeight: '500',
-    color: '#3D3D3A',
+    color: '#333333',
     textAlign: 'center',
   },
 });
