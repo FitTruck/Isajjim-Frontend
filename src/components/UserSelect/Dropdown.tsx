@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, FlatList, StyleSheet, Platform, ScrollView } from 'react-native';
+import { View, Text, TouchableOpacity, FlatList, StyleSheet, Platform, ScrollView, Image } from 'react-native';
 
 interface Option {
   label: string;
@@ -52,7 +52,10 @@ export default function Dropdown({ label, placeholder = '선택해주세요', va
         <Text style={[styles.inputValue, !selectedOption && styles.placeholder]}>
           {selectedOption ? selectedOption.label : placeholder}
         </Text>
-        <Text style={styles.arrowIcon}>{isOpen ? '∧' : '∨'}</Text>
+        {isOpen ? 
+          <Image style={styles.arrowIcon} source={require('../../../assets/up.png')} /> : 
+          <Image style={styles.arrowIcon} source={require('../../../assets/bottom.png')} />
+        }
       </TouchableOpacity>
 
       {isOpen && (
@@ -122,8 +125,10 @@ const styles = StyleSheet.create({
     color: '#999',
   },
   arrowIcon: {
-    fontSize: 14,
-    color: '#999',
+    width: 14,
+    height: 14,
+    tintColor: '#999',
+    resizeMode: 'contain',
   },
   
   dropdownListContainer: {
@@ -154,14 +159,14 @@ const styles = StyleSheet.create({
   dropdownItem: {
     paddingVertical: 12,
     paddingHorizontal: 15,
-    // borderBottomWidth: 1,
-    // borderBottomColor: '#F5F5F5',
+    borderBottomWidth: 1,
+    borderBottomColor: '#F5F5F5',
   },
   lastItem: {
     borderBottomWidth: 0,
   },
   dropdownItemSelected: {
-    backgroundColor: '#FFF0E6', // Very light orange background
+    backgroundColor: '#FFF0E6', 
   },
   dropdownItemText: {
     fontSize: 16,
