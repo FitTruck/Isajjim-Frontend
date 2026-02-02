@@ -3,8 +3,8 @@ import { View, Text, ScrollView, StyleSheet, Alert, Modal, TouchableOpacity } fr
 import { commonStyles } from '../styles/commonStyles';
 import { UploadedImage } from '../types/common';
 import { BACKEND_DOMAIN } from '../utils/Server';
-import ResultCard from '../components/Result/ResultCard';
-import UploadCard from '../components/Result/UploadCard';
+import ResultCard from '../components/ResultPage/ResultCard';
+import UploadCard from '../components/ResultPage/UploadCard';
 import Header from '../components/common/Header';
 import Space3D from '../components/Space/Space3D';
 import { Ionicons } from '@expo/vector-icons';

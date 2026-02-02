@@ -2,11 +2,11 @@ import React, { useState } from 'react';
 import { View, Text, ScrollView, StyleSheet } from 'react-native';
 import { commonStyles } from '../styles/commonStyles';
 import Header from '../components/common/Header';
-import NextBtn from '../components/UserSelect/NextBtn2'; 
+import NextBtn from '../components/UserSelectPage/NextBtn2'; 
 import AlertBox from '../components/common/AlertBox';
-import Dropdown from '../components/UserSelect/Dropdown';
-import DateSelector from '../components/UserSelect/DateSelector';
-import AddressInput from '../components/UserSelect/AddressInput';
+import Dropdown from '../components/UserSelectPage/Dropdown';
+import DateSelector from '../components/UserSelectPage/DateSelector';
+import AddressInput from '../components/UserSelectPage/AddressInput';
 
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types/navigation';

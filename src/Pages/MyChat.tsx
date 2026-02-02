@@ -234,6 +234,7 @@ const styles = StyleSheet.create({
   filterBar: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    alignItems: 'center',
     paddingHorizontal: 17,
     marginTop: 10,
     marginBottom: 10,

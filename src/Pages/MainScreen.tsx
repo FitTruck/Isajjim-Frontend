@@ -5,8 +5,8 @@ import { commonStyles } from '../styles/commonStyles';
 import { UploadedImage } from '../types/common';
 
 import Header from '../components/common/Header';
-import UploadBox from '../components/MainScreen/UploadBox';
-import NextBtn1 from '../components/MainScreen/NextBtn1';
+import UploadBox from '../components/MainPage/UploadBox';
+import NextBtn1 from '../components/MainPage/NextBtn1';
 import AlertBox from '../components/common/AlertBox';
 
 import { NativeStackScreenProps } from '@react-navigation/native-stack';

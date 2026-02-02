@@ -3,8 +3,8 @@ import { commonStyles } from "../styles/commonStyles";
 import Header from "../components/common/Header";
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types/navigation';
-import EstimateCard from "../components/MyEstimate/EstimateCard";
-import SidePanel from "../components/MyEstimate/SidePanel";
+import EstimateCard from "../components/MyEstimatePage/EstimateCard";
+import SidePanel from "../components/MyEstimatePage/SidePanel";
 
 type Props = NativeStackScreenProps<RootStackParamList, 'MyEstimate'>;
 
