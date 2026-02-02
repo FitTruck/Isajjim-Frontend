@@ -1,86 +1,60 @@
 import React, { useState } from "react";
-import { View, Text, Image, StyleSheet, TextInput, FlatList, TouchableOpacity } from "react-native";
+import { View, Text, Image, StyleSheet, TextInput, FlatList, Platform, TouchableOpacity } from "react-native";
 import { Ionicons } from '@expo/vector-icons';
+import { ChatItemData } from "../../Pages/MyChat";
 
-interface ChatItemData {
-  id: string;
-  companyName: string;
-  price: string;
-  time: string;
-  isActive: boolean;
-  isUnread: boolean;
-  logoUri?: any;
+interface ChatListPanelProps {
+  chatList: ChatItemData[];
+  selectedChatId: string | null;
+  onSelectChat: (id: string) => void;
 }
 
-// mock데이터. 나중에 백엔드에서 받는 값이어야 함.
-const dummyChatList: ChatItemData[] = [
-  {
-    id: '1',
-    companyName: '백마익스프레스',
-    price: '860,000원',
-    time: '방금',
-    isActive: true,
-    isUnread: false,
-    logoUri: require('../../../assets/back.png'),
-  },
-  {
-    id: '2',
-    companyName: '작은 짐 이사',
-    price: '820,000원',
-    time: '1월 9일',
-    isActive: false,
-    isUnread: true,
-    logoUri: require('../../../assets/smallisa.png'),
-  },
-  {
-    id: '3',
-    companyName: '2424닷컴',
-    price: '900,000원',
-    time: '1월 8일',
-    isActive: false,
-    isUnread: true,
-    logoUri: require('../../../assets/2424.png'),
-  },
-];
-
-export default function ChatListPanel() {
+export default function ChatListPanel({ chatList, selectedChatId, onSelectChat }: ChatListPanelProps) {
   // 검색바에 검색한 값
   const [searchText, setSearchText] = useState("");
   
   // 검색바에 검색한 값에 따라 필터링된 리스트
-  const filteredList = dummyChatList.filter(item =>
+  const filteredList = chatList.filter(item =>
     // 업체 이름 목록들 중에서 searchText가 포함된 것만 필터링
     item.companyName.includes(searchText)
   );
 
   // 채팅방 리스트 렌더링 함수
-  const renderItem = ({ item }: { item: ChatItemData }) => (
-    <View style={[styles.chatItem, item.isActive && styles.chatItemActive]}>
-      {item.logoUri ? (
-        <Image source={item.logoUri} style={styles.avatar} />
-      ) : ( // logoUri가 없을 경우
-        <View style={styles.avatarPlaceholder}>
-          <Text style={{fontSize: 10}}>Logo</Text> 
-        </View>
-      )}
-      
-      <View style={styles.chatItemContent}>
-        <View style={styles.chatItemHeader}>
-          <Text style={styles.chatItemName}>{item.companyName}</Text>
-          <View style={styles.chatItemMeta}>
-            <View style={item.isActive ? styles.statusDot : styles.statusDotGray} />
-            <Text style={styles.chatTime}>{item.time}</Text>
+  const renderItem = ({ item }: { item: ChatItemData }) => {
+    const isSelected = item.id === selectedChatId;
+    
+    return (
+      <TouchableOpacity 
+        style={[styles.chatItem, isSelected && styles.chatItemActive]}
+        onPress={() => onSelectChat(item.id)}
+      >
+        {item.logoUri ? (
+          <Image source={item.logoUri} style={styles.avatar} />
+        ) : ( // logoUri가 없을 경우
+          <View style={styles.avatarPlaceholder}>
+            <Text style={{fontSize: 10}}>Logo</Text> 
+          </View>
+        )}
+        
+        <View style={styles.chatItemContent}>
+          <View style={styles.chatItemHeader}>
+            <Text style={styles.chatItemName}>{item.companyName}</Text>
+            <View style={styles.chatItemMeta}>
+              {/* isSelected가 true이면 statusDot(주황색 등), 아니면 gray */}
+              <View style={isSelected ? styles.statusDot : styles.statusDotGray} />
+              <Text style={styles.chatTime}>{item.time}</Text>
+            </View>
+          </View>
+          <View style={styles.chatItemPriceRow}>
+            <Text style={styles.chatPriceLabel}>제안 가격:</Text>
+            <Text style={styles.chatPriceValue}>{item.price}</Text>
           </View>
         </View>
-        <View style={styles.chatItemPriceRow}>
-          <Text style={styles.chatPriceLabel}>제안 가격:</Text>
-          <Text style={styles.chatPriceValue}>{item.price}</Text>
-        </View>
-      </View>
-      {/* 안 읽었을 때 뜨는 점 */}
-      {item.isUnread && <View style={styles.unreadDot} />}
-    </View>
-  );
+        {/* 안 읽었을 때 뜨는 점 */}
+        {item.isUnread && <View style={styles.unreadDot} />}
+      </TouchableOpacity>
+    );
+  };
 
   return (
     <View style={styles.leftPanel}>
@@ -104,16 +78,16 @@ export default function ChatListPanel() {
       </View>
       <View style={styles.divider} />
 
-      {/* 채팅 리스트 - FlatList 사용 */}
+      {/* 채팅 리스트 */}
       <FlatList
         data={filteredList}
         renderItem={renderItem}
         keyExtractor={item => item.id}
-        contentContainerStyle={{ paddingBottom: 60 }} // 휴지통 아이콘 공간 확보
+        contentContainerStyle={{ paddingBottom: 60 }}
       />
 
       {/* 휴지통 아이콘 */}
-      <Image source={{uri: 'https://placehold.co/18x18'}} style={styles.trashIcon} />
+      <Image source={require('../../../assets/trash.png')} style={styles.trashIcon} />
     </View>
   );
 }
@@ -125,12 +99,13 @@ const styles = StyleSheet.create({
     borderColor: '#E6E6E6',
     backgroundColor: 'white',
     position: 'relative',
-    height: '100%', // Ensure full height for scrolling
+    height: '100%',
   },
   searchBar: {
     width: 260,
     height: 44,
     backgroundColor: '#F4F4F4',
+    borderRadius: 8,
     margin: 9,
     flexDirection: 'row',
     alignItems: 'center',
@@ -140,8 +115,14 @@ const styles = StyleSheet.create({
   input: {
     flex: 1,
     fontSize: 16,
+    marginLeft: 7,
     color: '#333',
     height: '100%',
+    ...Platform.select({
+      web: {
+        outlineStyle: 'none',
+      },
+    }) as any,
   },
   searchTextPlaceholder: {
     color: '#929AA9',
@@ -257,5 +238,6 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 15,
     left: 17,
+    tintColor: '#4e4e4e', 
   },
 });

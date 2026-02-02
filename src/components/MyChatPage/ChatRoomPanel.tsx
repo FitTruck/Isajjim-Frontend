@@ -1,19 +1,32 @@
 import React from "react";
 import { View, Text, Image, StyleSheet } from "react-native";
+import { ChatItemData } from "../../Pages/MyChat";
 
-export default function ChatRoomPanel() {
+interface ChatRoomPanelProps {
+  data: ChatItemData | null;
+}
+
+export default function ChatRoomPanel({ data }: ChatRoomPanelProps) {
+  if (!data) {
+    return (
+      <View style={[styles.rightPanel, { justifyContent: 'center', alignItems: 'center' }]}>
+        <Text style={{ fontSize: 16, color: '#999' }}>채팅방을 선택해주세요.</Text>
+      </View>
+    );
+  }
+
   return (
     <View style={styles.rightPanel}>
       {/* 헤더 */}
       <View style={styles.chatHeader}>
         <View>
-           <Text style={styles.headerCompanyName}>백마익스프레스</Text>
+           <Text style={styles.headerCompanyName}>{data.companyName}</Text>
            <Text style={styles.headerCompanyDesc}>보통 15분 내 응답, 응답률 100%</Text>
         </View>
         <View style={styles.headerRightGroup}>
            <View style={styles.headerPriceBlock}>
               <Text style={styles.headerPriceLabel}>제안 가격:</Text>
-              <Text style={styles.headerPriceValue}>860,000원</Text>
+              <Text style={styles.headerPriceValue}>{data.price}</Text>
            </View>
            <View style={styles.confirmButton}>
               <Text style={styles.confirmButtonText}>확정하기</Text>
