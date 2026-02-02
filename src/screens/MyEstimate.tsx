@@ -25,17 +25,14 @@ export default function MyEstimate({ navigation }: Props) {
           {/* Page Content: 기준점 */}
           <View style={styles.pageContent}>
 
-            {/* 중앙정렬 컨테이너*/}
-            <View style={styles.centerContainer}>
+            {/* 타이틀 섹션 */}
+            <View style={styles.titleContainer}>
+              <Text style={styles.pageTitle}>내 견적</Text>
+              <Text style={styles.pageSubtitle}>내 정보를 바탕으로 견적을 받습니다.</Text>
+            </View>
 
-              {/* 타이틀 섹션 */}
-              <View style={styles.titleSection}>
-                <Text style={styles.pageTitle}>내 견적</Text>
-                <View style={styles.subtitleRow}>
-                  <View style={styles.subtitleBar} />
-                  <Text style={styles.pageSubtitle}>업체에게 받은 견적서를 확인하세요</Text>
-                </View>
-              </View>
+
+            <View style={styles.listContainer}>
 
               {/* 필터 버튼 */}
               <View style={styles.filterButtonContainer}>
@@ -47,12 +44,28 @@ export default function MyEstimate({ navigation }: Props) {
 
               {/* 견적 리스트 (카드들) */}
               <View style={styles.cardList}>
-                {/* Card 1: 견적 받는 중 */}
+
+                {/* 견적 대기 중 */}
+                <EstimateCard 
+                  status="pending"
+                  date="2026.04.15"
+                  locations={{ start: '서울시 송파구', end: '서울시 강동구' }}
+                  timelineStep={2}
+                  quoteInfo={{
+                    isLowest: false,
+                    price: '1,030,000원',
+                    rating: '3.5',
+                    tags: ['사다리차', '엘레베이터'],
+                    companyCount: 0
+                  }}
+                />
+
+                {/* 견적 받는 중 */}
                 <EstimateCard 
                   status="active"
                   date="2026.03.02"
                   locations={{ start: '서울시 강남구', end: '경기도 성남시' }}
-                  timelineStep={2} // Estimate
+                  timelineStep={3}
                   quoteInfo={{
                     isLowest: true,
                     price: '820,000원',
@@ -62,14 +75,29 @@ export default function MyEstimate({ navigation }: Props) {
                   }}
                 />
 
-                {/* Card 2: 이사 진행 중 */}
+                {/* 이사 진행 중 */}
                 <EstimateCard 
                   status="moving"
                   date="2026.03.02" 
                   locations={{ start: '서울시 강남구', end: '경기도 성남시' }}
-                  timelineStep={3} // Confirmed/Moving
+                  timelineStep={4}
                   quoteInfo={{
-                    isLowest: false, // Normal
+                    isLowest: false,
+                    price: '1,030,000원',
+                    rating: '3.5',
+                    tags: ['사다리차', '엘레베이터'],
+                    companyCount: 5
+                  }}
+                />
+              
+                {/* 완료된 이사 */}
+                <EstimateCard 
+                  status="completed"
+                  date="2026.03.02"
+                  locations={{ start: '서울시 강남구', end: '경기도 성남시' }}
+                  timelineStep={5}
+                  quoteInfo={{
+                    isLowest: false,
                     price: '1,030,000원',
                     rating: '3.5',
                     tags: ['사다리차', '엘레베이터'],
@@ -77,22 +105,21 @@ export default function MyEstimate({ navigation }: Props) {
                   }}
                 />
 
-                {/* Card 3: 취소된 이사 */}
+                { /* 취소된 이사 */}
                 <EstimateCard 
                   status="cancelled"
                   date="2026.03.02"
                   locations={{ start: '서울시 강남구', end: '경기도 성남시' }}
-                  timelineStep={1}
+                  timelineStep={0}
                 />
               </View>
             </View>
-
-            {/* 오른쪽 사이드 패널 (절대위치) */}
-            <View style={styles.sideColumn}>
-              <SidePanel />
-            </View>
-
           </View>
+        </View>
+
+        {/* 오른쪽 사이드 패널 (절대위치) */}
+        <View style={styles.sideColumn}>
+          <SidePanel />
         </View>
       </ScrollView>
     </View>
@@ -111,42 +138,34 @@ const styles = StyleSheet.create({
     maxWidth: 1600, // 사이드패널 공간 확보를 위해 넓게 잡음
     paddingTop: 80,
     position: 'relative', // 사이드패널 배치를 위한 기준
+    alignItems: 'center',
+    flexDirection: 'column',
   },
   
-  // 중앙 컨텐츠 컨테이너
-  centerContainer: {
-    width: 900, // 리스트 너비에 맞춤
-    alignSelf: 'center', // 화면 중앙 정렬
+  // 타이틀 섹션
+  titleContainer: {
+    width: 700, 
+    marginBottom: 50,
+    flexDirection: 'column',
+    alignItems: 'flex-start',
   },
 
-  titleSection: {
-    marginBottom: 60,
-    width: '100%', 
-    // left : 300 // Remove manual offset
-  },
   pageTitle: {
-    fontSize: 60,
+    fontSize: 30,
     fontWeight: '700',
-    color: '#3D3D3A',
-    marginBottom: 20,
-  },
-  subtitleRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginLeft: 22, 
-  },
-  subtitleBar: {
-    width: 7,
-    height: 27,
-    backgroundColor: '#FADDC3',
-    marginRight: 15,
-    position: 'absolute',
-    left: -22,
+    color: '#323232',
+    lineHeight: 34,
+    marginBottom: 5,
   },
   pageSubtitle: {
-    fontSize: 20,
-    color: '#62625D',
+    fontSize: 15,
+    color: '#999999',
     fontWeight: '400',
+  },
+
+  listContainer: {
+    width: 700,
+    alignSelf: 'center',
   },
 
   filterButtonContainer: {
@@ -187,8 +206,8 @@ const styles = StyleSheet.create({
   // 오른쪽 컬럼
   sideColumn: {
     position: 'absolute',
-    right: 0,
-    top: 250, // 타이틀(약100) + 마진(60) + 필터(47+20) = 대략 227+a. 눈대중으로 조정
+    right: 100,
+    top: 170, 
     width: 307,
   }
 });
