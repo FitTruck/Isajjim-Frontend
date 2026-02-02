@@ -123,13 +123,13 @@ export default function ChatRoomPanel({ data }: ChatRoomPanelProps) {
         <View style={[styles.messageRow, styles.theirMessageRow]}>
           <View style={[styles.profileCircle, { opacity: 0 }]} />
           <View style={[styles.messageBubble, styles.theirMessageBubble, { width: 280, maxWidth: 280 }]}>
-             <Text style={styles.quoteGreeting}>
-                {item.text}
-             </Text>
+            <Text style={styles.quoteGreeting}>
+              {item.text}
+            </Text>
              
-             <TouchableOpacity style={styles.viewAllButton}>
-                <Text style={styles.viewAllButtonText}>전체보기</Text>
-             </TouchableOpacity>
+            <TouchableOpacity style={styles.viewAllButton}>
+              <Text style={styles.viewAllButtonText}>전체보기</Text>
+            </TouchableOpacity>
           </View>
           <Text style={styles.messageTime}>{item.time}</Text>
         </View>
@@ -166,17 +166,22 @@ export default function ChatRoomPanel({ data }: ChatRoomPanelProps) {
       {/* 헤더 */}
       <View style={styles.chatHeader}>
         <View>
-           <Text style={styles.headerCompanyName}>{data.companyName}</Text>
-           <Text style={styles.headerCompanyDesc}>보통 15분 내 응답, 응답률 100%</Text>
+          <Text style={styles.headerCompanyName}>{data.companyName}</Text>
+          <Text style={styles.headerCompanyDesc}>보통 15분 내 응답, 응답률 100%</Text>
         </View>
         <View style={styles.headerRightGroup}>
-           <View style={styles.headerPriceBlock}>
-              <Text style={styles.headerPriceLabel}>제안 가격:</Text>
-              <Text style={styles.headerPriceValue}>{data.price}</Text>
-           </View>
-           <TouchableOpacity style={styles.confirmButton}>
-              <Text style={styles.confirmButtonText}>확정하기</Text>
-           </TouchableOpacity>
+          <View style={styles.headerPriceBlock}>
+            <Text style={styles.headerPriceLabel}>제안 가격:</Text>
+            <Text style={styles.headerPriceValue}>{data.price}</Text>
+          </View>
+
+          <TouchableOpacity style={styles.headerRequestButton}>
+            <Image source={require('../../../assets/docs.png')} style={styles.headerRequestIcon} resizeMode="contain" />
+            <Text style={styles.headerRequestText}>내 요청사항</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.confirmButton}>
+            <Text style={styles.confirmButtonText}>확정하기</Text>
+          </TouchableOpacity>
         </View>
       </View>
 
@@ -273,6 +278,7 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontWeight: '700',
     color: '#333333',
+    bottom: 2
   },
   confirmButton: {
     backgroundColor: '#EA6500',
@@ -281,12 +287,29 @@ const styles = StyleSheet.create({
     borderColor: '#FF8A32',
     paddingHorizontal: 16,
     paddingVertical: 5,
-    marginLeft: 10,
   },
   confirmButtonText: {
     color: 'white',
     fontSize: 15,
     fontWeight: '400',
+  },
+  headerRequestButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#F5F5F5',
+    borderRadius: 6,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+  },
+  headerRequestIcon: {
+    width: 14,
+    height: 14,
+    marginRight: 6,
+  },
+  headerRequestText: {
+    fontSize: 14,
+    color: '#555',
+    fontWeight: '500',
   },
   
   // 채팅 영역 스타일
