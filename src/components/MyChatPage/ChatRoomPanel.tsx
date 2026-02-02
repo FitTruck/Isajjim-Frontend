@@ -80,7 +80,11 @@ export default function ChatRoomPanel({ data }: ChatRoomPanelProps) {
       return (
         <View style={[styles.messageRow, styles.theirMessageRow]}>
           <View style={styles.profileCircle}>
-            <Text style={styles.profileText}>{data.companyName[0]}</Text>
+            {data.logoUri ? (
+              <Image source={data.logoUri} style={styles.profileImage} />
+            ) : (
+              <Text style={styles.profileText}>{data.companyName[0]}</Text>
+            )}
           </View>
           <View style={styles.quoteBubble}>
             <View style={styles.quoteHeader}>
@@ -143,8 +147,11 @@ export default function ChatRoomPanel({ data }: ChatRoomPanelProps) {
       ]}>
         {!item.isMe && (
           <View style={styles.profileCircle}>
-            {/* 상대방 프로필 자리 (로고 등) */}
-            <Text style={styles.profileText}>{data.companyName[0]}</Text>
+            {data.logoUri ? (
+              <Image source={data.logoUri} style={styles.profileImage} />
+            ) : (
+              <Text style={styles.profileText}>{data.companyName[0]}</Text>
+            )}
           </View>
         )}
         <View style={[
@@ -343,6 +350,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignSelf: 'flex-start',
     top: 10,
+  },
+  profileImage: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 18,
   },
   profileText: {
     fontSize: 14,
