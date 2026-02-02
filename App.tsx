@@ -2,11 +2,11 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 // 각 화면 컴포넌트 import
-import Main from './src/screens/MainScreen';
-import UserSelect from './src/screens/UserSelect';
-import Result from './src/screens/Result';
-import MyEstimate from './src/screens/MyEstimate';
-import MyChat from './src/screens/MyChat';
+import Main from './src/Pages/MainScreen';
+import UserSelect from './src/Pages/UserSelect';
+import Result from './src/Pages/Result';
+import MyEstimate from './src/Pages/MyEstimate';
+import MyChat from './src/Pages/MyChat';
 
 // 각 화면의 매개변수 타입들을 정의하고 있는 타입 import
 import { RootStackParamList } from './src/types/navigation';
