@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { View, Text, ScrollView, StyleSheet, Alert, Modal, TouchableOpacity } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, Alert, Modal } from 'react-native';
 import { commonStyles } from '../styles/commonStyles';
 import { UploadedImage } from '../types/common';
 import { BACKEND_DOMAIN } from '../utils/Server';
@@ -8,6 +8,7 @@ import UploadCard from '../components/ResultPage/UploadCard';
 import Header from '../components/common/Header';
 import Space3D from '../components/Space/Space3D';
 import { Ionicons } from '@expo/vector-icons';
+import MyTouch from "../components/common/MyTouch";
 
 // app.tsx로부터 전달받을 함수의 자료형 정의
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -170,12 +171,12 @@ export default function Result({ navigation, route }: Props) {
             ]}>
               <View style={[styles.space3DContainer, isSpaceModalVisible && styles.expandedContainer]}>
                 <Space3D />
-                <TouchableOpacity 
+                <MyTouch 
                   style={isSpaceModalVisible ? styles.closeButtonFixed : styles.expandButton}
                   onPress={() => setIsSpaceModalVisible(!isSpaceModalVisible)}
                 >
                   <Ionicons name={isSpaceModalVisible ? "close" : "expand"} size={isSpaceModalVisible ? 30 : 20} color={isSpaceModalVisible ? "#333333" : "#555"} />
-                </TouchableOpacity>
+                </MyTouch>
               </View>
               <UploadCard 
                 data={estimateData} 
