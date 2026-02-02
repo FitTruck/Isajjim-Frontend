@@ -105,7 +105,7 @@ const styles = StyleSheet.create({
   searchBar: {
     width: 260,
     height: 44,
-    backgroundColor: '#F4F4F4',
+    backgroundColor: '#eef0f3',
     borderRadius: 8,
     margin: 9,
     flexDirection: 'row',
@@ -160,8 +160,8 @@ const styles = StyleSheet.create({
     position: 'relative',
   },
   chatItemActive: {
-    backgroundColor: '#FFF6EF',
-  },
+    backgroundColor: '#eef0f3',
+  },  
   avatar: {
     width: 55,
     height: 55,
