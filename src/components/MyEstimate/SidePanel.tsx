@@ -49,7 +49,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: '500',
     color: '#333333',
-    marginBottom: 24,
+    marginBottom: 15,
     textAlign: 'center',
   },
   infoBox: {
@@ -60,7 +60,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#FFE0D5',
     padding: 17,
-    marginBottom: 20,
+    marginBottom: 15,
   },
   infoTitle: {
     fontSize: 15,
@@ -73,8 +73,8 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: '400',
     color: '#333333',
-    lineHeight: 19.5,
-    textAlign: 'center', // Design looks centered
+    lineHeight: 20,
+    textAlign: 'center',
   },
   chatButton: {
     width: '100%',

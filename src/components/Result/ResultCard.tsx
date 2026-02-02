@@ -50,7 +50,7 @@ const ResultCard = ({ image, items, onQuantityChange }: ResultCardProps) => {
 
       {/* 이미지 밑의 내용 */}
       <View style={styles.resultCardContent}>
-        {translatedItems.map((item) => ( // 번역된 가구명 사용
+        {translatedItems.map((item) => (
           <View key={item.furnitureId} style={styles.itemContainer}>
             <View style={styles.itemDetailContainer}>
               <Text style={styles.itemTitle}>{item.label}</Text>
@@ -113,9 +113,11 @@ const styles = StyleSheet.create({
   },
   resultCardContent: {
     width: '100%',
+    borderTopWidth:1,
+    borderTopColor: '#EBEBEB',
     borderBottomLeftRadius: 10,
     borderBottomRightRadius: 10,
-    backgroundColor: '#fffdfaff', // 우아한 리넨 베이지 색상
+    backgroundColor: 'white',
     alignItems: 'center',
     textAlign: 'left',
     paddingTop: 29,
