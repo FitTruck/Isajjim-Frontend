@@ -71,24 +71,21 @@ export default function MyChat({ navigation }: Props) {
 
             {/* 중앙정렬 컨테이너 */}
             <View style={styles.centerContainer}>
-              <View>
-                <Text style={styles.pageTitle}>채팅</Text>
-                <Text style={styles.pageSubtitle}>나의 상황에 대해 상의해 보세요 AI가 요약하여 견적서에 반영합니다.</Text>
-              </View>
+              <Text style={styles.pageTitle}>채팅</Text>
             </View>
 
-              {/* 채팅 UI 섹션 */}
-              <View style={styles.chatSection}>
-                {/* 왼쪽 패널 */}
-                <ChatListPanel 
-                  chatList={dummyChatList} 
-                  selectedChatId={selectedChatId}
-                  onSelectChat={setSelectedChatId}
-                />
+            {/* 채팅 UI 섹션 */}
+            <View style={styles.chatSection}>
+              {/* 왼쪽 패널 */}
+              <ChatListPanel 
+                chatList={dummyChatList} 
+                selectedChatId={selectedChatId}
+                onSelectChat={setSelectedChatId}
+              />
 
-                {/* 오른쪽 패널 */}
-                <ChatRoomPanel data={selectedChatData} />
-              </View>
+              {/* 오른쪽 패널 */}
+              <ChatRoomPanel data={selectedChatData} />
+            </View>
           </View>
         </View>
       </ScrollView>
@@ -117,7 +114,7 @@ const styles = StyleSheet.create({
     width: 1050, 
     alignSelf: 'center',
     marginHorizontal: 'auto',
-    marginBottom: 50,
+    marginBottom: 30,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'baseline',
@@ -129,11 +126,6 @@ const styles = StyleSheet.create({
     color: '#323232',
     lineHeight: 34,
     marginBottom: 5,
-  },
-  pageSubtitle: {
-    fontSize: 15,
-    color: '#999999',
-    fontWeight: '400',
   },
 
   // 채팅 레이아웃 스타일
