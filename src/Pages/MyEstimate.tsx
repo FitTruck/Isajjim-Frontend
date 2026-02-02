@@ -146,7 +146,7 @@ const styles = StyleSheet.create({
   // 타이틀 섹션
   titleContainer: {
     width: 700, 
-    marginBottom: 50,
+    marginBottom: 30,
     flexDirection: 'column',
     alignItems: 'flex-start',
   },
@@ -201,7 +201,7 @@ const styles = StyleSheet.create({
   },
   
   cardList: {
-    gap: 20, 
+    gap: 15, 
   },
 
   // 오른쪽 컬럼
