@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { View, Text, Image, StyleSheet, TextInput, FlatList, KeyboardAvoidingView, Platform, TouchableOpacity, Pressable } from "react-native";
 import { ChatItemData } from "../../Pages/MyChat";
 import MyTouch from "../common/MyTouch";
+import ConfirmButton from "./ConfirmButton";
 import { Ionicons } from '@expo/vector-icons';
 
 interface ChatRoomPanelProps {
@@ -21,6 +22,8 @@ export default function ChatRoomPanel({ data }: ChatRoomPanelProps) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputText, setInputText] = useState("");
   const [isFileHovered, setIsFileHovered] = useState(false);
+  const [isSendHovered, setIsSendHovered] = useState(false);
+  const [replyStep, setReplyStep] = useState(0); // 응답 순서 관리
   const flatListRef = useRef<FlatList>(null);
 
   // 채팅방 변경 시 메시지 초기화 (mock 데이터)
@@ -41,54 +44,6 @@ export default function ChatRoomPanel({ data }: ChatRoomPanelProps) {
           time: '오후 12:51',
           price: data.price,
           text: `안녕하세요.\n포장이사 전문 "${data.companyName}" 입니다.\n\n회원님들께 최고의 서비스를 드리겠습니다.\n\n 혹시 짐 중에서 분해가 필요한 가구(붙박이장 등)나 특수 가전(벽걸이 TV) 등이 있을까요?`
-        },
-        { 
-          id: '3', 
-          type: 'text',
-          isMe: true, 
-          time: '오후 12:55', 
-          price: data.price,
-          text: '붙박이장은 그대로 둘거고요, 벽걸이 TV 이전 설치가 필요합니다. 에어컨은 출발지/도착지 모두 시스템 에어컨이어서 신경 안써주셔도 됩니다.'
-        },
-        { 
-          id: '4', 
-          type: 'text',
-          isMe: false, 
-          time: '오후 12:56', 
-          price: data.price,
-          text: '확인 감사합니다.'
-        },
-        { 
-          id: '5', 
-          type: 'text',
-          isMe: true, 
-          time: '오후 12:58', 
-          price: data.price,
-          text: '넵 혹시 집 골목이 조금 좁은 편인데, 5톤 트럭 진입이 가능할까요?'
-        },
-        { 
-          id: '6', 
-          type: 'text',
-          isMe: false, 
-          time: '오후 1:00', 
-          price: data.price,
-          text: '골목 사진을 보니 진입은 가능해보이나, 당일 사다리차 작업을 위해 미리 공간을 비워주시면 감사하겠습니다.'
-        },
-        { 
-          id: '7', 
-          type: 'text',
-          isMe: true, 
-          time: '오후 1:05', 
-          price: data.price,
-          text: '넵 그리고 고가의 도자기가 몇 개 있는데, 특수하게 작업 부탁드립니다.'
-        },
-        { 
-          id: '8', 
-          type: 'text',
-          isMe: false, 
-          time: '오후 1:06', 
-          price: data.price,
-          text: '알겠습니다 그럼 당일날 뵙겠습니다.'
         },
       ]);
     }
@@ -114,6 +69,38 @@ export default function ChatRoomPanel({ data }: ChatRoomPanelProps) {
     setTimeout(() => {
       flatListRef.current?.scrollToEnd({ animated: true });
     }, 100);
+
+    // 자동 응답 로직
+    setTimeout(() => {
+      let replyText = "";
+      
+      if (replyStep === 0) {
+        replyText = "확인 감사합니다.";
+      } else if (replyStep === 1) {
+        replyText = "골목 사진을 보니 진입은 가능해보이나, 당일 사다리차 작업을 위해 미리 공간을 비워주시면 감사하겠습니다.";
+      } else if (replyStep === 2) {
+        replyText = "알겠습니다 그럼 당일날 뵙겠습니다.";
+      }
+
+      if (replyText) {
+        const replyMessage: Message = {
+          id: Date.now().toString() + '_reply',
+          type: 'text',
+          text: replyText,
+          isMe: false,
+          time: new Date().toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' }),
+          price: data.price
+        };
+
+        setMessages(prev => [...prev, replyMessage]);
+        setReplyStep(prev => prev + 1);
+
+        // 응답 후 스크롤
+        setTimeout(() => {
+          flatListRef.current?.scrollToEnd({ animated: true });
+        }, 100);
+      }
+    }, 1500); // 1.5초 뒤 응답
   };
 
   if (!data) {
@@ -177,8 +164,8 @@ export default function ChatRoomPanel({ data }: ChatRoomPanelProps) {
         // 두 번째 메시지 : 소개
         <View style={[styles.messageRow, styles.theirMessageRow]}>
           <View style={[styles.profileCircle, { opacity: 0 }]} />
-          <View style={[styles.messageBubble, styles.theirMessageBubble, { width: 280, maxWidth: 280 }]}>
-            <Text style={styles.quoteGreeting}>
+          <View style={[styles.messageBubble, styles.theirMessageBubble]}>
+            <Text style={[styles.messageText, styles.theirMessageText]}>
               {item.text}
             </Text>
           </View>
@@ -233,9 +220,9 @@ export default function ChatRoomPanel({ data }: ChatRoomPanelProps) {
             <Image source={require('../../../assets/docs.png')} style={styles.headerRequestIcon} resizeMode="contain" />
             <Text style={styles.headerRequestText}>내 요청사항</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.confirmButton}>
-            <Text style={styles.confirmButtonText}>확정하기</Text>
-          </TouchableOpacity>
+
+          {/* 확정하기 버튼 */}
+          <ConfirmButton messages={messages} />
         </View>
       </View>
 
@@ -264,6 +251,12 @@ export default function ChatRoomPanel({ data }: ChatRoomPanelProps) {
             value={inputText}
             onChangeText={setInputText}
             multiline={true}
+            onKeyPress={(e) => {
+              if (Platform.OS === 'web' && e.nativeEvent.key === 'Enter' && !(e.nativeEvent as any).shiftKey) {
+                e.preventDefault();
+                handleSend();
+              }
+            }}
           />
 
           <View style={styles.footerToolbar}>
@@ -278,9 +271,17 @@ export default function ChatRoomPanel({ data }: ChatRoomPanelProps) {
               <Image source={require('../../../assets/file.png')} style={styles.clipIcon} />
             </Pressable>
 
-            <MyTouch onPress={handleSend}>
+            <Pressable 
+              onPress={handleSend}
+              onHoverIn={() => setIsSendHovered(true)}
+              onHoverOut={() => setIsSendHovered(false)}
+              style={[
+                styles.iconButton,
+                isSendHovered && styles.iconButtonHoveredOrange
+              ]}
+            >
               <Image source={require('../../../assets/plane.png')} style={styles.sendIcon} />
-            </MyTouch>
+            </Pressable>
           </View>
         </View>
       </KeyboardAvoidingView>
@@ -341,19 +342,6 @@ const styles = StyleSheet.create({
     color: '#333333',
     bottom: 2
   },
-  confirmButton: {
-    backgroundColor: '#EA6500',
-    borderRadius: 6,
-    borderWidth: 1,
-    borderColor: '#FF8A32',
-    paddingHorizontal: 11,
-    paddingVertical: 7,
-  },
-  confirmButtonText: {
-    color: 'white',
-    fontSize: 15,
-    fontWeight: '400',
-  },
   headerRequestButton: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -384,7 +372,7 @@ const styles = StyleSheet.create({
     paddingTop: 40,
   },
   messageRow: {
-    marginBottom: 15,
+    marginBottom: 20,
     flexDirection: 'row',
     alignItems: 'flex-end',
   },
@@ -403,7 +391,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     alignSelf: 'flex-start',
-    top: 10,
   },
   profileImage: {
     width: '100%',
@@ -416,8 +403,8 @@ const styles = StyleSheet.create({
     color: '#555',
   },
   messageBubble: {
-    maxWidth: '70%',
-    padding: 12,
+    maxWidth: '39%',
+    padding: 15,
     borderRadius: 12,
   },
   myMessageBubble: {
@@ -570,6 +557,9 @@ const styles = StyleSheet.create({
   },
   iconButtonHovered: {
     backgroundColor: '#F5F5F5',
+  },
+  iconButtonHoveredOrange: {
+    backgroundColor: '#FFF3E0', // 연한 주황색 (Light Orange)
   },
 
 });
