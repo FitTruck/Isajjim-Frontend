@@ -30,9 +30,10 @@ interface LoadedFurniture {
 
 interface ControlsProps {
   truckType?: TruckType;
+  containerCenter?: [number, number, number];
 }
 
-const Controls: React.FC<ControlsProps> = ({ truckType }) => {
+const Controls: React.FC<ControlsProps> = ({ truckType, containerCenter }) => {
   const { camera, gl } = useThree();
   const controlsRef = useRef<OrbitControlsStd>(null);
 
@@ -44,10 +45,10 @@ const Controls: React.FC<ControlsProps> = ({ truckType }) => {
   }, [truckType]);
 
   useEffect(() => {
-    if (controlsRef.current) {
-      controlsRef.current.target.set(0, 0, 0);
+    if (controlsRef.current && containerCenter) {
+      controlsRef.current.target.set(containerCenter[0], containerCenter[1], containerCenter[2]);
     }
-  }, []);
+  }, [containerCenter]);
 
   useFrame(() => {
     controlsRef.current?.update();
@@ -205,6 +206,7 @@ const Space3D: React.FC<Space3DProps> = ({
   const [isPlaying, setIsPlaying] = useState(false);
   const [animationKey, setAnimationKey] = useState(0);
   const [packingMessage, setPackingMessage] = useState('');
+  const [simulationState, setSimulationState] = useState<'idle' | 'running' | 'completed'>('idle');
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   const hasSimulation = furniture && furniture.length > 0;
@@ -311,6 +313,7 @@ const Space3D: React.FC<Space3DProps> = ({
     setCurrentTruckIndex(0);
     setVisibleCount(0);
     setIsPlaying(false);
+    setSimulationState('idle');
     setAnimationKey((k) => k + 1);
   }, [loadedFurniture, truckType, furniture]);
 
@@ -353,6 +356,7 @@ const Space3D: React.FC<Space3DProps> = ({
           }, 800);
         } else {
           setIsPlaying(false);
+          setSimulationState('completed');
           onAnimationComplete?.();
         }
         return next;
@@ -366,6 +370,7 @@ const Space3D: React.FC<Space3DProps> = ({
     setVisibleCount(0);
     setAnimationKey((k) => k + 1);
     setIsPlaying(true);
+    setSimulationState('running');
 
     // 약간의 딜레이 후 시작 (리셋 반영)
     setTimeout(() => {
@@ -377,6 +382,7 @@ const Space3D: React.FC<Space3DProps> = ({
     setIsPlaying(false);
     setCurrentTruckIndex(0);
     setVisibleCount(0);
+    setSimulationState('idle');
     setAnimationKey((k) => k + 1);
     if (timerRef.current) {
       clearTimeout(timerRef.current);
@@ -403,20 +409,26 @@ const Space3D: React.FC<Space3DProps> = ({
     return [distance, distance * 0.8, distance];
   }, [hasSimulation, currentTruckType]);
 
+  // 컨테이너 중앙 (카메라 타겟)
+  const containerCenter = useMemo((): [number, number, number] => {
+    const dims = TRUCK_DIMENSIONS[currentTruckType as keyof typeof TRUCK_DIMENSIONS] || TRUCK_DIMENSIONS['2.5ton'];
+    return [0, dims.height / 2, 0];
+  }, [currentTruckType]);
+
   return (
-    <View style={{ width: '100%', height: '100%', backgroundColor: '#020617' }}>
+    <View style={styles.canvasContainer}>
       <Canvas
         shadows
         camera={{ position: cameraPosition, fov: 50 }}
         gl={{ antialias: true, alpha: true }}
       >
-        <color attach="background" args={['#020617']} />
+        <color attach="background" args={['#FFFFFF']} />
         <ambientLight intensity={0.8} />
         <directionalLight position={[20, 40, 20]} intensity={2} />
         <pointLight position={[-20, 20, -20]} intensity={0.5} color="#6ad2ff" />
 
         <group position={[0, -0.01, 0]}>
-          <gridHelper args={[20, 20, "#081027", "#050c1f"]} />
+          <gridHelper args={[20, 20, "#CCCCCC", "#E0E0E0"]} />
         </group>
 
         <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.02, 0]} receiveShadow>
@@ -436,7 +448,7 @@ const Space3D: React.FC<Space3DProps> = ({
           <TruckContainer truckType="2.5ton" />
         )}
 
-        <Controls truckType={hasSimulation ? currentTruckType as any : undefined} />
+        <Controls truckType={hasSimulation ? currentTruckType as any : undefined} containerCenter={containerCenter} />
       </Canvas>
 
       {/* 컨트롤 UI */}
@@ -447,69 +459,21 @@ const Space3D: React.FC<Space3DProps> = ({
           ) : trucks.length === 0 ? (
             <Text style={styles.loadingText}>배치 계산 중...</Text>
           ) : (
-            <>
-              {/* 트럭 정보 */}
-              <View style={styles.truckInfoRow}>
-                <Text style={styles.truckInfoText}>
-                  {packingMessage}
-                </Text>
-              </View>
-
-              {/* 트럭 네비게이션 (멀티트럭일 때만) */}
-              {trucks.length > 1 && (
-                <View style={styles.truckNavRow}>
-                  {trucks.map((truck, index) => (
-                    <TouchableOpacity
-                      key={index}
-                      style={[
-                        styles.truckNavButton,
-                        currentTruckIndex === index && styles.truckNavButtonActive,
-                      ]}
-                      onPress={() => goToTruck(index)}
-                    >
-                      <Text
-                        style={[
-                          styles.truckNavText,
-                          currentTruckIndex === index && styles.truckNavTextActive,
-                        ]}
-                      >
-                        {index + 1}. {truck.type} ({truck.utilization}%)
-                      </Text>
-                    </TouchableOpacity>
-                  ))}
-                </View>
+            <View style={styles.controlsRow}>
+              {simulationState === 'idle' && (
+                <TouchableOpacity style={styles.playButton} onPress={play}>
+                  <Text style={styles.buttonText}>▶ 시작</Text>
+                </TouchableOpacity>
               )}
-
-              <View style={styles.controlsRow}>
-                {!isPlaying && (
-                  <TouchableOpacity style={styles.playButton} onPress={play}>
-                    <Text style={styles.buttonText}>▶ 시작</Text>
-                  </TouchableOpacity>
-                )}
-                {isPlaying && (
-                  <TouchableOpacity style={styles.pauseButton} onPress={() => {
-                    setIsPlaying(false);
-                    if (timerRef.current) {
-                      clearTimeout(timerRef.current);
-                      timerRef.current = null;
-                    }
-                  }}>
-                    <Text style={styles.buttonText}>⏸ 일시정지</Text>
-                  </TouchableOpacity>
-                )}
-                {(visibleCount > 0 || currentTruckIndex > 0) && (
-                  <TouchableOpacity style={styles.resetButton} onPress={reset}>
-                    <Text style={styles.buttonText}>↺ 리셋</Text>
-                  </TouchableOpacity>
-                )}
-              </View>
-              <View style={styles.statsRow}>
-                <Text style={styles.statsText}>
-                  {trucks.length > 1 ? `[${currentTruckIndex + 1}/${trucks.length}] ` : ''}
-                  {currentTruckType}: {visibleCount} / {placements.length} 배치
-                </Text>
-              </View>
-            </>
+              {simulationState === 'running' && (
+                <Text style={styles.loadingText}>로딩 중...</Text>
+              )}
+              {simulationState === 'completed' && (
+                <TouchableOpacity style={styles.resetButton} onPress={reset}>
+                  <Text style={styles.buttonText}>↺ 리셋</Text>
+                </TouchableOpacity>
+              )}
+            </View>
           )}
         </View>
       )}
@@ -518,6 +482,18 @@ const Space3D: React.FC<Space3DProps> = ({
 };
 
 const styles = StyleSheet.create({
+  canvasContainer: {
+    width: '100%',
+    height: '100%',
+    backgroundColor: '#FFFFFF',
+    borderRadius: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 2,
+    overflow: 'hidden',
+  },
   controlsOverlay: {
     position: 'absolute',
     bottom: 10,
@@ -525,54 +501,12 @@ const styles = StyleSheet.create({
     right: 0,
     alignItems: 'center',
   },
-  truckInfoRow: {
-    marginBottom: 8,
-    backgroundColor: 'rgba(59, 130, 246, 0.8)',
-    paddingHorizontal: 14,
-    paddingVertical: 6,
-    borderRadius: 12,
-  },
-  truckInfoText: {
-    color: 'white',
-    fontSize: 12,
-    fontWeight: '600',
-  },
-  truckNavRow: {
-    flexDirection: 'row',
-    gap: 6,
-    marginBottom: 8,
-    flexWrap: 'wrap',
-    justifyContent: 'center',
-  },
-  truckNavButton: {
-    backgroundColor: 'rgba(100, 100, 100, 0.7)',
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 8,
-  },
-  truckNavButtonActive: {
-    backgroundColor: 'rgba(59, 130, 246, 0.9)',
-  },
-  truckNavText: {
-    color: '#aaa',
-    fontSize: 11,
-  },
-  truckNavTextActive: {
-    color: 'white',
-    fontWeight: '600',
-  },
   controlsRow: {
     flexDirection: 'row',
     gap: 10,
   },
   playButton: {
     backgroundColor: '#F0893B',
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
-  },
-  pauseButton: {
-    backgroundColor: 'rgba(200, 150, 0, 0.8)',
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 20,
@@ -587,17 +521,6 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 12,
     fontWeight: '600',
-  },
-  statsRow: {
-    marginTop: 8,
-    backgroundColor: 'rgba(0, 0, 0, 0.6)',
-    paddingHorizontal: 12,
-    paddingVertical: 4,
-    borderRadius: 10,
-  },
-  statsText: {
-    color: 'white',
-    fontSize: 11,
   },
   loadingText: {
     color: 'white',
