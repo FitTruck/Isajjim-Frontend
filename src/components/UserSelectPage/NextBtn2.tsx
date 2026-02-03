@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { TouchableOpacity, Text, View, StyleSheet, Alert, Platform } from 'react-native';
 import { BACKEND_DOMAIN } from '../../utils/Server';
 import LoadingModal from './LoadingModal';
@@ -237,9 +237,9 @@ const styles = StyleSheet.create({
     marginBottom: 250,
   },
   nextBtn: {
-    width: 100, 
-    height: 50, 
-    backgroundColor: '#F0893B', 
+    paddingHorizontal: 15,
+    paddingVertical: 8,
+    backgroundColor: '#F0893B',
     borderRadius: 7,
     justifyContent: 'center', 
     alignItems: 'center',
@@ -250,7 +250,7 @@ const styles = StyleSheet.create({
   },
   nextBtnText: {
     color: 'white', 
-    fontSize: 18, 
+    fontSize: 17, 
     fontWeight: 400
   }
 });

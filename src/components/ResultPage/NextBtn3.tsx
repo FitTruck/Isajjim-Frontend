@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+﻿import React, { useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Animated, Image } from 'react-native';
 
 
@@ -193,10 +193,8 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 42,
     marginTop: 20,
-    backgroundColor: '#F36845',
+    backgroundColor: '#F0893B',
     borderRadius: 3,
-    borderWidth: 1,
-    borderColor: '#F0893B',
     justifyContent: 'center',
     alignItems: 'center',
   },

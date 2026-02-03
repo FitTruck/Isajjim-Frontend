@@ -28,7 +28,7 @@ const HoverableMenuItem = ({ label, onPress, isActive, isMobile, showBadge = fal
       <Text style={[
         styles.mypageText,
         isMobile && styles.mobileMypageText,
-        (isActive) && { color: '#EA6500', fontWeight: '700' }
+        (isActive) && { color: '#F0893B', fontWeight: '600' }
       ]}>
         {label}
       </Text>
@@ -131,8 +131,7 @@ const styles = StyleSheet.create({
   logoText: {
     fontSize: 26, 
     fontWeight: '700', 
-    color: '#333333',  
-    fontFamily: 'sans-serif', 
+    color: '#333333',
     letterSpacing: -0.5,
   },
   mobileLogoText: {
@@ -163,7 +162,7 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 6,
-    backgroundColor: '#FF8383',
+    backgroundColor: '#F36845',
     position: 'absolute',
     top: 23,
     right: -11,
@@ -178,8 +177,8 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 0,
     width: 70,
-    height: 5,
-    backgroundColor: '#EA6500',
+    height: 4,
+    backgroundColor: '#F0893B',
   },
   hoverBackground: {
     position: 'absolute',

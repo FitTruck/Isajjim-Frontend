@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 
 interface EstimateCardProps {
@@ -48,14 +48,14 @@ export default function EstimateCard({ status, date, locations, quoteInfo, timel
     }
     if (status === 'pending') {
       return (
-        <View style={[styles.statusBadge, { borderColor: '#EA6500' }]}>
-          <Text style={[styles.statusBadgeText, { color: '#EA6500' }]}>견적 대기 중</Text>
+        <View style={[styles.statusBadge, { borderColor: '#F0893B' }]}>
+          <Text style={[styles.statusBadgeText, { color: '#F0893B' }]}>견적 대기 중</Text>
         </View>
       );
     }
     return (
-      <View style={[styles.statusBadge, { borderColor: '#EA6500' }]}>
-        <Text style={[styles.statusBadgeText, { color: '#EA6500' }]}>견적 받는 중</Text>
+      <View style={[styles.statusBadge, { borderColor: '#F0893B' }]}>
+        <Text style={[styles.statusBadgeText, { color: '#F0893B' }]}>견적 받는 중</Text>
       </View>
     );
   };
@@ -473,7 +473,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   priceText: {
-    color: '#EA6500',
+    color: '#F0893B',
     fontSize: 26, 
     fontWeight: '700',
     textAlign: 'center', 

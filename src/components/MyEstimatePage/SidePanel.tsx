@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -79,10 +79,8 @@ const styles = StyleSheet.create({
   chatButton: {
     width: '100%',
     height: 42,
-    backgroundColor: '#F36845',
+    backgroundColor: '#F0893B',
     borderRadius: 3,
-    borderWidth: 1,
-    borderColor: '#F0893B',
     justifyContent: 'center',
     alignItems: 'center',
   },

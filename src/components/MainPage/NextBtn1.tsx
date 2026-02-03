@@ -114,10 +114,11 @@ export default function NextBtn1({ imageList, onNavigateNext, onShowAlert }: Nex
 
 const styles = StyleSheet.create({
   nextBtn: {
+    paddingHorizontal: 15,
+    paddingVertical: 8,
     backgroundColor: '#F0893B',
-    paddingHorizontal: 24,
-    paddingVertical: 14,
-    borderRadius: 8,
+    borderRadius: 7,
+    justifyContent: 'center', 
     alignItems: 'center',
     marginTop: -10,
   },

@@ -106,7 +106,7 @@ export default function RequestDetailModal({ visible, onClose, data }: RequestDe
             
             <View style={styles.aiSection}>
               <View style={styles.aiHeader}>
-                <Ionicons name="sparkles" size={16} color="#EA6500" />
+                <Ionicons name="sparkles" size={16} color="#F0893B" />
                 <Text style={styles.aiTitle}>AI 요약 (확정 사항)</Text>
               </View>
               <Text style={styles.aiContent}>
