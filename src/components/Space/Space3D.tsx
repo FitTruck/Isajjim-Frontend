@@ -144,6 +144,13 @@ function easeOutBack(t: number): number {
   return 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2);
 }
 
+// instanceId에서 baseId 추출 (예: "chair_0_2" → "chair_0")
+const extractBaseId = (instanceId: string): string => {
+  const lastUnderscoreIdx = instanceId.lastIndexOf('_');
+  if (lastUnderscoreIdx === -1) return instanceId;
+  return instanceId.substring(0, lastUnderscoreIdx);
+};
+
 // 시뮬레이션 씬
 interface SimulationSceneProps {
   truckType: TruckType;
@@ -165,7 +172,9 @@ const SimulationScene: React.FC<SimulationSceneProps> = ({
       <TruckContainer truckType={truckType} />
 
       {placements.map((placement, index) => {
-        const furniture = loadedFurniture.get(placement.itemId);
+        // instanceId에서 baseId 추출하여 geometry/material 조회
+        const baseId = extractBaseId(placement.itemId);
+        const furniture = loadedFurniture.get(baseId);
         if (!furniture) return null;
 
         return (
@@ -221,7 +230,8 @@ const Space3D: React.FC<Space3DProps> = ({
         const id = `${f.furnitureId}_${i}`;
 
         try {
-          const { geometry, material } = await loadPLY(f.ply_url, 0.008);
+          // GCS PLY는 이미 Y-up으로 변환됨 → 좌표계 변환 비활성화
+          const { geometry, material } = await loadPLY(f.ply_url, 0.008, false);
           geometry.center();
 
           // PLY 바운딩박스 = 히트박스 (절대 크기, m 단위)
@@ -249,23 +259,33 @@ const Space3D: React.FC<Space3DProps> = ({
     loadAllPLY();
   }, [furniture]);
 
-  // 2. PLY 로드 완료 후 binPacking 실행
+  // 2. PLY 로드 완료 후 binPacking 실행 (quantity 반영)
   useEffect(() => {
-    if (loadedFurniture.size === 0) {
+    if (loadedFurniture.size === 0 || !furniture || furniture.length === 0) {
       setTrucks([]);
       setPackingMessage('');
       return;
     }
 
-    // PLY 바운딩박스 크기로 OBBItem 생성 (m → cm for binPacking)
-    const items: OBBItem[] = Array.from(loadedFurniture.values()).map((f) => ({
-      id: f.id,
-      width: f.width * 100,   // m → cm
-      depth: f.depth * 100,
-      height: f.height * 100,
-    }));
+    // quantity만큼 OBBItem 복제 생성 (m → cm for binPacking)
+    const items: OBBItem[] = [];
+    furniture.forEach((f, furnitureIndex) => {
+      const baseId = `${f.furnitureId}_${furnitureIndex}`;
+      const loadedItem = loadedFurniture.get(baseId);
+      if (!loadedItem) return;
 
-    console.log('=== binPacking 입력 (실제 PLY 크기, cm) ===', items);
+      const qty = f.quantity || 1;
+      for (let copyIndex = 0; copyIndex < qty; copyIndex++) {
+        items.push({
+          id: `${baseId}_${copyIndex}`,  // instanceId: baseId_copyIndex
+          width: loadedItem.width * 100,   // m → cm
+          depth: loadedItem.depth * 100,
+          height: loadedItem.height * 100,
+        });
+      }
+    });
+
+    console.log('=== binPacking 입력 (quantity 반영, cm) ===', items);
 
     if (truckType) {
       // 트럭 타입이 지정되면 단일 트럭 모드
@@ -292,7 +312,7 @@ const Space3D: React.FC<Space3DProps> = ({
     setVisibleCount(0);
     setIsPlaying(false);
     setAnimationKey((k) => k + 1);
-  }, [loadedFurniture, truckType]);
+  }, [loadedFurniture, truckType, furniture]);
 
   // 타이머 클린업
   useEffect(() => {
@@ -546,7 +566,7 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   playButton: {
-    backgroundColor: 'rgba(0, 200, 100, 0.8)',
+    backgroundColor: '#F0893B',
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 20,
