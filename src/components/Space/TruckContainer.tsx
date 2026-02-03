@@ -19,7 +19,7 @@ interface TruckContainerProps {
 
 const TruckContainer: React.FC<TruckContainerProps> = ({
   truckType,
-  color = '#00ff88',
+  color = '#9CA3AF',
   opacity = 0.15,
 }) => {
   const dimensions = TRUCK_DIMENSIONS[truckType];
