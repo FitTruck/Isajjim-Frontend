@@ -9,6 +9,7 @@ import Space3D from '../components/Space/Space3D';
 import { Ionicons } from '@expo/vector-icons';
 import { SimulationFurniture, TruckType } from '../types/simulation';
 import MyTouch from "../components/common/MyTouch";
+import { useEstimate } from '../context/EstimateContext';
 
 // app.tsx로부터 전달받을 함수의 자료형 정의
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -26,7 +27,13 @@ const mapTruckType = (backendType: string | null): TruckType => {
 };
 
 export default function Result({ navigation, route }: Props) {
-  const { data, estimateId, ResultOfUserSelect } = route.params
+  const { requestData } = useEstimate();
+  
+  // Context에서 데이터 추출
+  const data = requestData?.images || [];
+  const estimateId = requestData?.estimateId;
+  const analysisResult = requestData?.analysisResult;
+  const truckInfo = requestData?.truckInfo;
 
   const onNavigateNext = () => {
     navigation.navigate('MyEstimate');
@@ -42,16 +49,21 @@ export default function Result({ navigation, route }: Props) {
 
   // 첫 실행 시에 자동 실행됨.
   useEffect(() => {
+    if (!requestData) {
+      console.log('저장소에 데이터가 없음');
+      return;
+    }
 
-    if (ResultOfUserSelect && ResultOfUserSelect.data.images) {
+    if (analysisResult && analysisResult.data.images) {
       // mappedResultCard : ResultCard에 필요한 이미지와 content객체
-      const mappedResultCard = ResultOfUserSelect.data.images.map((imgResult: any, i: number) => ({
+      const mappedResultCard = analysisResult.data.images.map((imgResult: any, i: number) => ({
         // main에서 전달받은 이미지 url과 width, height 정보
-        image: {
-          localUri: data[i].localUri,
+        // data[i]가 존재하는지 확인
+        image: data[i] ? {
+          localUri: data[i].uri || data[i].localUri,
           width: data[i].width,
           height: data[i].height,
-        },
+        } : null,
         // furnitureList : userselect에서 전달받은 가구 정보
         // V2.5: 확장된 가구 데이터 (ply_url, width, depth, height, volume)
         contents: imgResult.furnitureList ? imgResult.furnitureList.map((f: any) => ({
@@ -69,8 +81,14 @@ export default function Result({ navigation, route }: Props) {
       }));
       setResults(mappedResultCard);
 
-      if (ResultOfUserSelect.data.items) {
-        const truckItem = ResultOfUserSelect.data.items.find((item: any) => item.category === "TRUCK");
+      // 트럭 정보 설정 (Context에 이미 계산된 값이 있으면 사용)
+      if (truckInfo) {
+        setEstimateData({
+          truckType: truckInfo.type,
+          truckQuantity: truckInfo.quantity,
+        });
+      } else if (analysisResult.data.items) {
+        const truckItem = analysisResult.data.items.find((item: any) => item.category === "TRUCK");
 
         setEstimateData({
           truckType: truckItem ? truckItem.itemType : null,
@@ -81,7 +99,7 @@ export default function Result({ navigation, route }: Props) {
     } else {
       Alert.alert("오류", "분석결과를 불러올 수 없습니다.");
     }
-  }, [ResultOfUserSelect]); //이 값이 바뀔 때마다 useEffect 실행되는 거임.
+  }, [requestData]); //이 값이 바뀔 때마다 useEffect 실행되는 거임.
 
   // 시뮬레이션용 가구 목록 (모든 이미지의 가구 합침)
   const simulationFurniture = useMemo((): SimulationFurniture[] => {
@@ -118,10 +136,8 @@ export default function Result({ navigation, route }: Props) {
     return mapTruckType(estimateData.truckType);
   }, [estimateData.truckType]);
 
-  // ResultCard컴포넌트를 보면 onQuantityChange라는 것이 실행되면 handleUpdataQuantity 함수가 실행됨.
-  // ResultCard.tsx에서 furnitureId와 newQuantity값을 받아온 것임.
   const handleUpdateQuantity = async (furnitureId: number, newQuantity: number) => {
-    if (!estimateId) return; // 견적서id가 없으면 리턴(안전장치)
+    if (!estimateId) return;
 
     // 프론트에서 즉각 변경하는 부분 : results의 값을 변경하는 로직임. results는 useState로 만든 값이므로 results의 값이 바뀌면, 자동으로 results를 쓰는 모든 컴포넌트를 다시 그림. >> ResultCard 컴포넌트의 속성이 즉각적으로 변경됨.
     setResults(prev => prev.map(result => ({ // 기존의 results를 써서 results를 수정하겠다는 뜻임. result는 results중에서 하나씩 가져온 객체. 즉, 카드 하나에 대한 정보임.
@@ -238,47 +254,14 @@ export default function Result({ navigation, route }: Props) {
                   <Ionicons name={isSpaceModalVisible ? "close" : "expand"} size={isSpaceModalVisible ? 30 : 20} color={isSpaceModalVisible ? "#333333" : "#555"} />
                 </MyTouch>
               </View>
+
               <UploadCard
-                data={estimateData}
+                data={truckInfo || { type: '', quantity: 0 }}
                 status={updateStatus}
                 onNavigateNext={handleNextStep}
               />
             </View>
 
-          </View>
-
-
-          {/* footer */}
-          <View style={commonStyles.footer}>
-            <View style={commonStyles.footerLine} />
-            <Text style={commonStyles.footerLogo}>이삿짐</Text>
-
-            <View style={commonStyles.footerLinksRow}>
-              <View style={commonStyles.footerColumn}>
-                <Text style={commonStyles.footerTopic}>안내</Text>
-                <Text style={commonStyles.footerPage}>서비스 소개</Text>
-                <Text style={commonStyles.footerPage}>이용 방법</Text>
-                <Text style={commonStyles.footerPage}>요금 안내</Text>
-              </View>
-              <View style={commonStyles.footerColumn}>
-                <Text style={commonStyles.footerTopic}>고객센터</Text>
-                <Text style={commonStyles.footerPage}>공지사항</Text>
-                <Text style={commonStyles.footerPage}>자주 묻는 질문</Text>
-                <Text style={commonStyles.footerPage}>1:1 문의</Text>
-              </View>
-              <View style={commonStyles.footerColumn}>
-                <Text style={commonStyles.footerTopic}>정책</Text>
-                <Text style={commonStyles.footerPage}>이용약관</Text>
-                <Text style={commonStyles.footerPage}>개인정보처리방침</Text>
-                <Text style={commonStyles.footerPage}>위치기반서비스 이용약관</Text>
-              </View>
-            </View>
-
-            <View style={commonStyles.socialIcons}>
-              {[1, 2, 3, 4].map((i: number) => (
-                <View key={i} style={commonStyles.socialIconPlaceholder} />
-              ))}
-            </View>
           </View>
 
         </View>

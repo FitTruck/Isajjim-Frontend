@@ -79,19 +79,6 @@ export const typeTranslations: { [key: string]: string } = {
   "DIGITAL_PIANO": "디지털피아노",
 };
 
-export const truckTypeTranslations: { [key: string]: string } = {
-  "TRUCK_1_TON": "1톤 트럭",
-  "TRUCK_1_4_TON": "1.4톤 트럭",
-  "TRUCK_2_5_TON": "2.5톤 트럭",
-  "TRUCK_3_5_TON": "3.5톤 트럭",
-  "TRUCK_5_TON": "5톤 트럭",
-}
-
-export const BoxTypeTranslations: { [key: string]: string } = {
-  "BOX_5": "우체국 5호 박스",
-  "DAN_PLASTIC_BOX_5": "단프라 박스 5호",
-}
-
 export function translateLabel(label: string): string {
   if(label) return furnitureTranslations[label] || '';
   else return '';
@@ -99,15 +86,5 @@ export function translateLabel(label: string): string {
 
 export function translateType(type: string): string {
   if(type) return typeTranslations[type] || '';
-  else return '';
-}
-
-export function translateTruckType(truckType: string): string {
-  if(truckType) return truckTypeTranslations[truckType] || '';
-  else return '';
-}
-
-export function translateBoxType(boxType: string): string {
-  if(boxType) return BoxTypeTranslations[boxType] || '';
   else return '';
 }
