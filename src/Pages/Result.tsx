@@ -207,13 +207,13 @@ export default function Result({ navigation, route }: Props) {
         {/* Main Wrapper */}
         <View style={commonStyles.mainWrapper}>
 
-          {/* 결과 및 업로드 카드 컨테이너 */}
-          <View style={styles.resultEstimateCardContainer}>
+          {/* 왼쪽 및 오른쪽 컨테이너 */}
+          <View style={styles.leftrightContainer}>
             
-            {/* 결과 섹션 컨테이너 */}
+            {/* 왼쪽 컨테이너 */}
             <View style={styles.leftContainer}>
 
-              {/* 왼쪽 카드 */}
+              {/* 분석 카드 */}
               {results.map((result, index) => (
                 <LeftCard
                   key={index}
@@ -225,11 +225,12 @@ export default function Result({ navigation, route }: Props) {
 
             </View>
 
-            {/* 오른쪽 카드 */}
+            {/* 오른쪽 컨테이너 */}
             <View style={[
               styles.rightContainer,
               isSpaceModalVisible && { position: 'relative', zIndex: 10000 }
             ]}>
+              {/* 3D 시뮬레이션 */}
               <View style={[styles.space3DContainer, isSpaceModalVisible && styles.expandedContainer]}>
                 <Space3D
                   furniture={simulationFurniture}
@@ -244,11 +245,13 @@ export default function Result({ navigation, route }: Props) {
                 </MyTouch>
               </View>
 
+              {/* 다음 단계 버튼 */}
               <NextBtn3
                 data={truckInfo || { type: '', quantity: 0 }}
                 status={updateStatus}
                 onNavigateNext={handleNextStep}
               />
+              
             </View>
 
           </View>
@@ -260,7 +263,7 @@ export default function Result({ navigation, route }: Props) {
 }
 
 const styles = StyleSheet.create({
-  resultEstimateCardContainer: {
+  leftrightContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
