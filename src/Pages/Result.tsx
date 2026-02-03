@@ -64,7 +64,7 @@ export default function Result({ navigation, route }: Props) {
           depth: f.depth || 0,      // mm
           height: f.height || 0,    // mm
           volume: f.volume || 0,    // m³
-          ply_url: f.ply_url || null,  // GCS PLY URL
+          ply_url: f.plyUrl || null,  // GCS PLY URL (백엔드: plyUrl)
         })) : []
       }));
       setResults(mappedResultCard);
@@ -85,9 +85,15 @@ export default function Result({ navigation, route }: Props) {
 
   // 시뮬레이션용 가구 목록 (모든 이미지의 가구 합침)
   const simulationFurniture = useMemo((): SimulationFurniture[] => {
-    if (!results || results.length === 0) return [];
+    if (!results || results.length === 0) {
+      console.log('[시뮬레이션] results가 비어있음');
+      return [];
+    }
 
-    return results.flatMap((result) =>
+    console.log('[시뮬레이션] results:', results);
+    console.log('[시뮬레이션] 전체 가구 목록:', results.flatMap(r => r.contents));
+
+    const furniture = results.flatMap((result) =>
       result.contents
         .filter((c: any) => c.ply_url)  // PLY가 있는 것만
         .map((c: any): SimulationFurniture => ({
@@ -102,6 +108,9 @@ export default function Result({ navigation, route }: Props) {
           ply_url: c.ply_url,
         }))
     );
+
+    console.log('[시뮬레이션] PLY가 있는 가구:', furniture);
+    return furniture;
   }, [results]);
 
   // 시뮬레이션 트럭 타입
