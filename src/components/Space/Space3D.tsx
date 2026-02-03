@@ -221,7 +221,8 @@ const Space3D: React.FC<Space3DProps> = ({
         const id = `${f.furnitureId}_${i}`;
 
         try {
-          const { geometry, material } = await loadPLY(f.ply_url, 0.008);
+          // AI 서버에서 이미 Y-up으로 정렬된 PLY 제공 → 좌표계 변환 비활성화
+          const { geometry, material } = await loadPLY(f.ply_url, 0.008, false);
           geometry.center();
 
           // PLY 바운딩박스 = 히트박스 (절대 크기, m 단위)
