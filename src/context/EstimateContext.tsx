@@ -1,24 +1,24 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 
-// 견적 및 요청사항 관련 공통 인터페이스
 export interface LocationInfo {
   address: string | null;
   detailAddress: string | null;
+  buildingType: string | null;
+  roomSize: string | null;
   floor: string | null;
   elevator: boolean | null;
-  buildingType?: string | null;
-  roomSize?: string | null;
-  ladderTruck?: string | null;
-  roomType?: string | null;
-  duplex?: boolean | null;
-  groundStair?: boolean | null;
-  parking?: boolean | null;
-  [key: string]: any;
+  ladderTruck: string | null;
+  roomType: string | null;
+  duplex: boolean | null;
+  groundStair: boolean | null;
+  parking: boolean | null;
 }
 
-export interface ItemInfo {
+export interface Item {
   name: string;
   quantity: number;
+  category?: string;
+  itemType?: string;
 }
 
 export interface TruckInfo {
@@ -27,36 +27,29 @@ export interface TruckInfo {
 }
 
 export interface RequestData {
-  estimateId?: number;
+  estimateId: number;
   movingDate: string | null;
   startLocation: LocationInfo;
   endLocation: LocationInfo;
-  items: ItemInfo[];
+  items: Item[];
   truckInfo: TruckInfo | null;
   aiSummary?: string;
+  images?: any[];
+  analysisResult?: any;
 }
 
 interface EstimateContextType {
   requestData: RequestData | null;
   setRequestData: (data: RequestData) => void;
-  updateAiSummary: (summary: string) => void;
 }
 
 const EstimateContext = createContext<EstimateContextType | undefined>(undefined);
 
 export const EstimateProvider = ({ children }: { children: ReactNode }) => {
-  const [requestData, setRequestDataState] = useState<RequestData | null>(null);
-
-  const setRequestData = (data: RequestData) => {
-    setRequestDataState(data);
-  };
-
-  const updateAiSummary = (summary: string) => {
-    setRequestDataState(prev => prev ? { ...prev, aiSummary: summary } : null);
-  };
+  const [requestData, setRequestData] = useState<RequestData | null>(null);
 
   return (
-    <EstimateContext.Provider value={{ requestData, setRequestData, updateAiSummary }}>
+    <EstimateContext.Provider value={{ requestData, setRequestData }}>
       {children}
     </EstimateContext.Provider>
   );
