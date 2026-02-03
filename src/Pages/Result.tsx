@@ -64,7 +64,7 @@ export default function Result({ navigation, route }: Props) {
           depth: f.depth || 0,      // mm
           height: f.height || 0,    // mm
           volume: f.volume || 0,    // m³
-          ply_url: f.ply_url || null,  // GCS PLY URL
+          ply_url: f.plyUrl || null,  // GCS PLY URL (백엔드: plyUrl)
         })) : []
       }));
       setResults(mappedResultCard);
