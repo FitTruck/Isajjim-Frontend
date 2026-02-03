@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useRef } from 'react';
+﻿import { useState, useEffect, useMemo, useRef } from 'react';
 import { View, ScrollView, StyleSheet, Alert } from 'react-native';
 import { commonStyles } from '../styles/commonStyles';
 import { BACKEND_DOMAIN } from '../utils/Server';
@@ -196,22 +196,6 @@ export default function Result({ navigation }: Props) {
   };
 
   // mock 데이터 나중에 지워도 됨
-  const mockResults = [
-    {
-      image: { localUri: require('../../assets/mock이미지 1.jpg'), width: 500, height: 300 },
-      contents: [
-        { furnitureId: 1, label: "SOFA", type: "SUPER_SINGLE_BED", quantity: 1 },
-        { furnitureId: 2, label: "BATHTUB", type: "QUEEN_SIZE_BED", quantity: 2 }
-      ]
-    },
-    {
-      image: { localUri: require('../../assets/mock이미지 2.jpg'), width: 800, height: 600 },
-      contents: [
-        { furnitureId: 3, label: "BED", type: "KING_SIZE_BED", quantity: 1 },
-        { furnitureId: 4, label: "DESK", type: "OFFICE_DESK", quantity: 1 }
-      ]
-    }
-  ];
 
   // 슬라이더 로직
   const scrollRef = useRef<ScrollView>(null);
@@ -224,7 +208,7 @@ export default function Result({ navigation }: Props) {
     let newIndex = scrollIndex;
 
     if (direction === 'next') {
-      if (scrollIndex < mockResults.length - 1) {
+      if (scrollIndex < results.length - 1) {
         newIndex = scrollIndex + 1;
       }
     } else {
@@ -264,8 +248,8 @@ export default function Result({ navigation }: Props) {
                 scrollEnabled={false}
               >
                 {/* 분석 카드 */}
-                {/* mockResults -> 모든 항목 변경 : results로 바꿔야함, 바꿀 때 mockResults 변수 자체명도 바뀌니까 주석처리 같이 해야함. */}
-                {mockResults.map((result, index) => (
+                {/* results -> 모든 항목 변경 : results로 바꿔야함, 바꿀 때 results 변수 자체명도 바뀌니까 주석처리 같이 해야함. */}
+                {results.map((result, index) => (
                   <View key={index} style={{ width: 970, alignItems: 'center' }}>
                     <LeftCard
                       image={result.image}
@@ -285,7 +269,7 @@ export default function Result({ navigation }: Props) {
                   <Ionicons name="chevron-back" size={40} color="#333" />
                 </MyTouch>
               )}
-              {scrollIndex < mockResults.length - 1 && (
+              {scrollIndex < results.length - 1 && (
                 <MyTouch 
                   style={styles.arrowButtonRight} 
                   onPress={() => handleScroll('next')}
@@ -297,7 +281,7 @@ export default function Result({ navigation }: Props) {
 
               {/* 페이지 인디케이터 (Dots) */}
               <View style={styles.paginationContainer}>
-                {mockResults.map((_, index) => (
+                {results.map((_, index) => (
                   <View 
                     key={index} 
                     style={[
@@ -483,7 +467,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#E0E0E0',
   },
   activeDot: {
-    backgroundColor: '#EA6500', // 브랜드 컬러
+    backgroundColor: '#F0893B', // 브랜드 컬러
     width: 24, // 활성화된 닷은 길게
   },
 });
