@@ -1,5 +1,14 @@
 {
   "projects": {
     "default": "knu-team-05"
+  },
+  "targets": {
+    "knu-team-05": {
+      "hosting": {
+        "isajjim-site": [
+          "isajjim-frontend"
+        ]
+      }
+    }
   }
 }
