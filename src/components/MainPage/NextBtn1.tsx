@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { StyleSheet, TouchableOpacity, Text,useWindowDimensions, Platform, Alert } from 'react-native';
-import { ref, uploadBytes } from 'firebase/storage';
 import { v4 as uuidv4 } from 'uuid';
 import { UploadedImage } from '../../types/common';
 import { BACKEND_DOMAIN } from '../../utils/Server';
