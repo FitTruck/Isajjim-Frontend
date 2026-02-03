@@ -117,39 +117,6 @@ export default function Main({ navigation }: Props) {
             </View>
           </View>
 
-          {/* footer */}
-          <View style={[commonStyles.footer, isMobile && styles.mobileFooter]}>
-            <View style={[commonStyles.footerLine, isMobile && styles.mobileFooterLine]} />
-            <Text style={[commonStyles.footerLogo, isMobile && styles.mobileFooterLogo]}>이삿찜</Text>
-
-            <View style={[commonStyles.footerLinksRow, isMobile && styles.mobileFooterLinksRow]}>
-              <View style={[commonStyles.footerColumn, isMobile && styles.mobileFooterColumn]}>
-                <Text style={commonStyles.footerTopic}>안내</Text>
-                <Text style={commonStyles.footerPage}>서비스 소개</Text>
-                <Text style={commonStyles.footerPage}>이용 방법</Text>
-                <Text style={commonStyles.footerPage}>요금 안내</Text>
-              </View>
-              <View style={[commonStyles.footerColumn, isMobile && styles.mobileFooterColumn]}>
-                <Text style={commonStyles.footerTopic}>고객센터</Text>
-                <Text style={commonStyles.footerPage}>공지사항</Text>
-                <Text style={commonStyles.footerPage}>자주 묻는 질문</Text>
-                <Text style={commonStyles.footerPage}>1:1 문의</Text>
-              </View>
-              <View style={[commonStyles.footerColumn, isMobile && styles.mobileFooterColumn]}>
-                <Text style={commonStyles.footerTopic}>정책</Text>
-                <Text style={commonStyles.footerPage}>이용약관</Text>
-                <Text style={commonStyles.footerPage}>개인정보처리방침</Text>
-                <Text style={commonStyles.footerPage}>위치기반서비스 이용약관</Text>
-              </View>
-            </View>
-
-            <View style={[commonStyles.socialIcons, isMobile && styles.mobileSocialIcons]}>
-              {[1, 2, 3, 4].map((i: number) => (
-                <View key={i} style={commonStyles.socialIconPlaceholder} />
-              ))}
-            </View>
-          </View>
-
         </View>
       </ScrollView>
     </View>
