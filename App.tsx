@@ -7,6 +7,7 @@ import UserSelect from './src/Pages/UserSelect';
 import Result from './src/Pages/Result';
 import MyEstimate from './src/Pages/MyEstimate';
 import MyChat from './src/Pages/MyChat';
+import SimulationTest from './src/Pages/SimulationTest';
 
 // 각 화면의 매개변수 타입들을 정의하고 있는 타입 import
 import { RootStackParamList } from './src/types/navigation';
@@ -31,6 +32,7 @@ export default function App() {
         Result: 'result',
         MyEstimate: 'my-estimate',
         MyChat: 'my-chat',
+        SimulationTest: 'simulation-test',
       },
     },
   };
@@ -79,6 +81,7 @@ export default function App() {
         />
         <Stack.Screen name="MyEstimate" component={MyEstimate} />
         <Stack.Screen name="MyChat" component={MyChat} />
+        <Stack.Screen name="SimulationTest" component={SimulationTest} />
       </Stack.Navigator>
     </NavigationContainer>
   );
