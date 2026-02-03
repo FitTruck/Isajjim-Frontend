@@ -12,9 +12,10 @@ interface Message {
 
 interface ConfirmButtonProps {
   messages: Message[];
+  onConfirm?: (summary: string) => void;
 }
 
-export default function ConfirmButton({ messages }: ConfirmButtonProps) {
+export default function ConfirmButton({ messages, onConfirm }: ConfirmButtonProps) {
   const [isConfirmed, setIsConfirmed] = useState(false);
 
   const handleConfirm = async () => {
@@ -40,9 +41,14 @@ export default function ConfirmButton({ messages }: ConfirmButtonProps) {
       //   })
       // });
       // const data = await response.json();
-
+      
+      const mockSummary = "• 5톤 트럭 진입 가능 여부: 골목 진입 가능하나 사전 공간 확보 필요\n• 특수 작업 필요 물품: 도자기 (고가, 특수포장 요망)\n• 출발지 작업 조건: 사다리차 사용 공간 확보 완료\n• 기타: 에어컨 이전 설치 불필요";
 
       setIsConfirmed(true);
+      
+      if (onConfirm) {
+        onConfirm(mockSummary);
+      }
 
     } catch (error) {
       console.error('Error sending chat history:', error);

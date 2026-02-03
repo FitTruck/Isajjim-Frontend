@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useRef } from "react";
 import { View, Text, Image, StyleSheet, TextInput, FlatList, KeyboardAvoidingView, Platform, TouchableOpacity, Pressable } from "react-native";
 import { ChatItemData } from "../../Pages/MyChat";
-import MyTouch from "../common/MyTouch";
 import ConfirmButton from "./ConfirmButton";
+import RequestDetailModal from "../common/RequestDetailModal";
 import { Ionicons } from '@expo/vector-icons';
+import { useEstimate, RequestData } from "../../context/EstimateContext";
 
 interface ChatRoomPanelProps {
   data: ChatItemData | null;
@@ -24,7 +25,49 @@ export default function ChatRoomPanel({ data }: ChatRoomPanelProps) {
   const [isFileHovered, setIsFileHovered] = useState(false);
   const [isSendHovered, setIsSendHovered] = useState(false);
   const [replyStep, setReplyStep] = useState(0); // 응답 순서 관리
+  const [isRequestModalVisible, setIsRequestModalVisible] = useState(false);
   const flatListRef = useRef<FlatList>(null);
+
+  const { requestData, updateAiSummary } = useEstimate();
+
+  // Context 데이터가 있으면 사용, 없으면 Mock 데이터
+  const displayData: RequestData = requestData ? {
+    movingDate: requestData.movingDate,
+    startLocation: requestData.startLocation,
+    endLocation: requestData.endLocation,
+    items: requestData.items,
+    truckInfo: requestData.truckInfo,
+    aiSummary: requestData.aiSummary
+  } : {
+    // Mock Fallback
+    movingDate: "2026. 03. 15 (금)",
+    startLocation: {
+      address: "서울시 강남구 역삼동 123-45",
+      detailAddress: "OO아파트 101동 1202호",
+      floor: "12",
+      elevator: true,
+    },
+    endLocation: {
+      address: "경기도 용인시 수지구 풍덕천동 987-65",
+      detailAddress: "XX오피스텔 304호",
+      floor: "3",
+      elevator: true,
+    },
+    items: [
+      { name: "침대 (퀸사이즈)", quantity: 1 },
+      { name: "소파 (3인용)", quantity: 1 },
+      { name: "양문형 냉장고", quantity: 1 },
+    ],
+    truckInfo: {
+      type: "5톤 트럭",
+      quantity: 1
+    },
+    aiSummary: undefined
+  };
+
+  const handleConfirmSuccess = (summary: string) => {
+    updateAiSummary(summary);
+  };
 
   // 채팅방 변경 시 메시지 초기화 (mock 데이터)
   useEffect(() => {
@@ -216,15 +259,25 @@ export default function ChatRoomPanel({ data }: ChatRoomPanelProps) {
             <Text style={styles.headerPriceValue}>{data.price}</Text>
           </View>
 
-          <TouchableOpacity style={styles.headerRequestButton}>
+
+          <TouchableOpacity 
+            style={styles.headerRequestButton}
+            onPress={() => setIsRequestModalVisible(true)}
+          >
             <Image source={require('../../../assets/docs.png')} style={styles.headerRequestIcon} resizeMode="contain" />
             <Text style={styles.headerRequestText}>내 요청사항</Text>
           </TouchableOpacity>
 
           {/* 확정하기 버튼 */}
-          <ConfirmButton messages={messages} />
+          <ConfirmButton messages={messages} onConfirm={handleConfirmSuccess} />
         </View>
       </View>
+
+      <RequestDetailModal 
+        visible={isRequestModalVisible}
+        onClose={() => setIsRequestModalVisible(false)}
+        data={displayData}
+      />
 
       {/* 콘텐츠 */}
       <View style={styles.chatContent}>

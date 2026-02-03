@@ -1,5 +1,6 @@
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { EstimateProvider } from './src/context/EstimateContext';
 
 // 각 화면 컴포넌트 import
 import Main from './src/Pages/MainScreen';
@@ -39,50 +40,52 @@ export default function App() {
 
   return (
     // NavigationContainer: 앱의 네비게이션 트리를 관리하는 최상위 컴포넌트
-    <NavigationContainer linking={linking}>
-      {/* Stack.Navigator: 각 화면을 스택처럼 쌓아 관리 */}
-      <Stack.Navigator 
-        initialRouteName="Main" // 첫 화면의 name
-        screenOptions={{
-          headerShown: false, // 헤더 숨김
-          contentStyle: { backgroundColor: 'white' }
-        }}
-      >
-        {/* Stack.Screen: 각 화면을 정의. 각각의 component에는 컴포넌트 명을 써야함 */}
-        {/* name은 MainScreen이나 UserSelect에서 부를 때 파라미터와 일치해야함 */}
-        <Stack.Screen name="Main" component={Main} />
-        <Stack.Screen name="UserSelect" component={UserSelect} />
-        <Stack.Screen
-          name="Result" 
-          component={Result} 
-          initialParams={{
-            data: [{
-              fileName: "test.jpg",
-              mimeType: "image/jpeg",
-              localUri: "https://via.placeholder.com/300",
-              width: 500,
-              height: 500
-            }],
-            estimateId: 999,
-            ResultOfUserSelect: {
-              data: {
-                images: [{
-                  furnitureList: [
-                    { furnitureId: 101, label: "소파", type: "sofa", quantity: 1 },
-                    { furnitureId: 102, label: "침대", type: "bed", quantity: 1 }
-                  ]
-                }],
-                items: [
-                  { category: "TRUCK", itemType: "1톤", quantity: 2 }
-                ]
-              }
-            }
+    <EstimateProvider>
+      <NavigationContainer linking={linking}>
+        {/* Stack.Navigator: 각 화면을 스택처럼 쌓아 관리 */}
+        <Stack.Navigator 
+          initialRouteName="Main" // 첫 화면의 name
+          screenOptions={{
+            headerShown: false, // 헤더 숨김
+            contentStyle: { backgroundColor: 'white' }
           }}
-        />
-        <Stack.Screen name="MyEstimate" component={MyEstimate} />
-        <Stack.Screen name="MyChat" component={MyChat} />
-        <Stack.Screen name="SimulationTest" component={SimulationTest} />
-      </Stack.Navigator>
-    </NavigationContainer>
+        >
+          {/* Stack.Screen: 각 화면을 정의. 각각의 component에는 컴포넌트 명을 써야함 */}
+          {/* name은 MainScreen이나 UserSelect에서 부를 때 파라미터와 일치해야함 */}
+          <Stack.Screen name="Main" component={Main} />
+          <Stack.Screen name="UserSelect" component={UserSelect} />
+          <Stack.Screen
+            name="Result" 
+            component={Result} 
+            initialParams={{
+              data: [{
+                fileName: "test.jpg",
+                mimeType: "image/jpeg",
+                localUri: "https://via.placeholder.com/300",
+                width: 500,
+                height: 500
+              }],
+              estimateId: 999,
+              ResultOfUserSelect: {
+                data: {
+                  images: [{
+                    furnitureList: [
+                      { furnitureId: 101, label: "소파", type: "sofa", quantity: 1 },
+                      { furnitureId: 102, label: "침대", type: "bed", quantity: 1 }
+                    ]
+                  }],
+                  items: [
+                    { category: "TRUCK", itemType: "1톤", quantity: 2 }
+                  ]
+                }
+              }
+            }}
+          />
+          <Stack.Screen name="MyEstimate" component={MyEstimate} />
+          <Stack.Screen name="MyChat" component={MyChat} />
+          <Stack.Screen name="SimulationTest" component={SimulationTest} />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </EstimateProvider>
   );
 }
