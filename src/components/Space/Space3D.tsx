@@ -3,7 +3,6 @@ import { View, TouchableOpacity, Text, StyleSheet } from 'react-native';
 import { Canvas, extend, useThree, useFrame } from '@react-three/fiber';
 import { OrbitControls as OrbitControlsStd } from 'three-stdlib';
 import * as THREE from 'three';
-import PorterTruck from './PorterTruck';
 import TruckContainer from './TruckContainer';
 import { loadPLY, getGeometrySize } from './utils/plyLoader';
 import { Space3DProps, TruckType, TRUCK_DIMENSIONS } from '../../types/simulation';
@@ -203,7 +202,6 @@ const Space3D: React.FC<Space3DProps> = ({
   const currentTruck = trucks[currentTruckIndex];
   const placements = currentTruck?.placements || [];
   const currentTruckType = currentTruck?.type || truckType || '2.5ton';
-  const isComplete = visibleCount >= placements.length && placements.length > 0;
 
   // 1. PLY 로드 (AI 서버가 절대 크기 PLY 제공 → 스케일링 불필요)
   useEffect(() => {
@@ -304,6 +302,13 @@ const Space3D: React.FC<Space3DProps> = ({
       }
     };
   }, []);
+
+  // autoPlay 처리: 데이터 준비 완료 시 자동 재생
+  useEffect(() => {
+    if (autoPlay && !isLoading && trucks.length > 0 && !isPlaying && visibleCount === 0) {
+      play();
+    }
+  }, [autoPlay, isLoading, trucks.length]);
 
   // 순차 애니메이션 (현재 트럭 → 다음 트럭)
   const scheduleNext = useCallback(() => {
@@ -408,9 +413,7 @@ const Space3D: React.FC<Space3DProps> = ({
             animationKey={animationKey}
           />
         ) : (
-          <group position={[0, -2, 0]}>
-            <PorterTruck />
-          </group>
+          <TruckContainer truckType="2.5ton" />
         )}
 
         <Controls truckType={hasSimulation ? currentTruckType as any : undefined} />
@@ -464,7 +467,13 @@ const Space3D: React.FC<Space3DProps> = ({
                   </TouchableOpacity>
                 )}
                 {isPlaying && (
-                  <TouchableOpacity style={styles.pauseButton} onPress={() => setIsPlaying(false)}>
+                  <TouchableOpacity style={styles.pauseButton} onPress={() => {
+                    setIsPlaying(false);
+                    if (timerRef.current) {
+                      clearTimeout(timerRef.current);
+                      timerRef.current = null;
+                    }
+                  }}>
                     <Text style={styles.buttonText}>⏸ 일시정지</Text>
                   </TouchableOpacity>
                 )}
