@@ -16,15 +16,17 @@ export default function RequestDetailModal({ visible, onClose, data }: RequestDe
       <Text style={styles.sectionTitle}>{title}</Text>
       <View style={styles.row}>
         <Text style={styles.label}>주소</Text>
-        <Text style={styles.value}>{info.address} {info.detailAddress}</Text>
+        <Text style={styles.value}>
+          {info?.address || '-'} {info?.detailAddress || ''}
+        </Text>
       </View>
       <View style={styles.row}>
         <Text style={styles.label}>층수</Text>
-        <Text style={styles.value}>{info.floor ? `${info.floor}층` : '-'}</Text>
+        <Text style={styles.value}>{info?.floor ? `${info.floor}층` : '-'}</Text>
       </View>
       <View style={styles.row}>
         <Text style={styles.label}>엘리베이터</Text>
-        <Text style={styles.value}>{info.elevator ? '있음' : '없음'}</Text>
+        <Text style={styles.value}>{info?.elevator ? '있음' : '없음'}</Text>
       </View>
     </View>
   );
