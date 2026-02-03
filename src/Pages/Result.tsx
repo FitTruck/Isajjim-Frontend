@@ -383,11 +383,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#F5F5F5',
     borderWidth: 1,
     borderColor: '#D8D8D8',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.25,
-    shadowRadius: 1,
-    elevation: 2,
     position: 'relative', // 버튼 배치 때문에 넣음
   },
   expandedContainer: {
