@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { View, Text, Image, StyleSheet, TextInput, FlatList, KeyboardAvoidingView, Platform, TouchableOpacity } from "react-native";
+import { View, Text, Image, StyleSheet, TextInput, FlatList, KeyboardAvoidingView, Platform, TouchableOpacity, Pressable } from "react-native";
 import { ChatItemData } from "../../Pages/MyChat";
 import MyTouch from "../common/MyTouch";
 import { Ionicons } from '@expo/vector-icons';
@@ -20,6 +20,7 @@ interface Message {
 export default function ChatRoomPanel({ data }: ChatRoomPanelProps) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputText, setInputText] = useState("");
+  const [isFileHovered, setIsFileHovered] = useState(false);
   const flatListRef = useRef<FlatList>(null);
 
   // 채팅방 변경 시 메시지 초기화 (mock 데이터)
@@ -39,7 +40,55 @@ export default function ChatRoomPanel({ data }: ChatRoomPanelProps) {
           isMe: false, 
           time: '오후 12:51',
           price: data.price,
-          text: `안녕하세요.\n포장이사 전문 "${data.companyName}" 입니다.\n\n숨고 회원님들께 최고의 서비스를 드리겠습니다..\n\n◆ 2.5톤 이사 금액은\n\n* 포장 이사: 1,950,000원 (작업인원 2명 기준)\n\n거리 및 작업 조건에 따라 가격 상이\n\n◆ 사다리 추가 별도\n\n* 5층(2.5톤) 기준: 150,000원\n(층 수와 짐 양에 따라...`
+          text: `안녕하세요.\n포장이사 전문 "${data.companyName}" 입니다.\n\n회원님들께 최고의 서비스를 드리겠습니다.\n\n 혹시 짐 중에서 분해가 필요한 가구(붙박이장 등)나 특수 가전(벽걸이 TV) 등이 있을까요?`
+        },
+        { 
+          id: '3', 
+          type: 'text',
+          isMe: true, 
+          time: '오후 12:55', 
+          price: data.price,
+          text: '붙박이장은 그대로 둘거고요, 벽걸이 TV 이전 설치가 필요합니다. 에어컨은 출발지/도착지 모두 시스템 에어컨이어서 신경 안써주셔도 됩니다.'
+        },
+        { 
+          id: '4', 
+          type: 'text',
+          isMe: false, 
+          time: '오후 12:56', 
+          price: data.price,
+          text: '확인 감사합니다.'
+        },
+        { 
+          id: '5', 
+          type: 'text',
+          isMe: true, 
+          time: '오후 12:58', 
+          price: data.price,
+          text: '넵 혹시 집 골목이 조금 좁은 편인데, 5톤 트럭 진입이 가능할까요?'
+        },
+        { 
+          id: '6', 
+          type: 'text',
+          isMe: false, 
+          time: '오후 1:00', 
+          price: data.price,
+          text: '골목 사진을 보니 진입은 가능해보이나, 당일 사다리차 작업을 위해 미리 공간을 비워주시면 감사하겠습니다.'
+        },
+        { 
+          id: '7', 
+          type: 'text',
+          isMe: true, 
+          time: '오후 1:05', 
+          price: data.price,
+          text: '넵 그리고 고가의 도자기가 몇 개 있는데, 특수하게 작업 부탁드립니다.'
+        },
+        { 
+          id: '8', 
+          type: 'text',
+          isMe: false, 
+          time: '오후 1:06', 
+          price: data.price,
+          text: '알겠습니다 그럼 당일날 뵙겠습니다.'
         },
       ]);
     }
@@ -78,6 +127,7 @@ export default function ChatRoomPanel({ data }: ChatRoomPanelProps) {
   const renderMessage = ({ item }: { item: Message }) => {
     if (item.type === 'quote' && item.price) {
       return (
+        // 첫 번째 메시지 : 견적서
         <View style={[styles.messageRow, styles.theirMessageRow]}>
           <View style={styles.profileCircle}>
             {data.logoUri ? (
@@ -124,16 +174,13 @@ export default function ChatRoomPanel({ data }: ChatRoomPanelProps) {
 
     if (item.type === 'intro' && item.text) {
       return (
+        // 두 번째 메시지 : 소개
         <View style={[styles.messageRow, styles.theirMessageRow]}>
           <View style={[styles.profileCircle, { opacity: 0 }]} />
           <View style={[styles.messageBubble, styles.theirMessageBubble, { width: 280, maxWidth: 280 }]}>
             <Text style={styles.quoteGreeting}>
               {item.text}
             </Text>
-             
-            <TouchableOpacity style={styles.viewAllButton}>
-              <Text style={styles.viewAllButtonText}>전체보기</Text>
-            </TouchableOpacity>
           </View>
           <Text style={styles.messageTime}>{item.time}</Text>
         </View>
@@ -220,9 +267,16 @@ export default function ChatRoomPanel({ data }: ChatRoomPanelProps) {
           />
 
           <View style={styles.footerToolbar}>
-            <MyTouch>
+            <Pressable 
+              onHoverIn={() => setIsFileHovered(true)}
+              onHoverOut={() => setIsFileHovered(false)}
+              style={[
+                styles.iconButton,
+                isFileHovered && styles.iconButtonHovered
+              ]}
+            >
               <Image source={require('../../../assets/file.png')} style={styles.clipIcon} />
-            </MyTouch>
+            </Pressable>
 
             <MyTouch onPress={handleSend}>
               <Image source={require('../../../assets/plane.png')} style={styles.sendIcon} />
@@ -289,11 +343,11 @@ const styles = StyleSheet.create({
   },
   confirmButton: {
     backgroundColor: '#EA6500',
-    borderRadius: 9,
+    borderRadius: 6,
     borderWidth: 1,
     borderColor: '#FF8A32',
-    paddingHorizontal: 16,
-    paddingVertical: 5,
+    paddingHorizontal: 11,
+    paddingVertical: 7,
   },
   confirmButtonText: {
     color: 'white',
@@ -365,11 +419,12 @@ const styles = StyleSheet.create({
     maxWidth: '70%',
     padding: 12,
     borderRadius: 12,
-    marginTop: 5,
   },
   myMessageBubble: {
     backgroundColor: '#EA6500', // 내 메시지는 주황색
     borderTopRightRadius: 2,
+    borderWidth: 1,
+    borderColor: '#EFEFEF',
   },
   theirMessageBubble: {
     backgroundColor: '#FFFFFF', // 상대방 메시지는 흰색
@@ -378,8 +433,8 @@ const styles = StyleSheet.create({
     borderColor: '#EFEFEF',
   },
   messageText: {
-    fontSize: 15,
-    lineHeight: 22,
+    fontSize: 13,
+    lineHeight: 19,
   },
   myMessageText: {
     color: '#FFF',
@@ -457,10 +512,10 @@ const styles = StyleSheet.create({
     color: '#333',
   },
   quoteGreeting: {
+    marginVertical: 4,
     fontSize: 13,
     color: '#555',
     lineHeight: 18,
-    marginBottom: 12,
   },
   quoteDivider: {
     height: 1,
@@ -508,17 +563,13 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: '600',
   },
-  viewAllButton: {
-    marginTop: 10,
-    borderWidth: 1,
-    borderColor: '#EFEFEF',
-    borderRadius: 6,
-    paddingVertical: 8,
-    alignItems: 'center',
-    backgroundColor: '#fff',
+  iconButton: {
+    padding: 8,
+    borderRadius: 8,
+    backgroundColor: 'transparent',
   },
-  viewAllButtonText: {
-    fontSize: 13,
-    color: '#555',
+  iconButtonHovered: {
+    backgroundColor: '#F5F5F5',
   },
+
 });
