@@ -221,7 +221,7 @@ const Space3D: React.FC<Space3DProps> = ({
         const id = `${f.furnitureId}_${i}`;
 
         try {
-          // AI 서버에서 이미 Y-up으로 정렬된 PLY 제공 → 좌표계 변환 비활성화
+          // GCS PLY는 이미 Y-up으로 변환됨 → 좌표계 변환 비활성화
           const { geometry, material } = await loadPLY(f.ply_url, 0.008, false);
           geometry.center();
 
