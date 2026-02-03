@@ -485,8 +485,7 @@ const styles = StyleSheet.create({
   canvasContainer: {
     width: '100%',
     height: '100%',
-    backgroundColor: '#FFFFFF',
-    borderRadius: 8,
+    borderRadius: 4,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.25,

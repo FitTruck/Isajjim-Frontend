@@ -207,8 +207,8 @@ const styles = StyleSheet.create({
   // 오른쪽 컬럼
   sideColumn: {
     position: 'absolute',
-    right: 100,
-    top: 170, 
+    right: 200,
+    top: 272, 
     width: 307,
   }
 });

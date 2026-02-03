@@ -99,19 +99,12 @@ const NextBtn3 = ({ data, status, onNavigateNext }: NextBtn3Props) => {
 
 const styles = StyleSheet.create({
   container: {
-    width: 307,
+    width: '100%',
     backgroundColor: 'white',
     borderRadius: 4,
     borderWidth: 1,
     borderColor: '#D8D8D8',
     padding: 29,
-    //shadowing
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.25,
-    shadowRadius: 1,
-    elevation: 2,
-    right: 80,
   },
   infoSection: {
     width: '100%',
@@ -200,10 +193,10 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 42,
     marginTop: 20,
-    backgroundColor: '#EA6500',
+    backgroundColor: '#F36845',
     borderRadius: 3,
     borderWidth: 1,
-    borderColor: '#FF8A32',
+    borderColor: '#F0893B',
     justifyContent: 'center',
     alignItems: 'center',
   },

@@ -1,12 +1,13 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { translateLabel, translateType } from '../../utils/Translator';
+import { Ionicons } from '@expo/vector-icons';
 
 
 
 interface ResultCardProps {
   image: {
-    localUri: string;
+    localUri: any;
     width: number;
     height: number;
   }; 
@@ -18,15 +19,10 @@ interface ResultCardProps {
     quantity: number;
   }>;
 
-  // 수량 변경 함수를 쓸 때, '어떤 가구'의 수량을 변경했는지 알려주기 위해 furnitureId를 인자로 받음.
-  // 그리고 '얼마만큼' 변경했는지 알려주기 위해 newQuantity를 인자로 받음.
   onQuantityChange: (furnitureId: number, newQuantity: number) => void;
 }
 
-// 이미지 하나에 대한 ResultCard를 생성하는 컴포넌트임 image와 items 쌍이 하나만 있는 거임.
-// Result.tsx의 컴포넌트를 쓰는 구간을 보면 정확히 알 수 있음 
 const ResultCard = ({ image, items, onQuantityChange }: ResultCardProps) => {
-  const ratio = image.width / image.height; // 사진 비율 계산
 
   // props로 받은 items를 직접 수정하지 않고, 렌더링 시 변환된 값을 사용하도록 함
   // 만약 데이터 자체를 변환해야 한다면 원본을 건드리지 않기 위해 map을 새로 돌리는 것이 좋음
@@ -39,46 +35,59 @@ const ResultCard = ({ image, items, onQuantityChange }: ResultCardProps) => {
 
   return (
     <View style={styles.resultCardContainer}>
-      {/* 이미지 */}
-      <View style={styles.imageWrapper}>
-        <Image
-          source={{ uri: image.localUri }} 
-          style={[styles.cardImage, { aspectRatio: ratio }]} // 이미지 비율을 잘 쓰고 있음
-          resizeMode="cover" 
-        />
-      </View>
+      {/* Image */}
+      <Image
+        source={typeof image.localUri === 'string' ? { uri: image.localUri } : image.localUri} 
+        style={styles.cardImage} 
+        resizeMode="contain" 
+      />
 
-      {/* 이미지 밑의 내용 */}
+      {/* Content */}
       <View style={styles.resultCardContent}>
+        <Text style={styles.headerTitle}>가구 리스트</Text>
+        <View style={styles.contentDivider} />
+
+        {/* 아이템 하나 당 생김새 정의 */}
         {translatedItems.map((item) => (
           <View key={item.furnitureId} style={styles.itemContainer}>
+            
+            {/* 아이템 정보 */}
             <View style={styles.itemDetailContainer}>
               <Text style={styles.itemTitle}>{item.label}</Text>
               <Text style={styles.itemSubtitle}>{item.type}</Text>
             </View>
+
+            {/* 수량 조절 버튼 */}
             <View style={styles.itemCountContainer}>
+
+              {/* - 버튼 */}
               <TouchableOpacity 
-                style={styles.minusButton}
+                style={styles.countButton}
                 onPress={() => {
                   const newQuantity = Math.max(0, item.quantity - 1);
                   onQuantityChange(item.furnitureId, newQuantity);
                 }}
               >
-                <Image source={require('../../../assets/Minus.png')} style={styles.minus} />
+                <Ionicons name="remove" size={20} color="#333" />
               </TouchableOpacity>
+
+              {/* 수량 */}
               <Text style={styles.resultCardNumber}>{item.quantity}</Text>
+              
+              {/* + 버튼 */}
               <TouchableOpacity 
-                style={styles.plusButton}
+                style={styles.countButton}
                 onPress={() => {
                   const newQuantity = item.quantity + 1;
                   onQuantityChange(item.furnitureId, newQuantity);
                 }}
               >
-                <Image source={require('../../../assets/Plus.png')} style={styles.plus} />
+                <Ionicons name="add" size={20} color="#333" />
               </TouchableOpacity>
             </View>
           </View>
         ))}
+
       </View>
     </View>
   );
@@ -88,107 +97,103 @@ export default ResultCard;
 
 const styles = StyleSheet.create({
   resultCardContainer: {
-    width: 520,
-    borderRadius: 10,
-    backgroundColor: '#FFFFFF',
-    borderWidth: 1,
-    borderColor: '#EBEBEB',
-    position: 'relative',
-    display: 'flex',
-    flexDirection: 'row',
-    alignSelf: 'flex-start', // 높이가 콘텐츠에 맞춰지도록 설정
-  },
-  imageWrapper: {
-    width: '100%',
-    borderTopLeftRadius: 10,
-    borderTopRightRadius: 10,
-    boxShadow: '0px 0px 8px rgba(0, 0, 0, 0.2)', // 그림자를 wrapper에 적용
-    zIndex: 0, // 아래 텍스트 영역보다 위에 오도록 설정
-    backgroundColor: 'white', // 그림자가 컨테이너 배경에 묻히지 않게 함
-  },
-  cardImage: {
-    width: '100%',
-    borderTopLeftRadius: 10,
-    borderTopRightRadius: 10,
-  },
-  resultCardContent: {
-    width: '100%',
-    borderWidth:1,
-    borderColor: '#EBEBEB',
+    width: 970,
+    borderRadius: 16,
     backgroundColor: 'white',
-    alignItems: 'center',
-    textAlign: 'left',
-    paddingTop: 29,
-    paddingBottom: 12,
-    paddingHorizontal: 20,
+    
+    borderWidth: 1,
+    borderColor: '#eeeeee',
+    flexDirection: 'row',
+    overflow: 'hidden',
+  },
+
+  // 이미지 부분(왼쪽)
+  cardImage: {
+    width: 670, 
+    height: 600,
+    borderTopLeftRadius: 10,
+    borderBottomLeftRadius: 10,
+  },
+
+  // Content 부분(오른쪽)
+  resultCardContent: {
+    width: 300,
+    paddingHorizontal: 24,
+    paddingVertical: 32,
+    backgroundColor: '#FFFFFF',
+    borderTopRightRadius: 10,
+    borderBottomRightRadius: 10,
+    justifyContent: 'flex-start',
+  },
+  headerTitle: {
+    fontSize: 20,
+    fontWeight: '800',
+    color: '#111',
+    marginBottom: 12,
+    marginTop: 4,
+  },
+  contentDivider: {
+    height: 2,
+    backgroundColor: '#F0F0F0',
+    marginBottom: 24,
+    width: 40,
+    borderRadius: 2,
   },
   itemContainer: {
     width: '100%',
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 18,
+    marginBottom: 20,
+    paddingBottom: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#F7F7F7',
   },
   itemDetailContainer: {
     justifyContent: 'center',
+    flex: 1,
   },
   itemTitle: {
-    fontSize: 20,
-    fontFamily : 'inter',
-    fontWeight: 600,
-    color: '#333333',
+    fontSize: 17,
+    fontFamily : 'inter', 
+    fontWeight: '700',
+    color: '#222',
+    marginBottom: 4,
   },
   itemSubtitle: {
-    fontSize: 15,
-    fontFamily : 'inter',
-    fontWeight: 500,
-    color: '#62625D',
+    fontSize: 13,
+    fontFamily : 'inter', 
+    fontWeight: '500',
+    color: '#9E9E9E',
   },
   itemCountContainer: {
-    width: 200,
-    height: 52,
-    backgroundColor: '#FFFFFF',
-    borderRadius: 8,
+    width: 104,
+    height: 38,
+    backgroundColor: '#F5F5F7',
+    borderRadius: 12,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    boxShadow: '0px 0px 2px 0.4px rgba(0, 0, 0, 0.25)',
+    paddingHorizontal: 4,
   },
-  minusButton: {
-    width: 58,
-    height: 52,
+  countButton: {
+    width: 30,
+    height: 30,
     justifyContent: 'center',
     alignItems: 'center',
-    borderRightWidth: 0.5,
-    borderColor: '#e2e2e2ff',
-  },
-  minus: {
-    width: 20,
-    height: 20,
-    resizeMode: 'contain',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  plusButton: {
-    width: 58,
-    height: 52,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderLeftWidth: 0.5,
-    borderColor: '#e2e2e2ff',
-  },
-  plus: {
-    width: 20,
-    height: 20,
-    resizeMode: 'contain',
-    alignItems: 'center',
-    justifyContent: 'center',
+    borderRadius: 10,
+    backgroundColor: '#FFFFFF',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
   },
   resultCardNumber: {
-    flex: 1,
-    fontSize: 28,
-    fontWeight: '500',
-    color: '#333333',
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#333',
     textAlign: 'center',
+    width: 20,
   },
 });
