@@ -23,11 +23,10 @@ interface LoadedFurniture {
   id: string;
   geometry: THREE.BufferGeometry;
   material: THREE.PointsMaterial;
-  // 균일 스케일 적용 후 실제 크기 (m)
-  scaledWidth: number;
-  scaledDepth: number;
-  scaledHeight: number;
-  scale: number;
+  // PLY 바운딩박스 크기 (m) - AI 서버가 절대 크기로 제공
+  width: number;
+  depth: number;
+  height: number;
 }
 
 interface ControlsProps {
@@ -88,7 +87,7 @@ const FurniturePoints: React.FC<FurniturePointsProps> = ({
 
   // 배치 위치 (cm → m)
   const targetX = placement.x / 100;
-  const targetY = placement.y / 100 + furniture.scaledHeight / 2;
+  const targetY = placement.y / 100 + furniture.height / 2;
   const targetZ = placement.z / 100;
 
   // 회전
@@ -206,11 +205,10 @@ const Space3D: React.FC<Space3DProps> = ({
   const currentTruckType = currentTruck?.type || truckType || '2.5ton';
   const isComplete = visibleCount >= placements.length && placements.length > 0;
 
-  // 1. PLY 로드 및 실제 스케일된 크기 계산
+  // 1. PLY 로드 (AI 서버가 절대 크기 PLY 제공 → 스케일링 불필요)
   useEffect(() => {
     if (!furniture || furniture.length === 0) {
       setLoadedFurniture(new Map());
-      setPlacements([]);
       return;
     }
 
@@ -228,39 +226,19 @@ const Space3D: React.FC<Space3DProps> = ({
           const { geometry, material } = await loadPLY(f.ply_url, 0.008);
           geometry.center();
 
-          // 원본 크기
-          const originalSize = getGeometrySize(geometry);
-
-          // 목표 크기 (mm → m)
-          const targetW = f.width / 1000;
-          const targetD = f.depth / 1000;
-          const targetH = f.height / 1000;
-
-          // 균일 스케일 계산 (가장 작은 비율)
-          const scaleX = targetW / originalSize.x;
-          const scaleY = targetH / originalSize.y;
-          const scaleZ = targetD / originalSize.z;
-          const scale = Math.min(scaleX, scaleY, scaleZ);
-
-          // 실제 스케일된 크기
-          const scaledWidth = originalSize.x * scale;
-          const scaledHeight = originalSize.y * scale;
-          const scaledDepth = originalSize.z * scale;
-
-          // 지오메트리에 스케일 적용
-          geometry.scale(scale, scale, scale);
+          // PLY 바운딩박스 = 히트박스 (절대 크기, m 단위)
+          const size = getGeometrySize(geometry);
 
           loaded.set(id, {
             id,
             geometry,
             material,
-            scaledWidth,
-            scaledDepth,
-            scaledHeight,
-            scale,
+            width: size.x,
+            depth: size.z,
+            height: size.y,
           });
 
-          console.log(`[PLY 로드] ${id}: 목표(${targetW.toFixed(2)}, ${targetD.toFixed(2)}, ${targetH.toFixed(2)}) → 실제(${scaledWidth.toFixed(2)}, ${scaledDepth.toFixed(2)}, ${scaledHeight.toFixed(2)})`);
+          console.log(`[PLY 로드] ${id}: ${size.x.toFixed(2)}m x ${size.z.toFixed(2)}m x ${size.y.toFixed(2)}m`);
         } catch (err) {
           console.error(`PLY 로드 실패: ${id}`, err);
         }
@@ -273,7 +251,7 @@ const Space3D: React.FC<Space3DProps> = ({
     loadAllPLY();
   }, [furniture]);
 
-  // 2. PLY 로드 완료 후 binPacking 실행 (실제 스케일된 크기 사용)
+  // 2. PLY 로드 완료 후 binPacking 실행
   useEffect(() => {
     if (loadedFurniture.size === 0) {
       setTrucks([]);
@@ -281,12 +259,12 @@ const Space3D: React.FC<Space3DProps> = ({
       return;
     }
 
-    // 실제 스케일된 크기로 OBBItem 생성 (m → cm for binPacking)
+    // PLY 바운딩박스 크기로 OBBItem 생성 (m → cm for binPacking)
     const items: OBBItem[] = Array.from(loadedFurniture.values()).map((f) => ({
       id: f.id,
-      width: f.scaledWidth * 100,   // m → cm
-      depth: f.scaledDepth * 100,
-      height: f.scaledHeight * 100,
+      width: f.width * 100,   // m → cm
+      depth: f.depth * 100,
+      height: f.height * 100,
     }));
 
     console.log('=== binPacking 입력 (실제 PLY 크기, cm) ===', items);
