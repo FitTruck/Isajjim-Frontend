@@ -1,11 +1,11 @@
 import React, { useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Animated, Image } from 'react-native';
-import { translateTruckType } from '../../utils/Translator';
+
 
 interface UploadCardProps {
   data: {
-    truckType: string;
-    truckQuantity: number;
+    type: string;
+    quantity: number;
   }
   status: 'prev' | 'updating' | 'done';
   onNavigateNext: () => void;
@@ -49,8 +49,6 @@ const UploadCard = ({ data, status, onNavigateNext }: UploadCardProps) => {
     }
   }, [status]);
 
-  const translatedTruckType = translateTruckType(data.truckType);
-
   return (
     <View style={styles.container}>
       {/* 용달 정보 섹션 */}
@@ -77,8 +75,8 @@ const UploadCard = ({ data, status, onNavigateNext }: UploadCardProps) => {
         </View>
 
         <View style={styles.row}>
-          <Text style={styles.truckType}>{translatedTruckType}</Text>
-          <Text style={styles.truckQuantity}>{data.truckQuantity}대</Text>
+          <Text style={styles.truckType}>{data.type}</Text>
+          <Text style={styles.truckQuantity}>{data.quantity}대</Text>
         </View>
       </View>
 
