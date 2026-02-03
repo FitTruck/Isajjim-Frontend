@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, Text, Image, StyleSheet, TextInput, FlatList, Platform } from "react-native";
+import { View, Text, Image, StyleSheet, TextInput, FlatList, Platform, Pressable } from "react-native";
 import { Ionicons } from '@expo/vector-icons';
 import { ChatItemData } from "../../Pages/MyChat";
 import MyTouch from "../common/MyTouch";
@@ -13,6 +13,7 @@ interface ChatListPanelProps {
 export default function ChatListPanel({ chatList, selectedChatId, onSelectChat }: ChatListPanelProps) {
   // 검색바에 검색한 값
   const [searchText, setSearchText] = useState("");
+  const [isSearchHovered, setIsSearchHovered] = useState(false);
   
   // 검색바에 검색한 값에 따라 필터링된 리스트
   const filteredList = chatList.filter(item =>
@@ -41,7 +42,6 @@ export default function ChatListPanel({ chatList, selectedChatId, onSelectChat }
           <View style={styles.chatItemHeader}>
             <Text style={styles.chatItemName}>{item.companyName}</Text>
             <View style={styles.chatItemMeta}>
-              {/* isSelected가 true이면 statusDot(주황색 등), 아니면 gray */}
               <View style={isSelected ? styles.statusDot : styles.statusDotGray} />
               <Text style={styles.chatTime}>{item.time}</Text>
             </View>
@@ -60,7 +60,11 @@ export default function ChatListPanel({ chatList, selectedChatId, onSelectChat }
   return (
     <View style={styles.leftPanel}>
       {/* 검색 바 */}
-      <View style={styles.searchBar}>
+      <Pressable 
+        style={[styles.searchBar, isSearchHovered && styles.searchBarHovered]}
+        onHoverIn={() => setIsSearchHovered(true)}
+        onHoverOut={() => setIsSearchHovered(false)}
+      >
         <TextInput 
           style={styles.input}
           placeholder="업체 이름을 검색해 주세요"
@@ -70,7 +74,7 @@ export default function ChatListPanel({ chatList, selectedChatId, onSelectChat }
           onChangeText={setSearchText}
         />
         <Ionicons name="search" size={20} color="#999" />
-      </View>
+      </Pressable>
 
       {/* 필터 바 */}
       <View style={styles.filterBar}>
@@ -112,6 +116,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 13,
+  },
+  searchBarHovered: {
+    backgroundColor: '#ebebebff',
   },
   input: {
     flex: 1,
