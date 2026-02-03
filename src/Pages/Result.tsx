@@ -3,7 +3,7 @@ import { View, Text, ScrollView, StyleSheet, Alert } from 'react-native';
 import { commonStyles } from '../styles/commonStyles';
 import { BACKEND_DOMAIN } from '../utils/Server';
 import LeftCard from '../components/ResultPage/LeftCard';
-import RightCard from '../components/ResultPage/RightCard';
+import NextBtn3 from '../components/ResultPage/NextBtn3';
 import Header from '../components/common/Header';
 import Space3D from '../components/Space/Space3D';
 import { Ionicons } from '@expo/vector-icons';
@@ -206,8 +206,10 @@ export default function Result({ navigation, route }: Props) {
 
         {/* Main Wrapper */}
         <View style={commonStyles.mainWrapper}>
+
           {/* 결과 및 업로드 카드 컨테이너 */}
           <View style={styles.resultEstimateCardContainer}>
+            
             {/* 결과 섹션 컨테이너 */}
             <View style={styles.leftContainer}>
 
@@ -242,7 +244,7 @@ export default function Result({ navigation, route }: Props) {
                 </MyTouch>
               </View>
 
-              <RightCard
+              <NextBtn3
                 data={truckInfo || { type: '', quantity: 0 }}
                 status={updateStatus}
                 onNavigateNext={handleNextStep}
@@ -262,7 +264,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
-    position: 'relative' 
+    position: 'relative',
+    top: 150,
   },
   leftContainer: {
     position: 'relative',

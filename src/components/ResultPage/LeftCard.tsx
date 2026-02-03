@@ -95,7 +95,7 @@ const styles = StyleSheet.create({
     borderColor: '#EBEBEB',
     position: 'relative',
     display: 'flex',
-    flexDirection: 'column',
+    flexDirection: 'row',
     alignSelf: 'flex-start', // 높이가 콘텐츠에 맞춰지도록 설정
   },
   imageWrapper: {
@@ -113,10 +113,8 @@ const styles = StyleSheet.create({
   },
   resultCardContent: {
     width: '100%',
-    borderTopWidth:1,
-    borderTopColor: '#EBEBEB',
-    borderBottomLeftRadius: 10,
-    borderBottomRightRadius: 10,
+    borderWidth:1,
+    borderColor: '#EBEBEB',
     backgroundColor: 'white',
     alignItems: 'center',
     textAlign: 'left',

@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Animated, Image } from 'react-native';
 
 
-interface UploadCardProps {
+interface NextBtn3Props {
   data: {
     type: string;
     quantity: number;
@@ -11,7 +11,7 @@ interface UploadCardProps {
   onNavigateNext: () => void;
 }
 
-const UploadCard = ({ data, status, onNavigateNext }: UploadCardProps) => {
+const NextBtn3 = ({ data, status, onNavigateNext }: NextBtn3Props) => {
   // useRef : Estimate 컴포넌트가 리렌더링 되어도 변수값 유지
   // useRef가 반환하는 값의 속성 중에 current가 있고 그 current값은 Animated.Value(0)의 값임
   // Animated.Value(x) -> 값을 자연스럽게 그라데이션으로 변경 
@@ -214,4 +214,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default UploadCard;
+export default NextBtn3;
