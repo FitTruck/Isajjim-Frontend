@@ -79,10 +79,10 @@ const styles = StyleSheet.create({
   chatButton: {
     width: '100%',
     height: 42,
-    backgroundColor: '#EA6500',
+    backgroundColor: '#F36845',
     borderRadius: 3,
     borderWidth: 1,
-    borderColor: '#FF8A32',
+    borderColor: '#F0893B',
     justifyContent: 'center',
     alignItems: 'center',
   },

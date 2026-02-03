@@ -76,10 +76,10 @@ export default function ConfirmButton({ messages, onConfirm }: ConfirmButtonProp
 const styles = StyleSheet.create({
   confirmButton: {
     width: 90,
-    backgroundColor: '#EA6500',
+    backgroundColor: '#F36845',
     borderRadius: 6,
     borderWidth: 1,
-    borderColor: '#FF8A32',
+    borderColor: '#F0893B',
     paddingHorizontal: 'auto',
     paddingVertical: 7,
     alignItems: 'center',

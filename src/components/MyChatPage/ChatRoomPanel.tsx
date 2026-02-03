@@ -448,7 +448,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   myMessageBubble: {
-    backgroundColor: '#EA6500', // 내 메시지는 주황색
+    backgroundColor: '#F36845', // 내 메시지는 주황색
     borderTopRightRadius: 2,
     borderWidth: 1,
     borderColor: '#EFEFEF',
@@ -508,7 +508,7 @@ const styles = StyleSheet.create({
   sendIcon: {
     width: 24,
     height: 24,
-    tintColor: '#EA6500', 
+    tintColor: '#F36845', 
   },
   quoteBubble: {
     backgroundColor: 'white',
@@ -577,7 +577,9 @@ const styles = StyleSheet.create({
     lineHeight: 16,
   },
   quoteButton: {
-    backgroundColor: '#EA6500',
+    backgroundColor: '#F36845',
+    borderWidth: 1,
+    borderColor: '#F0893B',
     borderRadius: 8,
     height: 38,
     flexDirection: 'row',
@@ -588,7 +590,7 @@ const styles = StyleSheet.create({
   quoteButtonText: {
     color: 'white',
     fontSize: 13,
-    fontWeight: '600',
+    fontWeight: '500'
   },
   iconButton: {
     padding: 8,
