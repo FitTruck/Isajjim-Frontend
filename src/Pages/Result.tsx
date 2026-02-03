@@ -1,13 +1,13 @@
-import { useState, useEffect } from 'react';
-import { View, Text, ScrollView, StyleSheet, Alert, Modal } from 'react-native';
+import { useState, useEffect, useMemo } from 'react';
+import { View, Text, ScrollView, StyleSheet, Alert } from 'react-native';
 import { commonStyles } from '../styles/commonStyles';
-import { UploadedImage } from '../types/common';
 import { BACKEND_DOMAIN } from '../utils/Server';
 import ResultCard from '../components/ResultPage/ResultCard';
 import UploadCard from '../components/ResultPage/UploadCard';
 import Header from '../components/common/Header';
 import Space3D from '../components/Space/Space3D';
 import { Ionicons } from '@expo/vector-icons';
+import { SimulationFurniture, TruckType } from '../types/simulation';
 import MyTouch from "../components/common/MyTouch";
 
 // app.tsx로부터 전달받을 함수의 자료형 정의
@@ -16,6 +16,15 @@ import { RootStackParamList } from '../types/navigation';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Result'>;
 
+// 트럭 타입 매핑 (백엔드 응답 → 시뮬레이션 타입)
+const mapTruckType = (backendType: string | null): TruckType => {
+  if (!backendType) return '2.5ton';
+  const normalized = backendType.toLowerCase().replace('_', '');
+  if (normalized.includes('1ton') || normalized === '1ton') return '1ton';
+  if (normalized.includes('5ton') || normalized === '5ton') return '5ton';
+  return '2.5ton';
+};
+
 export default function Result({ navigation, route }: Props) {
   const { data, estimateId, ResultOfUserSelect } = route.params
 
@@ -23,16 +32,17 @@ export default function Result({ navigation, route }: Props) {
     navigation.navigate('MyEstimate');
   };
   // results: ResultCard컴포넌트의 속성으로 전달할 값임
-  const [results, setResults] = useState<any[]>([]); 
-  
+  const [results, setResults] = useState<any[]>([]);
+
   // 견적서 컴포넌트에 전달할 값임
   const [estimateData, setEstimateData] = useState<any>({}); // 딕셔너리값임
   const [updateStatus, setUpdateStatus] = useState<'prev' | 'updating' | 'done'>('prev');
   const [isSpaceModalVisible, setIsSpaceModalVisible] = useState(false);
+  const [isSimulationPlaying, setIsSimulationPlaying] = useState(false);
 
   // 첫 실행 시에 자동 실행됨.
   useEffect(() => {
-    
+
     if (ResultOfUserSelect && ResultOfUserSelect.data.images) {
       // mappedResultCard : ResultCard에 필요한 이미지와 content객체
       const mappedResultCard = ResultOfUserSelect.data.images.map((imgResult: any, i: number) => ({
@@ -43,18 +53,25 @@ export default function Result({ navigation, route }: Props) {
           height: data[i].height,
         },
         // furnitureList : userselect에서 전달받은 가구 정보
+        // V2.5: 확장된 가구 데이터 (ply_url, width, depth, height, volume)
         contents: imgResult.furnitureList ? imgResult.furnitureList.map((f: any) => ({
           furnitureId: f.furnitureId,
-          label: f.label, 
-          type: f.type, 
+          label: f.label,
+          type: f.type,
           quantity: f.quantity,
+          // V2.5 추가 필드
+          width: f.width || 0,      // mm
+          depth: f.depth || 0,      // mm
+          height: f.height || 0,    // mm
+          volume: f.volume || 0,    // m³
+          ply_url: f.ply_url || null,  // GCS PLY URL
         })) : []
       }));
       setResults(mappedResultCard);
-      
+
       if (ResultOfUserSelect.data.items) {
         const truckItem = ResultOfUserSelect.data.items.find((item: any) => item.category === "TRUCK");
-        
+
         setEstimateData({
           truckType: truckItem ? truckItem.itemType : null,
           truckQuantity: truckItem ? truckItem.quantity : null,
@@ -66,16 +83,42 @@ export default function Result({ navigation, route }: Props) {
     }
   }, [ResultOfUserSelect]); //이 값이 바뀔 때마다 useEffect 실행되는 거임.
 
+  // 시뮬레이션용 가구 목록 (모든 이미지의 가구 합침)
+  const simulationFurniture = useMemo((): SimulationFurniture[] => {
+    if (!results || results.length === 0) return [];
+
+    return results.flatMap((result) =>
+      result.contents
+        .filter((c: any) => c.ply_url)  // PLY가 있는 것만
+        .map((c: any): SimulationFurniture => ({
+          furnitureId: c.furnitureId,
+          label: c.label,
+          type: c.type,
+          quantity: c.quantity,
+          width: c.width,
+          depth: c.depth,
+          height: c.height,
+          volume: c.volume,
+          ply_url: c.ply_url,
+        }))
+    );
+  }, [results]);
+
+  // 시뮬레이션 트럭 타입
+  const simulationTruckType = useMemo((): TruckType => {
+    return mapTruckType(estimateData.truckType);
+  }, [estimateData.truckType]);
+
   // ResultCard컴포넌트를 보면 onQuantityChange라는 것이 실행되면 handleUpdataQuantity 함수가 실행됨.
   // ResultCard.tsx에서 furnitureId와 newQuantity값을 받아온 것임.
   const handleUpdateQuantity = async (furnitureId: number, newQuantity: number) => {
     if (!estimateId) return; // 견적서id가 없으면 리턴(안전장치)
-    
+
     // 프론트에서 즉각 변경하는 부분 : results의 값을 변경하는 로직임. results는 useState로 만든 값이므로 results의 값이 바뀌면, 자동으로 results를 쓰는 모든 컴포넌트를 다시 그림. >> ResultCard 컴포넌트의 속성이 즉각적으로 변경됨.
     setResults(prev => prev.map(result => ({ // 기존의 results를 써서 results를 수정하겠다는 뜻임. result는 results중에서 하나씩 가져온 객체. 즉, 카드 하나에 대한 정보임.
-      ...result, // "...result, contents:" 다른 것들은 그대로 놔두고 contents만 바꾼다. 
+      ...result, // "...result, contents:" 다른 것들은 그대로 놔두고 contents만 바꾼다.
       contents: result.contents.map((item: any) => // 카드 이미지에 인식된 하나의 가구를 item이라 하자. 카드 하나 중에서도 아이템 하나
-        item.furnitureId === furnitureId ? { ...item, quantity: newQuantity } : item 
+        item.furnitureId === furnitureId ? { ...item, quantity: newQuantity } : item
         // item의 id가 furnitureId와 같다면 수량을 newQuantity로 바꾼다.
         // item.furnitureId 순회하면서 볼 가구들의 id
         // furnitureId : 변경할 가구의 id
@@ -103,10 +146,10 @@ export default function Result({ navigation, route }: Props) {
       const resultOfUpdate = await response.json();
 
       if (response.ok && resultOfUpdate.code === 'OK') {
-        
+
         const truckItem = resultOfUpdate.data.items.find((item: any) => item.category === "TRUCK");
 
-        setEstimateData({ 
+        setEstimateData({
           truckType: truckItem ? truckItem.itemType : null,
           truckQuantity: truckItem ? truckItem.quantity : null,
         });
@@ -130,9 +173,13 @@ export default function Result({ navigation, route }: Props) {
     onNavigateNext();
   }
 
+  const handleSimulationComplete = () => {
+    setIsSimulationPlaying(false);
+  };
+
   return (
     <View style={commonStyles.container}>
-      <ScrollView 
+      <ScrollView
         contentContainerStyle={commonStyles.scrollContent}
         stickyHeaderIndices={[0]}
       >
@@ -152,7 +199,7 @@ export default function Result({ navigation, route }: Props) {
           <View style={styles.resultEstimateCardContainer}>
             {/* 결과 섹션 컨테이너 */}
             <View style={styles.resultSectionContainer}>
-              
+
               {results.map((result, index) => (
                 <ResultCard
                   key={index}
@@ -170,23 +217,27 @@ export default function Result({ navigation, route }: Props) {
               isSpaceModalVisible && { position: 'relative', zIndex: 10000 }
             ]}>
               <View style={[styles.space3DContainer, isSpaceModalVisible && styles.expandedContainer]}>
-                <Space3D />
-                <MyTouch 
+                <Space3D
+                  furniture={simulationFurniture}
+                  autoPlay={isSimulationPlaying}
+                  onAnimationComplete={handleSimulationComplete}
+                />
+                <MyTouch
                   style={isSpaceModalVisible ? styles.closeButtonFixed : styles.expandButton}
                   onPress={() => setIsSpaceModalVisible(!isSpaceModalVisible)}
                 >
                   <Ionicons name={isSpaceModalVisible ? "close" : "expand"} size={isSpaceModalVisible ? 30 : 20} color={isSpaceModalVisible ? "#333333" : "#555"} />
                 </MyTouch>
               </View>
-              <UploadCard 
-                data={estimateData} 
-                status={updateStatus} 
+              <UploadCard
+                data={estimateData}
+                status={updateStatus}
                 onNavigateNext={handleNextStep}
               />
             </View>
-            
+
           </View>
-          
+
 
           {/* footer */}
           <View style={commonStyles.footer}>
@@ -255,7 +306,7 @@ const styles = StyleSheet.create({
     top: 150, // 고정 위치 설정
     zIndex: 10,
     height: 'auto',
-    marginBottom: 200, 
+    marginBottom: 200,
     alignItems: 'center',
   },
   space3DContainer: {
@@ -272,7 +323,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 1,
     elevation: 2,
-    right: 80, 
+    right: 80,
     position: 'relative', // 버튼 배치를 위해
   },
   expandButton: {
@@ -284,7 +335,7 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     zIndex: 10,
   },
-  
+
   // Modal Styles
   modalContainer: {
     flex: 1,
@@ -316,19 +367,19 @@ const styles = StyleSheet.create({
     shadowRadius: 3.84,
     elevation: 5,
   },
-  
+
   expandedContainer: {
-    position: 'fixed' as any, 
-    top: 0, 
-    left: 0, 
-    right: 0, 
+    position: 'fixed' as any,
+    top: 0,
+    left: 0,
+    right: 0,
     bottom: 0,
     width: '100vw' as any,
     height: '100vh' as any,
     zIndex: 9999,
     margin: 0,
     borderRadius: 0,
-    backgroundColor: '#020617', 
+    backgroundColor: '#020617',
   },
   closeButtonFixed: {
     position: 'absolute',
