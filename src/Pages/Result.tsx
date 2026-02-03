@@ -2,8 +2,8 @@ import { useState, useEffect, useMemo } from 'react';
 import { View, Text, ScrollView, StyleSheet, Alert } from 'react-native';
 import { commonStyles } from '../styles/commonStyles';
 import { BACKEND_DOMAIN } from '../utils/Server';
-import ResultCard from '../components/ResultPage/ResultCard';
-import UploadCard from '../components/ResultPage/UploadCard';
+import LeftCard from '../components/ResultPage/LeftCard';
+import RightCard from '../components/ResultPage/RightCard';
 import Header from '../components/common/Header';
 import Space3D from '../components/Space/Space3D';
 import { Ionicons } from '@expo/vector-icons';
@@ -138,17 +138,10 @@ export default function Result({ navigation, route }: Props) {
 
   const handleUpdateQuantity = async (furnitureId: number, newQuantity: number) => {
     if (!estimateId) return;
-
-    // 프론트에서 즉각 변경하는 부분 : results의 값을 변경하는 로직임. results는 useState로 만든 값이므로 results의 값이 바뀌면, 자동으로 results를 쓰는 모든 컴포넌트를 다시 그림. >> ResultCard 컴포넌트의 속성이 즉각적으로 변경됨.
-    setResults(prev => prev.map(result => ({ // 기존의 results를 써서 results를 수정하겠다는 뜻임. result는 results중에서 하나씩 가져온 객체. 즉, 카드 하나에 대한 정보임.
-      ...result, // "...result, contents:" 다른 것들은 그대로 놔두고 contents만 바꾼다.
-      contents: result.contents.map((item: any) => // 카드 이미지에 인식된 하나의 가구를 item이라 하자. 카드 하나 중에서도 아이템 하나
+    setResults(prev => prev.map(result => ({
+      ...result,
+      contents: result.contents.map((item: any) =>
         item.furnitureId === furnitureId ? { ...item, quantity: newQuantity } : item
-        // item의 id가 furnitureId와 같다면 수량을 newQuantity로 바꾼다.
-        // item.furnitureId 순회하면서 볼 가구들의 id
-        // furnitureId : 변경할 가구의 id
-        // 그것이 동일하다면 그것의 quantity를 바꿔야함. 그래서 바꿀 값으로 newQuantity를 넣음.
-        // "...item, quantity: newQuantity" : item의 다른 값들은 놔두고 quantity만 newQuantity로 바꾼다.
       )
     })));
 
@@ -213,20 +206,14 @@ export default function Result({ navigation, route }: Props) {
 
         {/* Main Wrapper */}
         <View style={commonStyles.mainWrapper}>
-
-          {/* 메인 섹션 */}
-          <View style={commonStyles.mainSection}>
-            <Text style={commonStyles.mainTitle}>AI 결과 확인하기</Text>
-            <Text style={commonStyles.mainSubtitle}>이미지 분석 결과</Text>
-          </View>
-
           {/* 결과 및 업로드 카드 컨테이너 */}
           <View style={styles.resultEstimateCardContainer}>
             {/* 결과 섹션 컨테이너 */}
-            <View style={styles.resultSectionContainer}>
+            <View style={styles.leftContainer}>
 
+              {/* 왼쪽 카드 */}
               {results.map((result, index) => (
-                <ResultCard
+                <LeftCard
                   key={index}
                   image={result.image}
                   items={result.contents}
@@ -236,9 +223,9 @@ export default function Result({ navigation, route }: Props) {
 
             </View>
 
-            {/* 업로드 컨테이너 */}
+            {/* 오른쪽 카드 */}
             <View style={[
-              styles.estimateCardContainer,
+              styles.rightContainer,
               isSpaceModalVisible && { position: 'relative', zIndex: 10000 }
             ]}>
               <View style={[styles.space3DContainer, isSpaceModalVisible && styles.expandedContainer]}>
@@ -255,7 +242,7 @@ export default function Result({ navigation, route }: Props) {
                 </MyTouch>
               </View>
 
-              <UploadCard
+              <RightCard
                 data={truckInfo || { type: '', quantity: 0 }}
                 status={updateStatus}
                 onNavigateNext={handleNextStep}
@@ -275,9 +262,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
+    position: 'relative' 
   },
-  resultSectionContainer: {
-    marginTop: 150,
+  leftContainer: {
+    position: 'relative',
     minHeight: 1200,
     width: '75%',
     maxWidth: 1740,
@@ -290,16 +278,10 @@ const styles = StyleSheet.create({
     rowGap: 70,
     columnGap: 70,
   },
-
-  estimateCardContainer: {
-    marginTop: 150,
+  rightContainer: {
+    position: 'relative',
     width: '25%',
-    position: 'sticky' as any,
-    top: 150, // 고정 위치 설정
     zIndex: 10,
-    height: 'auto',
-    marginBottom: 200,
-    alignItems: 'center',
   },
   space3DContainer: {
     width: 307,
