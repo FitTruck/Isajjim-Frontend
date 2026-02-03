@@ -3,6 +3,7 @@ import { TouchableOpacity, Text, View, StyleSheet, Alert, Platform } from 'react
 import { BACKEND_DOMAIN } from '../../utils/Server';
 import LoadingModal from './LoadingModal';
 import { useEstimate } from '../../context/EstimateContext';
+import { MOCK_REQUEST_DATA } from '../../constants/mockData';
 
 interface Props {
   navigation: any;
@@ -66,6 +67,39 @@ export default function NextBtn2({ navigation, estimateId, images, onShowAlert, 
     // 상세주소가 비어 있을 수도 있어서 값 변환을 먼저 함.
     const startLocation = mapToBackendValue(data1);
     const endLocation = mapToBackendValue(data2);
+
+    // 모든 값이 비어있는지 확인 (테스트용 목데이터 적용을 위함)
+    const isAllEmpty = !movingDate && 
+      // 모든 값이 null이거나 ""인 경우 true 반환
+      Object.values(startLocation).every(v => v === null || v === "") && 
+      Object.values(endLocation).every(v => v === null || v === "");
+
+    if (isAllEmpty) {
+      // 목데이터 적용 (constants/mockData.ts에서 가져옴)
+      setRequestData(MOCK_REQUEST_DATA);
+
+      // 가짜 결과 데이터 생성 (MOCK_REQUEST_DATA 기반)
+      const mockResultOfUserSelect = {
+        data: {
+          items: [
+            // 트럭 정보 매핑
+            { 
+              category: "TRUCK", 
+              itemType: MOCK_REQUEST_DATA.truckInfo ? MOCK_REQUEST_DATA.truckInfo.type : "5톤", 
+              quantity: MOCK_REQUEST_DATA.truckInfo ? MOCK_REQUEST_DATA.truckInfo.quantity : 1 
+            }
+          ],
+          images: images // 기존 이미지 데이터 사용
+        }
+      };
+
+      navigation.navigate('Result', {
+        data: images,
+        estimateId: estimateId,
+        ResultOfUserSelect: mockResultOfUserSelect
+      });
+      return;
+    }
 
     if (!validateData(startLocation) || !validateData(endLocation) || !movingDate) {
       const msg = "모든 항목을 선택해주세요.";
