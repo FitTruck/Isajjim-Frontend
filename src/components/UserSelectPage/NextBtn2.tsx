@@ -3,7 +3,8 @@ import { TouchableOpacity, Text, View, StyleSheet, Alert, Platform } from 'react
 import { BACKEND_DOMAIN } from '../../utils/Server';
 import LoadingModal from './LoadingModal';
 import { useEstimate } from '../../context/EstimateContext';
-import { MOCK_REQUEST_DATA } from '../../constants/mockData';
+import { optimizeOBBMulti } from '../../binPacking/multiTruck';
+import { TruckPlacement } from '../../binPacking/types';
 
 interface Props {
   navigation: any;
@@ -39,6 +40,7 @@ interface Props {
   };
 }
 
+// 나중에 onShowAlert 쓸거임
 export default function NextBtn2({ navigation, estimateId, images, onShowAlert, movingDate, data1, data2 }: Props) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { setRequestData } = useEstimate();
@@ -65,50 +67,41 @@ export default function NextBtn2({ navigation, estimateId, images, onShowAlert, 
 
   const handlePressNext = async () => {
     // 상세주소가 비어 있을 수도 있어서 값 변환을 먼저 함.
+    let targetDate = movingDate;
     const startLocation = mapToBackendValue(data1);
     const endLocation = mapToBackendValue(data2);
-
-    // 모든 값이 비어있는지 확인 (테스트용 목데이터 적용을 위함)
-    const isAllEmpty = !movingDate && 
-      // 모든 값이 null이거나 ""인 경우 true 반환
-      Object.values(startLocation).every(v => v === null || v === "") && 
-      Object.values(endLocation).every(v => v === null || v === "");
-
-    if (isAllEmpty) {
-      // 목데이터 적용 (constants/mockData.ts에서 가져옴)
-      setRequestData(MOCK_REQUEST_DATA);
-
-      // 가짜 결과 데이터 생성 (MOCK_REQUEST_DATA 기반)
-      const mockResultOfUserSelect = {
-        data: {
-          items: [
-            // 트럭 정보 매핑
-            { 
-              category: "TRUCK", 
-              itemType: MOCK_REQUEST_DATA.truckInfo ? MOCK_REQUEST_DATA.truckInfo.type : "5톤", 
-              quantity: MOCK_REQUEST_DATA.truckInfo ? MOCK_REQUEST_DATA.truckInfo.quantity : 1 
-            }
-          ],
-          images: images // 기존 이미지 데이터 사용
-        }
-      };
-
-      navigation.navigate('Result', {
-        data: images,
-        estimateId: estimateId,
-        ResultOfUserSelect: mockResultOfUserSelect
-      });
-      return;
-    }
-
-    if (!validateData(startLocation) || !validateData(endLocation) || !movingDate) {
-      const msg = "모든 항목을 선택해주세요.";
-      if (Platform.OS === 'web') {
-        onShowAlert();
-      } else { 
-        Alert.alert("알림", msg);
-      }
-      return;
+    
+    if (!validateData(startLocation) || !validateData(endLocation) || !targetDate) {
+      // const msg = "모든 항목을 선택해주세요.";
+      // if (Platform.OS === 'web') {
+      //   onShowAlert();
+      // } else { 
+      //   Alert.alert("알림", msg);
+      // }
+      // return;
+      targetDate = "2026-02-03";
+      startLocation.address = "서울특별시 강남구 테헤란로 123";
+      startLocation.detailAddress = "402호";
+      startLocation.buildingType = "APARTMENT";
+      startLocation.roomSize = "UNDER_10";
+      startLocation.floor = "FL_4";
+      startLocation.elevator = true;
+      startLocation.ladderTruck = "REQUIRED";
+      startLocation.roomType = "STUDIO";
+      startLocation.duplex = false;
+      startLocation.groundStair = false;
+      startLocation.parking = true;
+      endLocation.address = "서울특별시 종로구 창신동 123";
+      endLocation.detailAddress = "402호";
+      endLocation.buildingType = "APARTMENT";
+      endLocation.roomSize = "UNDER_10";
+      endLocation.floor = "FL_4";
+      endLocation.elevator = true;
+      endLocation.ladderTruck = "REQUIRED";
+      endLocation.roomType = "STUDIO";
+      endLocation.duplex = false;
+      endLocation.groundStair = false;
+      endLocation.parking = true;
     }
 
     setIsSubmitting(true);
@@ -117,7 +110,7 @@ export default function NextBtn2({ navigation, estimateId, images, onShowAlert, 
       const BACKEND_URL = `${BACKEND_DOMAIN}/api/v1/estimates/${estimateId}`;
       
       const payload = {
-        "date": movingDate,
+        "date": targetDate,
         "startLocation": startLocation,
         "endLocation": endLocation
       };
@@ -129,7 +122,8 @@ export default function NextBtn2({ navigation, estimateId, images, onShowAlert, 
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
-
+      console.log("받은 응답:", response);
+      
       if (!response.ok) {
         throw new Error("초기 수정 요청 실패");
       }
@@ -137,6 +131,7 @@ export default function NextBtn2({ navigation, estimateId, images, onShowAlert, 
       const SSE_URL = `${BACKEND_DOMAIN}/api/v1/estimates/${estimateId}/sse`;
       const eventSource = new EventSource(SSE_URL);
 
+      // SSE이벤트 받게 되면 실행됨
       eventSource.addEventListener("sse", async (event) => {
         console.log("받은 SSE 데이터:", event.data);
         if (event.data === "COMPLETED") {
@@ -145,25 +140,57 @@ export default function NextBtn2({ navigation, estimateId, images, onShowAlert, 
             headers: { 'Content-Type': 'application/json' },
           });
 
-          const ResultOfUserSelect = await response.json();
+          const furnitureInfo = await response.json();
+          console.log("가구 정보: ", furnitureInfo);
 
-          // Context에 데이터 저장
-          const truckItem = ResultOfUserSelect.data.items?.find((item: any) => item.category === "TRUCK");
+          // 다중 트럭 계산 로직 적용
+          // 1. OBBItem으로 변환 (미터 단위 -> cm 단위 변환 가정)
+          const itemsForPacking: any[] = furnitureInfo.data.items.map((item: any) => ({
+            id: item.id || `item-${Math.random()}`,
+            width: (item.width || 0) * 100, 
+            depth: (item.depth || 0) * 100, 
+            height: (item.height || 0) * 100 
+          }));
+
+          // 2. 트럭 계산
+          const packingResult = optimizeOBBMulti(itemsForPacking);
           
+          let truckType = "정보 없음";
+          let truckQuantity = 0;
+
+          if (packingResult.success) {
+            truckQuantity = packingResult.totalTrucks;
+            // 예: "5ton + 1ton" 형태의 문자열 생성
+            const typeMap: {[key: string]: string} = {
+              '1ton': '1톤 트럭',
+              '2.5ton': '2.5톤 트럭',
+              '5ton': '5톤 트럭'
+            };
+            const types = packingResult.trucks.map((t: TruckPlacement) => typeMap[t.type] || t.type);
+            truckType = types.join(' + ');
+            
+            console.log(`트럭 계산 결과: ${packingResult.message}`);
+          } else {
+            console.warn("트럭 계산 실패:", packingResult.message);
+          }
+
+          console.log("트럭 type: ", truckType);
+          console.log("트럭 quantity: ", truckQuantity);
+          // 저장소로 보낼 값
           setRequestData({
             estimateId: estimateId,
-            movingDate: movingDate,
+            movingDate: targetDate,
             startLocation: startLocation,
             endLocation: endLocation,
             items: [], // Result 페이지에서 다시 로드하거나 여기서 items 정보가 있다면 추가
-            truckInfo: truckItem ? { type: truckItem.itemType, quantity: truckItem.quantity } : null,
+            truckInfo: { type: truckType, quantity: truckQuantity },
+            images: images,
+            analysisResult: furnitureInfo
           });
 
-          navigation.navigate('Result', {
-            data: images,
-            estimateId: estimateId,
-            ResultOfUserSelect: ResultOfUserSelect
-          });
+          // Result 페이지로 이동 함수
+          navigation.navigate('Result');
+          
           eventSource.close();
           setIsSubmitting(false);
         }
