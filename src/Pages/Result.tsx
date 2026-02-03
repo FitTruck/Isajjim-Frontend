@@ -1,5 +1,5 @@
-import { useState, useEffect, useMemo } from 'react';
-import { View, Text, ScrollView, StyleSheet, Alert } from 'react-native';
+import { useState, useEffect, useMemo, useRef } from 'react';
+import { View, ScrollView, StyleSheet, Alert } from 'react-native';
 import { commonStyles } from '../styles/commonStyles';
 import { BACKEND_DOMAIN } from '../utils/Server';
 import LeftCard from '../components/ResultPage/LeftCard';
@@ -26,7 +26,7 @@ const mapTruckType = (backendType: string | null): TruckType => {
   return '2.5ton';
 };
 
-export default function Result({ navigation, route }: Props) {
+export default function Result({ navigation }: Props) {
   const { requestData } = useEstimate();
   
   // Context에서 데이터 추출
@@ -195,6 +195,50 @@ export default function Result({ navigation, route }: Props) {
     setIsSimulationPlaying(false);
   };
 
+  // mock 데이터 나중에 지워도 됨
+  const mockResults = [
+    {
+      image: { localUri: require('../../assets/mock이미지 1.jpg'), width: 500, height: 300 },
+      contents: [
+        { furnitureId: 1, label: "SOFA", type: "SUPER_SINGLE_BED", quantity: 1 },
+        { furnitureId: 2, label: "BATHTUB", type: "QUEEN_SIZE_BED", quantity: 2 }
+      ]
+    },
+    {
+      image: { localUri: require('../../assets/mock이미지 2.jpg'), width: 800, height: 600 },
+      contents: [
+        { furnitureId: 3, label: "BED", type: "KING_SIZE_BED", quantity: 1 },
+        { furnitureId: 4, label: "DESK", type: "OFFICE_DESK", quantity: 1 }
+      ]
+    }
+  ];
+
+  // 슬라이더 로직
+  const scrollRef = useRef<ScrollView>(null);
+  const [scrollIndex, setScrollIndex] = useState(0);
+
+  const handleScroll = (direction: 'next' | 'prev') => {
+    if (!scrollRef.current) return;
+    
+    const PAGE_WIDTH = 970; 
+    let newIndex = scrollIndex;
+
+    if (direction === 'next') {
+      if (scrollIndex < mockResults.length - 1) {
+        newIndex = scrollIndex + 1;
+      }
+    } else {
+      if (scrollIndex > 0) {
+        newIndex = scrollIndex - 1;
+      }
+    }
+
+    if (newIndex !== scrollIndex) {
+      scrollRef.current.scrollTo({ x: newIndex * PAGE_WIDTH, animated: true });
+      setScrollIndex(newIndex);
+    }
+  };
+
   return (
     <View style={commonStyles.container}>
       <ScrollView
@@ -212,16 +256,57 @@ export default function Result({ navigation, route }: Props) {
             
             {/* 왼쪽 컨테이너 */}
             <View style={styles.leftContainer}>
+              <ScrollView
+                ref={scrollRef}
+                horizontal
+                pagingEnabled
+                showsHorizontalScrollIndicator={false}
+                scrollEnabled={false}
+              >
+                {/* 분석 카드 */}
+                {/* mockResults -> 모든 항목 변경 : results로 바꿔야함, 바꿀 때 mockResults 변수 자체명도 바뀌니까 주석처리 같이 해야함. */}
+                {mockResults.map((result, index) => (
+                  <View key={index} style={{ width: 970, alignItems: 'center' }}>
+                    <LeftCard
+                      image={result.image}
+                      items={result.contents}
+                      onQuantityChange={handleUpdateQuantity}
+                    />
+                  </View>
+                ))}
+              </ScrollView>
 
-              {/* 분석 카드 */}
-              {results.map((result, index) => (
-                <LeftCard
-                  key={index}
-                  image={result.image}
-                  items={result.contents}
-                  onQuantityChange={handleUpdateQuantity}
-                />
-              ))}
+              {/* 네비게이션 버튼 */}
+              {scrollIndex > 0 && (
+                <MyTouch 
+                  style={styles.arrowButtonLeft} 
+                  onPress={() => handleScroll('prev')}
+                >
+                  <Ionicons name="chevron-back" size={40} color="#333" />
+                </MyTouch>
+              )}
+              {scrollIndex < mockResults.length - 1 && (
+                <MyTouch 
+                  style={styles.arrowButtonRight} 
+                  onPress={() => handleScroll('next')}
+                >
+                  <Ionicons name="chevron-forward" size={40} color="#333" />
+                </MyTouch>
+              )}
+
+
+              {/* 페이지 인디케이터 (Dots) */}
+              <View style={styles.paginationContainer}>
+                {mockResults.map((_, index) => (
+                  <View 
+                    key={index} 
+                    style={[
+                      styles.dot, 
+                      scrollIndex === index && styles.activeDot
+                    ]} 
+                  />
+                ))}
+              </View>
 
             </View>
 
@@ -251,7 +336,7 @@ export default function Result({ navigation, route }: Props) {
                 status={updateStatus}
                 onNavigateNext={handleNextStep}
               />
-              
+
             </View>
 
           </View>
@@ -265,32 +350,32 @@ export default function Result({ navigation, route }: Props) {
 const styles = StyleSheet.create({
   leftrightContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    position: 'relative',
-    top: 150,
-  },
-  leftContainer: {
-    position: 'relative',
-    minHeight: 1200,
-    width: '75%',
-    maxWidth: 1740,
-    alignSelf: 'flex-start',
     justifyContent: 'center',
+    position: 'relative',
+    marginTop: 150,
+    gap: 100,
+    marginLeft: 100,
+    height: 600
+  },
+
+  leftContainer: {
+    width: 970,
     paddingBottom: 100,
     paddingHorizontal: 0,
+    position: 'relative', // For arrow positioning
+
+    // 내부 요소
     flexDirection: 'row',
     flexWrap: 'wrap',
-    rowGap: 70,
-    columnGap: 70,
+    justifyContent: 'center',
+    rowGap: 0,
   },
   rightContainer: {
-    position: 'relative',
-    width: '25%',
+    width: 305,
     zIndex: 10,
   },
   space3DContainer: {
-    width: 307,
+    width: '100%',
     height: 307,
     marginBottom: 5,
     borderRadius: 4,
@@ -303,51 +388,8 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 1,
     elevation: 2,
-    right: 80,
-    position: 'relative', // 버튼 배치를 위해
+    position: 'relative', // 버튼 배치 때문에 넣음
   },
-  expandButton: {
-    position: 'absolute',
-    top: 10,
-    right: 10,
-    backgroundColor: 'rgba(255, 255, 255, 0.8)',
-    padding: 5,
-    borderRadius: 4,
-    zIndex: 10,
-  },
-
-  // Modal Styles
-  modalContainer: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.8)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  modalContent: {
-    width: '90%',
-    height: '90%',
-    backgroundColor: 'white',
-    borderRadius: 8,
-    overflow: 'hidden',
-    position: 'relative',
-  },
-  closeModalButton: {
-    position: 'absolute',
-    top: 20,
-    right: 20,
-    backgroundColor: 'white',
-    borderRadius: 20,
-    width: 40,
-    height: 40,
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
-  },
-
   expandedContainer: {
     position: 'fixed' as any,
     top: 0,
@@ -361,9 +403,18 @@ const styles = StyleSheet.create({
     borderRadius: 0,
     backgroundColor: '#020617',
   },
+  expandButton: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+    padding: 5,
+    borderRadius: 4,
+    zIndex: 10,
+  },
   closeButtonFixed: {
     position: 'absolute',
-    top: 40,
+    top: 80,
     right: 40,
     backgroundColor: 'white',
     width: 50,
@@ -373,9 +424,71 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     zIndex: 10000,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
     elevation: 5,
+  },
+
+  // 왼쪽 슬라이더 버튼 스타일
+  arrowButtonLeft: {
+    position: 'absolute',
+    left: -70,
+    top: '45%', // 카드 높이의 중간
+    width: 50,
+    height: 50,
+    zIndex: 100,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 25,
+    justifyContent: 'center',
+    alignItems: 'center',
+    // Shadow
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
+    borderWidth: 1,
+    borderColor: '#F5F5F5',
+  },
+  // 오른쪽 슬라이더 버튼 스타일
+  arrowButtonRight: {
+    position: 'absolute',
+    right: -70,
+    top: '45%',
+    width: 50,
+    height: 50,
+    zIndex: 100,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 25,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#F5F5F5',
+    
+    // 그림자
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+
+  // 슬라이드 도트
+  paginationContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginTop: 20,
+    gap: 8,
+  },
+  dot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: '#E0E0E0',
+  },
+  activeDot: {
+    backgroundColor: '#EA6500', // 브랜드 컬러
+    width: 24, // 활성화된 닷은 길게
   },
 });
