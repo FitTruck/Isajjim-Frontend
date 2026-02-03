@@ -1,10 +1,11 @@
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image} from "react-native";
+import { View, Text, StyleSheet, ScrollView, Image} from "react-native";
 import { commonStyles } from "../styles/commonStyles";
 import Header from "../components/common/Header";
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types/navigation';
 import EstimateCard from "../components/MyEstimatePage/EstimateCard";
 import SidePanel from "../components/MyEstimatePage/SidePanel";
+import MyTouch from "../components/common/MyTouch";
 
 type Props = NativeStackScreenProps<RootStackParamList, 'MyEstimate'>;
 
@@ -36,10 +37,10 @@ export default function MyEstimate({ navigation }: Props) {
 
               {/* 필터 버튼 */}
               <View style={styles.filterButtonContainer}>
-                <TouchableOpacity style={styles.filterButton}>
+                <MyTouch style={styles.filterButton}>
                   <Image source={require('../../assets/filter.png')} style={styles.filterIcon} />
                   <Text style={styles.filterText}>필터</Text>
-                </TouchableOpacity>
+                </MyTouch>
               </View>
 
               {/* 견적 리스트 (카드들) */}
@@ -145,7 +146,7 @@ const styles = StyleSheet.create({
   // 타이틀 섹션
   titleContainer: {
     width: 700, 
-    marginBottom: 50,
+    marginBottom: 30,
     flexDirection: 'column',
     alignItems: 'flex-start',
   },
@@ -200,7 +201,7 @@ const styles = StyleSheet.create({
   },
   
   cardList: {
-    gap: 20, 
+    gap: 15, 
   },
 
   // 오른쪽 컬럼

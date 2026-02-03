@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { View, Text, ScrollView, StyleSheet, Alert, TouchableOpacity } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, Alert } from 'react-native';
 import { commonStyles } from '../styles/commonStyles';
 import { BACKEND_DOMAIN } from '../utils/Server';
 import ResultCard from '../components/ResultPage/ResultCard';
@@ -8,6 +8,7 @@ import Header from '../components/common/Header';
 import Space3D from '../components/Space/Space3D';
 import { Ionicons } from '@expo/vector-icons';
 import { SimulationFurniture, TruckType } from '../types/simulation';
+import MyTouch from "../components/common/MyTouch";
 
 // app.tsx로부터 전달받을 함수의 자료형 정의
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -221,12 +222,12 @@ export default function Result({ navigation, route }: Props) {
                   autoPlay={isSimulationPlaying}
                   onAnimationComplete={handleSimulationComplete}
                 />
-                <TouchableOpacity
+                <MyTouch
                   style={isSpaceModalVisible ? styles.closeButtonFixed : styles.expandButton}
                   onPress={() => setIsSpaceModalVisible(!isSpaceModalVisible)}
                 >
                   <Ionicons name={isSpaceModalVisible ? "close" : "expand"} size={isSpaceModalVisible ? 30 : 20} color={isSpaceModalVisible ? "#333333" : "#555"} />
-                </TouchableOpacity>
+                </MyTouch>
               </View>
               <UploadCard
                 data={estimateData}

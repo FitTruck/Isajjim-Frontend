@@ -257,7 +257,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#D9D9D9',
     flexDirection: 'row',
-    marginBottom: 20,
   },
   leftSection: {
     flex: 1,
