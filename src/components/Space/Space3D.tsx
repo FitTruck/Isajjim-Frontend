@@ -547,7 +547,7 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   playButton: {
-    backgroundColor: 'rgba(0, 200, 100, 0.8)',
+    backgroundColor: '#F0893B',
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 20,
