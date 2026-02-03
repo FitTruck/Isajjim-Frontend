@@ -30,7 +30,7 @@ export default function ChatRoomPanel({ data }: ChatRoomPanelProps) {
 
   const { requestData, updateAiSummary } = useEstimate();
 
-  // Context 데이터가 있으면 사용, 없으면 Mock 데이터
+  // Context 데이터가 있으면 사용, 없으면 빈 값으로 초기화 (Error Case 대비)
   const displayData: RequestData = requestData ? {
     movingDate: requestData.movingDate,
     startLocation: requestData.startLocation,
@@ -39,29 +39,16 @@ export default function ChatRoomPanel({ data }: ChatRoomPanelProps) {
     truckInfo: requestData.truckInfo,
     aiSummary: requestData.aiSummary
   } : {
-    // Mock Fallback
-    movingDate: "2026. 03. 15 (금)",
+    // 데이터 없음 (Fallback) - 에러 상황
+    movingDate: null,
     startLocation: {
-      address: "서울시 강남구 역삼동 123-45",
-      detailAddress: "OO아파트 101동 1202호",
-      floor: "12",
-      elevator: true,
+      address: null, detailAddress: null, floor: null, elevator: null
     },
     endLocation: {
-      address: "경기도 용인시 수지구 풍덕천동 987-65",
-      detailAddress: "XX오피스텔 304호",
-      floor: "3",
-      elevator: true,
+      address: null, detailAddress: null, floor: null, elevator: null
     },
-    items: [
-      { name: "침대 (퀸사이즈)", quantity: 1 },
-      { name: "소파 (3인용)", quantity: 1 },
-      { name: "양문형 냉장고", quantity: 1 },
-    ],
-    truckInfo: {
-      type: "5톤 트럭",
-      quantity: 1
-    },
+    items: [],
+    truckInfo: null,
     aiSummary: undefined
   };
 
