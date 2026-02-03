@@ -32,20 +32,20 @@ export default function ChatRoomPanel({ data }: ChatRoomPanelProps) {
 
   // Context 데이터가 있으면 사용, 없으면 빈 값으로 초기화 (Error Case 대비)
   const displayData: RequestData = requestData ? {
-    movingDate: requestData.movingDate,
-    startLocation: requestData.startLocation,
-    endLocation: requestData.endLocation,
-    items: requestData.items,
-    truckInfo: requestData.truckInfo,
-    aiSummary: requestData.aiSummary
+    ...requestData
   } : {
-    // 데이터 없음 (Fallback) - 에러 상황
+    // 데이터 없음 >>>> 없는 대로 두기
+    estimateId: 0,
     movingDate: null,
     startLocation: {
-      address: null, detailAddress: null, floor: null, elevator: null
+      address: null, detailAddress: null, floor: null, elevator: null,
+      buildingType: null, roomSize: null, ladderTruck: null, roomType: null,
+      duplex: null, groundStair: null, parking: null
     },
     endLocation: {
-      address: null, detailAddress: null, floor: null, elevator: null
+      address: null, detailAddress: null, floor: null, elevator: null,
+      buildingType: null, roomSize: null, ladderTruck: null, roomType: null,
+      duplex: null, groundStair: null, parking: null
     },
     items: [],
     truckInfo: null,
@@ -448,7 +448,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   myMessageBubble: {
-    backgroundColor: '#F36845', // 내 메시지는 주황색
+    backgroundColor: '#F0893B', // 내 메시지는 주황색
     borderTopRightRadius: 2,
     borderWidth: 1,
     borderColor: '#EFEFEF',
@@ -508,7 +508,7 @@ const styles = StyleSheet.create({
   sendIcon: {
     width: 24,
     height: 24,
-    tintColor: '#F36845', 
+    tintColor: '#F0893B', 
   },
   quoteBubble: {
     backgroundColor: 'white',
@@ -577,9 +577,7 @@ const styles = StyleSheet.create({
     lineHeight: 16,
   },
   quoteButton: {
-    backgroundColor: '#F36845',
-    borderWidth: 1,
-    borderColor: '#F0893B',
+    backgroundColor: '#F0893B',
     borderRadius: 8,
     height: 38,
     flexDirection: 'row',

@@ -41,6 +41,7 @@ export interface RequestData {
 interface EstimateContextType {
   requestData: RequestData | null;
   setRequestData: (data: RequestData) => void;
+  updateAiSummary: (summary: string) => void;
 }
 
 const EstimateContext = createContext<EstimateContextType | undefined>(undefined);
@@ -48,8 +49,14 @@ const EstimateContext = createContext<EstimateContextType | undefined>(undefined
 export const EstimateProvider = ({ children }: { children: ReactNode }) => {
   const [requestData, setRequestData] = useState<RequestData | null>(null);
 
+  const updateAiSummary = (summary: string) => {
+    if (requestData) {
+      setRequestData({ ...requestData, aiSummary: summary });
+    }
+  };
+
   return (
-    <EstimateContext.Provider value={{ requestData, setRequestData }}>
+    <EstimateContext.Provider value={{ requestData, setRequestData, updateAiSummary }}>
       {children}
     </EstimateContext.Provider>
   );
