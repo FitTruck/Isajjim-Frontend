@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { TouchableOpacity, Text, View, StyleSheet, Alert, Platform } from 'react-native';
 import { BACKEND_DOMAIN } from '../../utils/Server';
 import LoadingModal from './LoadingModal';
+import { useEstimate } from '../../context/EstimateContext';
 
 interface Props {
   navigation: any;
@@ -39,25 +40,9 @@ interface Props {
 
 export default function NextBtn2({ navigation, estimateId, images, onShowAlert, movingDate, data1, data2 }: Props) {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { setRequestData } = useEstimate();
 
-  const mapToBackendValue1 = (data: any) => {
-    return {
-      // 여기서 buildingType'1' 같이 안 쓴 이유는 위에 Props정의할 때, 숫자를 뺏기 때문임.
-      "address": data.address,
-      "detailAddress": data.detailAddress || " ",
-      "buildingType": data.buildingType,
-      "roomSize": data.roomSize,
-      "floor": data.floor,
-      "elevator": data.elevator,
-      "ladderTruck": data.ladderTruck,
-      "roomType": data.roomType,
-      "duplex": data.duplex,
-      "groundStair": data.groundStair, 
-      "parking": data.parking,
-    };
-  };
-
-  const mapToBackendValue2 = (data: any) => {
+  const mapToBackendValue = (data: any) => {
     return {
       "address": data.address,
       "detailAddress": data.detailAddress || " ",
@@ -79,8 +64,8 @@ export default function NextBtn2({ navigation, estimateId, images, onShowAlert, 
 
   const handlePressNext = async () => {
     // 상세주소가 비어 있을 수도 있어서 값 변환을 먼저 함.
-    const startLocation = mapToBackendValue1(data1);
-    const endLocation = mapToBackendValue2(data2);
+    const startLocation = mapToBackendValue(data1);
+    const endLocation = mapToBackendValue(data2);
 
     if (!validateData(startLocation) || !validateData(endLocation) || !movingDate) {
       const msg = "모든 항목을 선택해주세요.";
@@ -127,6 +112,18 @@ export default function NextBtn2({ navigation, estimateId, images, onShowAlert, 
           });
 
           const ResultOfUserSelect = await response.json();
+
+          // Context에 데이터 저장
+          const truckItem = ResultOfUserSelect.data.items?.find((item: any) => item.category === "TRUCK");
+          
+          setRequestData({
+            estimateId: estimateId,
+            movingDate: movingDate,
+            startLocation: startLocation,
+            endLocation: endLocation,
+            items: [], // Result 페이지에서 다시 로드하거나 여기서 items 정보가 있다면 추가
+            truckInfo: truckItem ? { type: truckItem.itemType, quantity: truckItem.quantity } : null,
+          });
 
           navigation.navigate('Result', {
             data: images,
