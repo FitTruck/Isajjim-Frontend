@@ -126,9 +126,7 @@ export default function NextBtn1({ imageList, onShowAlert }: NextBtnProps) {
       style={[styles.nextBtn, isMobile && styles.mobileNextBtn]} 
       onPress={handleNextStep}
     >
-      <Text style={[styles.nextBtnText, isMobile && styles.mobileNextBtnText]}>
-        {isLoading ? '처리중...' : '다음단계'}
-      </Text>
+      <Text style={[styles.nextBtnText, isMobile && styles.mobileNextBtnText]}>다음 단계</Text>
     </TouchableOpacity>
   );
 }

@@ -220,9 +220,7 @@ export default function NextBtn2({ navigation, estimateId, images, onShowAlert, 
         onPress={handlePressNext}
         disabled={isSubmitting}
       >
-          <Text style={styles.nextBtnText}>
-            {isSubmitting ? '저장 중...' : '다음단계'}
-          </Text>
+          <Text style={styles.nextBtnText}>다음 단계</Text>
       </TouchableOpacity>
     </View>
   );
@@ -240,7 +238,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     paddingVertical: 8,
     backgroundColor: '#F0893B',
-    borderRadius: 7,
+    borderRadius: 4,
     justifyContent: 'center', 
     alignItems: 'center',
   },
