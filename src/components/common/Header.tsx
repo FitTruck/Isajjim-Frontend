@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, Image, TouchableOpacity, StyleSheet, useWindowDimensions, Pressable } from 'react-native';
+import { View, Text, Image, TouchableOpacity, StyleSheet, useWindowDimensions, Pressable, Platform } from 'react-native';
 
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -96,7 +96,7 @@ export default function Header() {
 
 const styles = StyleSheet.create({
   header: {
-    width: '100%',
+    width: (Platform.OS === 'web' ? '100vw' : '100%') as any,
     height: 65, 
     position: 'absolute',
     top: 0,
@@ -104,7 +104,7 @@ const styles = StyleSheet.create({
     right: 0,
     zIndex: 100, 
     backgroundColor: 'rgb(255, 255, 255)', 
-    paddingHorizontal: '20%',
+    paddingHorizontal: 30, // 왼쪽/오른쪽 여백 축소
     flexDirection: 'row', 
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -138,13 +138,11 @@ const styles = StyleSheet.create({
     fontSize: 20,
   },
   headerRight: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
+    // position: 'absolute' 제거하여 flex layout 따르도록 수정
     height: '100%',
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'flex-end', // 오른쪽 정렬
     gap: 40,
   },
   mobileHeaderRight: {
