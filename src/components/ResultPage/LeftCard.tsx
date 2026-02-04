@@ -9,7 +9,7 @@ const checkObjectImage = require('../../../assets/check_object.png');
 // 이미지 컨테이너 크기 (스타일과 동일하게 유지)
 const IMAGE_CONTAINER_WIDTH = 670;
 const IMAGE_CONTAINER_HEIGHT = 600;
-const MARKER_SIZE = 40; // 마커 크기
+const MARKER_SIZE = 20; // 마커 크기
 
 interface ResultCardProps {
   image: {
