@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, ScrollView, Image} from "react-native";
+import { View, Text, StyleSheet, ScrollView, Image, Platform } from "react-native";
 import { commonStyles } from "../styles/commonStyles";
 import Header from "../components/common/Header";
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -14,7 +14,7 @@ export default function MyEstimate({ navigation }: Props) {
   return (
     <View style={commonStyles.container}>
       <ScrollView 
-        contentContainerStyle={commonStyles.scrollContent}
+        contentContainerStyle={[commonStyles.scrollContent, Platform.OS === 'web' && { width: '100vw', overflowX: 'hidden' } as any]}
         stickyHeaderIndices={[0]}
       >
         {/* Header */}
@@ -138,16 +138,16 @@ const styles = StyleSheet.create({
     paddingTop: 80,
   },
   leftrightContainer: {
-    width: 1100,
+    width: 1240,
     flexDirection: 'row',
     justifyContent: 'space-between',
-    left: 150,
+    left: 0,
   },
   
   // 타이틀 섹션
   titleContainer: {
-    left: -50,
-    width: 700, 
+    width: 1240,
+    paddingLeft: 100, 
     marginBottom: 30,
     flexDirection: 'column',
   },
@@ -167,6 +167,7 @@ const styles = StyleSheet.create({
 
   leftContent: {
     width: 700,
+    marginLeft: 100,
   },
 
   filterButtonContainer: {

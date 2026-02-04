@@ -123,7 +123,7 @@ export default function NextBtn1({ imageList, onShowAlert }: NextBtnProps) {
 
   return (
     <TouchableOpacity 
-      style={[styles.nextBtn, isMobile && styles.mobileNextBtn]} 
+      style={[styles.nextBtn, isMobile && styles.mobileNextBtn, isLoading && styles.nextBtnDisabled]} 
       onPress={handleNextStep}
     >
       <Text style={[styles.nextBtnText, isMobile && styles.mobileNextBtnText]}>다음 단계</Text>
@@ -156,5 +156,9 @@ const styles = StyleSheet.create({
   },
   mobileNextBtnText: {
     fontSize: 15,
+  },
+  nextBtnDisabled: {
+    backgroundColor: '#666',
+    opacity: 0.7
   }
 });
