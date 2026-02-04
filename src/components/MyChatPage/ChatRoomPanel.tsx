@@ -214,6 +214,7 @@ export default function ChatRoomPanel({ data }: ChatRoomPanelProps) {
             )}
           </View>
         )}
+        {item.isMe && <Text style={styles.messageTime}>{item.time}</Text>}
         <View style={[
           styles.messageBubble, 
           item.isMe ? styles.myMessageBubble : styles.theirMessageBubble
@@ -223,7 +224,7 @@ export default function ChatRoomPanel({ data }: ChatRoomPanelProps) {
             item.isMe ? styles.myMessageText : styles.theirMessageText
           ]}>{item.text}</Text>
         </View>
-        <Text style={styles.messageTime}>{item.time}</Text>
+        {!item.isMe && <Text style={styles.messageTime}>{item.time}</Text>}
       </View>
     );
   };
@@ -333,6 +334,7 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     borderWidth: 1,
     borderColor: '#E6E6E6',
+    borderRadius: 4,
     display: 'flex',
     flexDirection: 'column',
   },
