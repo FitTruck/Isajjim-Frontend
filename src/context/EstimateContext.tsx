@@ -28,13 +28,14 @@ export interface TruckInfo {
 
 export interface RequestData {
   estimateId: number;
-  movingDate: string | null;
-  startLocation: LocationInfo;
-  endLocation: LocationInfo;
-  items: Item[];
-  truckInfo: TruckInfo | null;
-  aiSummary?: string;
   images?: any[];
+  
+  movingDate?: string | null;
+  startLocation?: LocationInfo;
+  endLocation?: LocationInfo;
+  items?: Item[];
+  truckInfo?: TruckInfo | null;
+  aiSummary?: string;
   analysisResult?: any;
 }
 
