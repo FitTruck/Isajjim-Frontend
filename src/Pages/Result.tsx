@@ -1,7 +1,8 @@
-import { useState, useEffect, useMemo, useRef } from 'react';
+import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { View, ScrollView, StyleSheet, Alert } from 'react-native';
 import { commonStyles } from '../styles/commonStyles';
 import { BACKEND_DOMAIN } from '../utils/Server';
+import { translateLabel } from '../utils/Translator';
 import LeftCard from '../components/ResultPage/LeftCard';
 import NextBtn3 from '../components/ResultPage/NextBtn3';
 import Header from '../components/common/Header';
@@ -18,7 +19,7 @@ import { RootStackParamList } from '../types/navigation';
 type Props = NativeStackScreenProps<RootStackParamList, 'Result'>;
 
 export default function Result({ navigation }: Props) {
-  const { requestData } = useEstimate();
+  const { requestData, setRequestData } = useEstimate();
 
   // Context에서 데이터 추출
   const data = requestData?.images || [];
@@ -79,7 +80,7 @@ export default function Result({ navigation }: Props) {
     } else {
       Alert.alert("오류", "분석결과를 불러올 수 없습니다.");
     }
-  }, [requestData]); //이 값이 바뀔 때마다 useEffect 실행되는 거임.
+  }, [analysisResult, data, estimateId]); // 값이 바뀔 때마다 useEffect 실행 (requestData 전체 의존성 제거)
 
   // 시뮬레이션용 가구 목록 (모든 이미지의 가구 합침)
   const simulationFurniture = useMemo((): SimulationFurniture[] => {
@@ -121,6 +122,33 @@ export default function Result({ navigation }: Props) {
     })));
 
     setUpdateStatus('updating');
+    
+    // results에서 해당 furnitureId를 가진 아이템 찾기
+    const targetItem = results
+      .flatMap(r => r.contents)
+      .find((item: any) => item.furnitureId === furnitureId);
+    
+    if (targetItem) {
+      // 한글 이름 변환
+      const convertedName = translateLabel(targetItem.label); 
+
+      // Context 업데이트
+      setRequestData(prev => {
+        if (!prev || !prev.items) return prev;
+        
+        const newItems = prev.items.map(item => {
+          if (item.name === convertedName) {
+            return { ...item, quantity: newQuantity }; // 수량 업데이트
+          }
+          return item;
+        });
+        
+        return {
+          ...prev,
+          items: newItems
+        };
+      });
+    }
 
     // 백엔드로 바뀐 정보를 보내는 부분
     try {
@@ -190,9 +218,57 @@ export default function Result({ navigation }: Props) {
   };
 
   // 시뮬레이션 트럭 결과 콜백
-  const handleTrucksChange = (trucks: SimulationTruckResult[]) => {
+  const handleTrucksChange = useCallback((trucks: SimulationTruckResult[]) => {
     setSimulationTrucks(trucks);
-  };
+
+    // Context 업데이트 (RequestDetailModal 등에 반영하기 위함)
+    const typeMap: {[key: string]: string} = {
+      '1ton': '1톤 트럭',
+      '2.5ton': '2.5톤 트럭',
+      '5ton': '5톤 트럭'
+    };
+    
+    // 트럭 종류 문자열 생성 (예: "1톤 트럭 + 5톤 트럭")
+    const flatTypes: string[] = [];
+    trucks.forEach(t => {
+      const label = typeMap[t.type] || t.type;
+      for (let i = 0; i < t.quantity; i++) {
+        flatTypes.push(label);
+      }
+    });
+
+    // 톤수 오름차순 정렬 (1톤 -> 2.5톤 -> 5톤)
+    const getTonnage = (str: string) => {
+      if (str.includes('1톤')) return 1;
+      if (str.includes('2.5톤')) return 2.5;
+      if (str.includes('5톤')) return 5;
+      return 999;
+    };
+    flatTypes.sort((a, b) => getTonnage(a) - getTonnage(b));
+
+    const newTruckTypeStr = flatTypes.join(' + ');
+    const newTotalQuantity = trucks.reduce((sum, t) => sum + t.quantity, 0);
+
+    // Context 업데이트 (값이 실제로 변했을 때만 수행)
+    setRequestData(prev => {
+      if (!prev) return null; // 실행될 일이 거의 없겠지만 방어 코드
+      
+      const currentType = prev.truckInfo?.type;
+      const currentQuantity = prev.truckInfo?.quantity;
+
+      if (currentType === newTruckTypeStr && currentQuantity === newTotalQuantity) {
+        return prev;
+      }
+
+      return {
+        ...prev,
+        truckInfo: {
+          type: newTruckTypeStr,
+          quantity: newTotalQuantity
+        }
+      };
+    });
+  }, [setRequestData]);
 
   return (
     <View style={commonStyles.container}>
