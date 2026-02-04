@@ -90,7 +90,7 @@ export default function Result({ navigation }: Props) {
 
     const furniture = results.flatMap((result) =>
       result.contents
-        .filter((c: any) => c.ply_url)  // PLY가 있는 것만
+        .filter((c: any) => c.ply_url && c.quantity > 0)  // PLY가 있고 quantity > 0인 것만
         .map((c: any): SimulationFurniture => ({
           furnitureId: c.furnitureId,
           label: c.label,

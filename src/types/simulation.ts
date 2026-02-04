@@ -16,6 +16,12 @@ export interface SimulationFurniture {
 
 export type TruckType = '1ton' | '2.5ton' | '5ton';
 
+// 시뮬레이션 트럭 결과 (타입별 수량)
+export interface SimulationTruckResult {
+  type: TruckType;
+  quantity: number;
+}
+
 export interface Space3DProps {
   furniture?: SimulationFurniture[];
   truckType?: TruckType;

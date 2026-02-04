@@ -2,11 +2,13 @@
 import { View, Text, StyleSheet, TouchableOpacity, Animated, Image } from 'react-native';
 
 
+interface TruckData {
+  type: string;
+  quantity: number;
+}
+
 interface NextBtn3Props {
-  data: {
-    type: string;
-    quantity: number;
-  }
+  data: TruckData[];
   status: 'prev' | 'updating' | 'done';
   onNavigateNext: () => void;
 }
@@ -74,10 +76,12 @@ const NextBtn3 = ({ data, status, onNavigateNext }: NextBtn3Props) => {
           </View>
         </View>
 
-        <View style={styles.row}>
-          <Text style={styles.truckType}>{data.type}</Text>
-          <Text style={styles.truckQuantity}>{data.quantity}대</Text>
-        </View>
+        {data.map((truck, index) => (
+          <View key={index} style={styles.row}>
+            <Text style={styles.truckType}>{truck.type}</Text>
+            <Text style={styles.truckQuantity}>{truck.quantity}대</Text>
+          </View>
+        ))}
       </View>
 
       {/* 구분선 */}
