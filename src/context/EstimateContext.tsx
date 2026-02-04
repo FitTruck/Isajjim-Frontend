@@ -41,7 +41,7 @@ export interface RequestData {
 
 interface EstimateContextType {
   requestData: RequestData | null;
-  setRequestData: (data: RequestData) => void;
+  setRequestData: React.Dispatch<React.SetStateAction<RequestData | null>>;
   updateAiSummary: (summary: string) => void;
 }
 
