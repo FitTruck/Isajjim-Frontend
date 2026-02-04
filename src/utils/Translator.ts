@@ -30,7 +30,7 @@ export const furnitureTranslations: { [key: string]: string } = {
   "CHAIR_STOOL": "의자/스툴",
   "WASHING_MACHINE": "세탁기",
   "DRYER": "건조기",
-  "POTTED_PLANT": "화분/식물",
+  "POTTED_PLANT": "화분",
   "KIMCHI_REFRIGERATOR": "김치냉장고",
   "VANITY_TABLE": "화장대",
   "TV_STAND": "TV 거치대",
@@ -38,6 +38,8 @@ export const furnitureTranslations: { [key: string]: string } = {
   "MASSAGE_CHAIR": "안마의자",
   "TREADMILL": "러닝머신",
   "EXERCISE_BIKE": "실내자전거",
+  "MICROWAVE_OVEN": "전자레인지",
+  "DISH_CABINET": "그릇진열장",
 };
 
 export const typeTranslations: { [key: string]: string } = {
