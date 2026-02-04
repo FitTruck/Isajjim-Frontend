@@ -287,7 +287,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#D9D9D9',
+    borderColor: '#D8D8D8',
     flexDirection: 'row',
   },
   leftSection: {
@@ -298,7 +298,7 @@ const styles = StyleSheet.create({
   rightSection: {
     width: 250,
     borderLeftWidth: 1,
-    borderLeftColor: '#D9D9D9',
+    borderLeftColor: '#D8D8D8',
     padding: 28,
     justifyContent: 'center',
   },
@@ -545,7 +545,7 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
     borderRadius: 4,
     borderWidth: 1,
-    borderColor: '#D9D9D9',
+    borderColor: '#D8D8D8',
   },
   tagText: {
     color: '#9F9F9F',

@@ -38,12 +38,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#D8D8D8',
     padding: 29,
-    // shadowing
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.25,
-    shadowRadius: 1,
-    elevation: 2,
   },
   title: {
     fontSize: 20,
