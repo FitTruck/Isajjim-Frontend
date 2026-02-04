@@ -237,7 +237,7 @@ export default function Result({ navigation }: Props) {
                   style={styles.arrowButtonLeft}
                   onPress={() => handleScroll('prev')}
                 >
-                  <ChevronLeft size={40} color="#333" />
+                  <ChevronLeft size={40} color="#F0893B" />
                 </MyTouch>
               )}
               {scrollIndex < results.length - 1 && (
@@ -245,7 +245,7 @@ export default function Result({ navigation }: Props) {
                   style={styles.arrowButtonRight}
                   onPress={() => handleScroll('next')}
                 >
-                  <ChevronRight size={40} color="#333" />
+                  <ChevronRight size={40} color="#F0893B" />
                 </MyTouch>
               )}
 
