@@ -259,12 +259,15 @@ const MultiTruckScene: React.FC<MultiTruckSceneProps> = ({
               const furniture = loadedFurniture.get(baseId);
               if (!furniture) return null;
 
+              // 완료된 트럭(truckIdx < currentTruckIndex)은 모든 아이템 항상 표시
+              const isCompletedTruck = truckIdx < currentTruckIndex;
+
               return (
                 <FurniturePoints
                   key={`${truckIdx}-${placement.itemId}`}
                   furniture={furniture}
                   placement={placement}
-                  visible={index < visibleCount}
+                  visible={isCompletedTruck || index < visibleCount}
                   animationKey={animationKey}
                 />
               );
@@ -479,7 +482,10 @@ const Space3D: React.FC<Space3DProps> = ({
           // 현재 트럭 계속 적재
           scheduleNext();
         } else if (currentIdx < currentTrucks.length - 1) {
-          // 다음 트럭으로 전환 (이전 트럭 유지!)
+          // 현재 트럭 적재 완료 → 다음 트럭으로 전환
+          // 현재 트럭의 visible count를 완전히 설정 (모든 아이템 표시)
+          newCounts[currentIdx] = currentPlacements.length;
+
           timerRef.current = setTimeout(() => {
             setCurrentTruckIndex((idx) => idx + 1);
             // animationKey는 리셋하지 않음 → 이전 가구 유지
