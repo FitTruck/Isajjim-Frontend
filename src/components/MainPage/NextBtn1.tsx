@@ -3,17 +3,23 @@ import { StyleSheet, TouchableOpacity, Text,useWindowDimensions, Platform, Alert
 import { v4 as uuidv4 } from 'uuid';
 import { UploadedImage } from '../../types/common';
 import { BACKEND_DOMAIN } from '../../utils/Server';
+import { useEstimate } from '../../context/EstimateContext';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../../types/navigation';
 
 interface NextBtnProps {
   imageList: UploadedImage[];
-  onNavigateNext: (images: UploadedImage[], estimateId: number) => void;
   onShowAlert: () => void;
 }
 
-export default function NextBtn1({ imageList, onNavigateNext, onShowAlert }: NextBtnProps) {
+export default function NextBtn1({ imageList, onShowAlert }: NextBtnProps) {
+  
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const [isLoading, setIsLoading] = useState(false);
   const { width } = useWindowDimensions();
   const isMobile = width < 768;
+  const { requestData, setRequestData } = useEstimate();
 
   const handleNextStep = async () => {
     // '다음단계' 중복 클릭 방지 : 이미 눌렀다면 isLoading = true이므로 리턴.
@@ -81,6 +87,7 @@ export default function NextBtn1({ imageList, onNavigateNext, onShowAlert }: Nex
           'Content-Type': 'application/json', 
         },
         body: JSON.stringify({
+          // firebaseUri만 보냄
           imageUrls: uploadedImages.map(img => img.firebaseUri),
         })
       });
@@ -88,10 +95,24 @@ export default function NextBtn1({ imageList, onNavigateNext, onShowAlert }: Nex
       // responseData에 data: {estimateId: 123} 이런식으로 있을거임.
       const responseData = await response.json();
 
+      // Context에 estimateId 저장
+      if (responseData.data && responseData.data.estimateId) {
+        setRequestData({
+          ...requestData, // 기존 데이터 유지 (있다면) - 초기엔 null일 수 있으므로 주의 필요하지만, 여기선 초기화 개념
+          estimateId: responseData.data.estimateId,
+          images: uploadedImages, // 업로드된 이미지 정보도 저장
+        });
+        console.log('Context에 estimateId 저장됨:', responseData.data.estimateId);
+        console.log('Context에 uploadedImages 저장됨:', uploadedImages);
+
+        // 지금까지의 requestData
+        console.log('requestData:', requestData);
+      }
+
       // 다음 페이지로 넘어가기
       if (responseData.data.estimateId) { 
         // 넘어갈 때, 이미지 정보, estimatedId가 같이 넘어감
-        onNavigateNext(uploadedImages, responseData.data.estimateId);
+        navigation.navigate('UserSelect', { images: uploadedImages, estimateId: responseData.data.estimateId });
       } else {
         console.error('estimateId 또는 uploadedImages배열을 받아오지 못함');
       }
