@@ -36,5 +36,20 @@ npm run build:web    # 웹 빌드
 - `src/Pages/`: 화면 컴포넌트
 - `src/components/`: 페이지별 하위 컴포넌트 (페이지명 폴더로 구분)
 - `src/components/common/`: 공통 컴포넌트 (Header, AlertBox)
+- `src/components/Space/`: 3D 트럭 시뮬레이션 컴포넌트
+- `src/binPacking/`: 가구 적재 최적화 알고리즘
 - `src/types/`: TypeScript 타입 정의
 - `src/utils/`: 서버 설정, 번역 유틸리티
+
+### 3D Simulation (`src/components/Space/Space3D.tsx`)
+
+트럭 적재 시뮬레이션의 핵심 컴포넌트. 주요 동작:
+
+- **PLY 로딩**: AI 서버에서 제공하는 PLY 파일을 로드하고 캐시 (`plyCache`)
+- **binPacking**: 가구 수량에 따라 트럭 배치 최적화 실행
+- **애니메이션**: 가구가 위에서 떨어지는 적재 애니메이션
+
+**점진적 업데이트 로직** (가구 수량 변경 시):
+- 트럭 구성(타입/개수)이 동일하면 기존 가구 유지, 새 가구만 애니메이션
+- 트럭 구성이 변경되면 전체 초기화 후 처음부터 애니메이션
+- `prevTrucksRef`로 이전 상태 비교, `scheduleNextRef`로 순환 의존성 방지
