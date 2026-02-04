@@ -1,5 +1,6 @@
-﻿import React from 'react';
+﻿import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import RequestDetailModal from "../common/RequestDetailModal";
 
 interface EstimateCardProps {
   status: 'pending' | 'active' | 'moving' | 'completed'| 'cancelled' ;
@@ -16,8 +17,32 @@ interface EstimateCardProps {
   timelineStep?: number;
 }
 
+import { useEstimate, RequestData } from '../../context/EstimateContext';
+
 export default function EstimateCard({ status, date, locations, quoteInfo, timelineStep = 2 }: EstimateCardProps) {
-  
+  const { requestData } = useEstimate();
+  const [isRequestModalVisible, setIsRequestModalVisible] = useState(false);
+  const displayData: RequestData = requestData ? {
+     ...requestData
+  } : {
+    // 데이터 없음 >>>> 없는 대로 두기
+    estimateId: 0,
+    movingDate: null,
+    startLocation: {
+      address: null, detailAddress: null, floor: null, elevator: null,
+      buildingType: null, roomSize: null, ladderTruck: null, roomType: null,
+      duplex: null, groundStair: null, parking: null
+    },
+    endLocation: {
+      address: null, detailAddress: null, floor: null, elevator: null,
+      buildingType: null, roomSize: null, ladderTruck: null, roomType: null,
+      duplex: null, groundStair: null, parking: null
+    },
+    items: [],
+    truckInfo: null,
+    aiSummary: undefined
+  };
+
   const isCancelled = status === 'cancelled';
   const isCompletedStatus = status === 'completed';
   const isMoving = status === 'moving';
@@ -154,10 +179,17 @@ export default function EstimateCard({ status, date, locations, quoteInfo, timel
 
         {/* 버튼들 */}
         <View style={styles.buttonRow}>
-          <TouchableOpacity style={styles.requestButton}>
+          <TouchableOpacity style={styles.requestButton}
+          onPress={() => setIsRequestModalVisible(true)}>
             <Image source={require('../../../assets/docs.png')} style={styles.btnIcon} resizeMode="contain" />
             <Text style={styles.requestButtonText}>내 요청사항</Text>
           </TouchableOpacity>
+
+          <RequestDetailModal 
+            visible={isRequestModalVisible}
+            onClose={() => setIsRequestModalVisible(false)}
+            data={displayData}
+          />
 
           {(status === 'active' || status === 'pending') && (
             <TouchableOpacity style={styles.stopButton}>
