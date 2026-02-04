@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { translateLabel, translateType } from '../../utils/Translator';
-import { Ionicons } from '@expo/vector-icons';
+import { Minus, Plus } from 'lucide-react-native';
 
 // 체크 마커 이미지
 const checkObjectImage = require('../../../assets/check_object.png');
@@ -10,8 +10,6 @@ const checkObjectImage = require('../../../assets/check_object.png');
 const IMAGE_CONTAINER_WIDTH = 670;
 const IMAGE_CONTAINER_HEIGHT = 600;
 const MARKER_SIZE = 40; // 마커 크기
-
-
 
 interface ResultCardProps {
   image: {
@@ -130,7 +128,7 @@ const ResultCard = ({ image, items, onQuantityChange }: ResultCardProps) => {
                   onQuantityChange(item.furnitureId, newQuantity);
                 }}
               >
-                <Ionicons name="remove" size={20} color="#333" />
+                <Minus size={20} color="#333" />
               </TouchableOpacity>
 
               {/* 수량 */}
@@ -144,7 +142,7 @@ const ResultCard = ({ image, items, onQuantityChange }: ResultCardProps) => {
                   onQuantityChange(item.furnitureId, newQuantity);
                 }}
               >
-                <Ionicons name="add" size={20} color="#333" />
+                <Plus size={20} color="#333" />
               </TouchableOpacity>
             </View>
           </View>

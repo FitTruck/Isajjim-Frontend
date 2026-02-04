@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, TouchableOpacity, Modal, StyleSheet, SafeAreaView, Platform, TextInput } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { Search, X } from 'lucide-react-native';
 
 let WebView: any;
 if (Platform.OS !== 'web') {
@@ -128,7 +128,7 @@ export default function AddressInput({
         <Text style={[styles.inputValue, !value && styles.placeholder]}>
           {value || "주소를 검색해 주세요"}
         </Text>
-        <Ionicons name="search" size={20} color="#999" />
+        <Search size={20} color="#999" />
       </TouchableOpacity>
       
       {/* 상세 주소 입력 */}
@@ -151,7 +151,7 @@ export default function AddressInput({
             <View style={styles.modalHeader}>
               <Text style={styles.modalTitle}>주소 검색</Text>
               <TouchableOpacity onPress={() => setIsModalVisible(false)} style={styles.closeButton}>
-                <Ionicons name="close" size={24} color="#333" />
+                <X size={24} color="#333" />
               </TouchableOpacity>
             </View>
             <WebView
