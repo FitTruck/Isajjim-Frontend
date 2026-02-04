@@ -1,6 +1,6 @@
 ﻿import React, { useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Animated, Image } from 'react-native';
-
+import { View, Text, StyleSheet, TouchableOpacity, Animated } from 'react-native';
+import { Truck, CheckCircle, ArrowRight } from 'lucide-react-native';
 
 interface TruckData {
   type: string;
@@ -66,22 +66,21 @@ const NextBtn3 = ({ data, status, onNavigateNext }: NextBtn3Props) => {
       {/* 용달 정보 섹션 */}
       <View style={styles.infoSection}>
         <View style={styles.infoHeader}>
-          <Text style={styles.sectionHeader}>용달 정보</Text>
+          <View style={styles.headerTitleRow}>
+            <Truck size={24} color="#333" style={{ marginRight: 8 }} />
+            <Text style={styles.sectionHeader}>용달 정보</Text>
+          </View>
           
           <View style={styles.statusWrapper}>
             <Animated.Text style={[{ 
               opacity: updatingOpacity 
             }, styles.updatingStatusText]}>
-              생성중...
+              계산중...
             </Animated.Text>
             <Animated.View style={[{ 
               opacity: doneOpacity 
             }, styles.doneStatusIconWrapper]}>
-              <Image 
-                source={require('../../../assets/Check.png')} 
-                style={styles.checkIcon}
-                resizeMode="contain"
-              />
+              {/* 계산 완료 시 아무것도 표시하지 않음 */}
             </Animated.View>
           </View>
         </View>
@@ -89,12 +88,12 @@ const NextBtn3 = ({ data, status, onNavigateNext }: NextBtn3Props) => {
         {/* 유효한 트럭 정보만 표시 (type이 있고 quantity > 0) */}
         {data.filter(truck => truck.type && truck.quantity > 0).length > 0 ? (
           data
-            .filter(truck => truck.type && truck.quantity > 0)
-            .map((truck, index) => (
+              .filter(truck => truck.type && truck.quantity > 0)
+              .map((truck, index) => (
               <View key={index} style={styles.row}>
-                <Text style={styles.truckType}>{getTruckLabel(truck.type)}</Text>
-                <Text style={styles.truckQuantity}>{truck.quantity}대</Text>
-              </View>
+                  <Text style={styles.truckType}>{getTruckLabel(truck.type)}</Text>
+                    <Text style={styles.truckQuantity}>{truck.quantity}대</Text>
+                  </View>
             ))
         ) : (
           <Text style={styles.loadingText}>시뮬레이션을 시작하면 계산됩니다</Text>
@@ -104,15 +103,9 @@ const NextBtn3 = ({ data, status, onNavigateNext }: NextBtn3Props) => {
       {/* 구분선 */}
       <View style={styles.divider} />
 
-      {/* 이사 정보 업로드 섹션 */}
-      <View style={styles.compareSection}>
-        <Text style={styles.compareTitle}>이사 정보 업로드</Text>
-        <Text style={styles.subtitle}>사용자 설정 및 AI로 산출된 정보를 업로드</Text>
-      </View>
-
       {/* 업로드 버튼 */}
       <TouchableOpacity style={styles.compareButton} onPress={onNavigateNext}>
-        <Text style={styles.compareButtonText}>업로드</Text>
+        <Text style={styles.compareButtonText}>최종 견적 확인하기</Text>
       </TouchableOpacity>
     </View>
   );
@@ -124,23 +117,25 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     borderRadius: 4,
     borderWidth: 1,
-    borderColor: '#D8D8D8',
-    padding: 29,
+    borderColor: '#E0E0E0',
+    padding: 24,
   },
   infoSection: {
     width: '100%',
-    marginTop: 5,
   },
   infoHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 20,
-    width: '100%',
+  },
+  headerTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   sectionHeader: {
     fontSize: 20,
-    fontWeight: '500',
+    fontWeight: '700',
     color: '#333333',
   },
   statusWrapper: {
@@ -162,10 +157,6 @@ const styles = StyleSheet.create({
     right: 0,
     width: 24,
     height: 24,
-  },
-  checkIcon: {
-    width: '100%',
-    height: '100%',
   },
   row: {
     width: '100%',
@@ -198,23 +189,6 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderColor: 'rgba(209, 217, 224, 0.57)',
   },
-  compareSection: {
-    marginTop: 10,
-  },
-  compareTitle: {
-    color: '#333333',
-    fontSize: 20,
-    fontWeight: '600',
-    lineHeight: 28,
-  },
-  subtitle: {
-    width: '100%',
-    marginTop: 8,
-    color: '#828282',
-    fontSize: 12,
-    fontWeight: '400',
-    lineHeight: 16,
-  },
   compareButton: {
     width: '100%',
     height: 42,
@@ -225,9 +199,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   compareButtonText: {
-    color: 'white',
     fontSize: 15,
     fontWeight: '500',
+    color: 'white',
   },
 });
 

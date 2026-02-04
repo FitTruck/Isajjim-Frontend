@@ -250,18 +250,20 @@ export default function Result({ navigation }: Props) {
               )}
 
 
-              {/* 페이지 인디케이터 (Dots) */}
-              <View style={styles.paginationContainer}>
-                {results.map((_, index) => (
-                  <View
-                    key={index}
-                    style={[
-                      styles.dot,
-                      scrollIndex === index && styles.activeDot
-                    ]}
-                  />
-                ))}
-              </View>
+              {/* 페이지 인디케이터 (Dots) - 2개 이상일 때만 표시 */}
+              {results.length > 1 && (
+                <View style={styles.paginationContainer}>
+                  {results.map((_, index) => (
+                    <View
+                      key={index}
+                      style={[
+                        styles.dot,
+                        scrollIndex === index && styles.activeDot
+                      ]}
+                    />
+                  ))}
+                </View>
+              )}
 
             </View>
 
@@ -344,7 +346,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     backgroundColor: '#F5F5F5',
     borderWidth: 1,
-    borderColor: '#D8D8D8',
+    borderColor: '#E0E0E0',
     position: 'relative', // 버튼 배치 때문에 넣음
   },
   expandedContainer: {

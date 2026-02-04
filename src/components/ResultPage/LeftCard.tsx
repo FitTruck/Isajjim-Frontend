@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView } from 'react-native';
 import { translateLabel, translateType } from '../../utils/Translator';
 import { Minus, Plus } from 'lucide-react-native';
 
@@ -104,51 +104,58 @@ const ResultCard = ({ image, items, onQuantityChange }: ResultCardProps) => {
 
       {/* Content */}
       <View style={styles.resultCardContent}>
-        <Text style={styles.headerTitle}>가구 리스트</Text>
-        <View style={styles.contentDivider} />
+        <View>
+          <Text style={styles.headerTitle}>가구 리스트</Text>
+          <View style={styles.contentDivider} />
+        </View>
 
-        {/* 아이템 하나 당 생김새 정의 */}
-        {translatedItems.map((item) => (
-          <View key={item.furnitureId} style={styles.itemContainer}>
-            
-            {/* 아이템 정보 */}
-            <View style={styles.itemDetailContainer}>
-              <Text style={styles.itemTitle}>{item.label}</Text>
-              <Text style={styles.itemSubtitle}>{item.type}</Text>
-            </View>
-
-            {/* 수량 조절 버튼 */}
-            <View style={styles.itemCountContainer}>
-
-              {/* - 버튼 */}
-              <TouchableOpacity
-                style={styles.countButton}
-                onPress={() => {
-                  if (item.quantity <= 0) return; // 이미 0이면 무시
-                  const newQuantity = item.quantity - 1;
-                  onQuantityChange(item.furnitureId, newQuantity);
-                }}
-              >
-                <Minus size={20} color="#333" />
-              </TouchableOpacity>
-
-              {/* 수량 */}
-              <Text style={styles.resultCardNumber}>{item.quantity}</Text>
+        {/* 아이템 리스트 스크롤 영역 */}
+        <ScrollView 
+          style={{ flex: 1, width: '100%' }}
+          showsVerticalScrollIndicator={true}
+          contentContainerStyle={{ paddingBottom: 20 }}
+        >
+          {translatedItems.map((item) => (
+            <View key={item.furnitureId} style={styles.itemContainer}>
               
-              {/* + 버튼 */}
-              <TouchableOpacity 
-                style={styles.countButton}
-                onPress={() => {
-                  const newQuantity = item.quantity + 1;
-                  onQuantityChange(item.furnitureId, newQuantity);
-                }}
-              >
-                <Plus size={20} color="#333" />
-              </TouchableOpacity>
-            </View>
-          </View>
-        ))}
+              {/* 아이템 정보 */}
+              <View style={styles.itemDetailContainer}>
+                <Text style={styles.itemTitle}>{item.label}</Text>
+                <Text style={styles.itemSubtitle}>{item.type}</Text>
+              </View>
 
+              {/* 수량 조절 버튼 */}
+              <View style={styles.itemCountContainer}>
+
+                {/* - 버튼 */}
+                <TouchableOpacity
+                  style={styles.countButton}
+                  onPress={() => {
+                    if (item.quantity <= 0) return; // 이미 0이면 무시
+                    const newQuantity = item.quantity - 1;
+                    onQuantityChange(item.furnitureId, newQuantity);
+                  }}
+                >
+                  <Minus size={20} color="#333" />
+                </TouchableOpacity>
+
+                {/* 수량 */}
+                <Text style={styles.resultCardNumber}>{item.quantity}</Text>
+                
+                {/* + 버튼 */}
+                <TouchableOpacity 
+                  style={styles.countButton}
+                  onPress={() => {
+                    const newQuantity = item.quantity + 1;
+                    onQuantityChange(item.furnitureId, newQuantity);
+                  }}
+                >
+                  <Plus size={20} color="#333" />
+                </TouchableOpacity>
+              </View>
+            </View>
+          ))}
+        </ScrollView>
       </View>
     </View>
   );
@@ -159,7 +166,7 @@ export default ResultCard;
 const styles = StyleSheet.create({
   resultCardContainer: {
     width: 970,
-    borderRadius: 16,
+    borderRadius: 4,
     backgroundColor: 'white',
     
     borderWidth: 1,

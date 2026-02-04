@@ -141,7 +141,6 @@ export default function UserSelect({ navigation, route }: Props) {
           <View style={commonStyles.mainSection}>
             <Text style={commonStyles.mainTitle}>상세 기재 사항</Text>
             <Text style={commonStyles.mainSubtitle}>정확한 견적을 위해 필요한 사항입니다</Text>
-            <Text> 전체 항목 필수 입력 사항입니다.</Text>
           </View>
 
           
