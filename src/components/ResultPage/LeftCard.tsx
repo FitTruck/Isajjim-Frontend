@@ -121,10 +121,11 @@ const ResultCard = ({ image, items, onQuantityChange }: ResultCardProps) => {
             <View style={styles.itemCountContainer}>
 
               {/* - 버튼 */}
-              <TouchableOpacity 
+              <TouchableOpacity
                 style={styles.countButton}
                 onPress={() => {
-                  const newQuantity = Math.max(0, item.quantity - 1);
+                  if (item.quantity <= 0) return; // 이미 0이면 무시
+                  const newQuantity = item.quantity - 1;
                   onQuantityChange(item.furnitureId, newQuantity);
                 }}
               >
