@@ -2,14 +2,26 @@
 import { View, Text, StyleSheet, TouchableOpacity, Animated, Image } from 'react-native';
 
 
+interface TruckData {
+  type: string;
+  quantity: number;
+}
+
 interface NextBtn3Props {
-  data: {
-    type: string;
-    quantity: number;
-  }
+  data: TruckData[];
   status: 'prev' | 'updating' | 'done';
   onNavigateNext: () => void;
 }
+
+// 트럭 타입 한글 변환
+const getTruckLabel = (type: string): string => {
+  const labels: Record<string, string> = {
+    '1ton': '1톤 트럭',
+    '2.5ton': '2.5톤 트럭',
+    '5ton': '5톤 트럭',
+  };
+  return labels[type] || type;
+};
 
 const NextBtn3 = ({ data, status, onNavigateNext }: NextBtn3Props) => {
   // useRef : Estimate 컴포넌트가 리렌더링 되어도 변수값 유지
@@ -74,10 +86,19 @@ const NextBtn3 = ({ data, status, onNavigateNext }: NextBtn3Props) => {
           </View>
         </View>
 
-        <View style={styles.row}>
-          <Text style={styles.truckType}>{data.type}</Text>
-          <Text style={styles.truckQuantity}>{data.quantity}대</Text>
-        </View>
+        {/* 유효한 트럭 정보만 표시 (type이 있고 quantity > 0) */}
+        {data.filter(truck => truck.type && truck.quantity > 0).length > 0 ? (
+          data
+            .filter(truck => truck.type && truck.quantity > 0)
+            .map((truck, index) => (
+              <View key={index} style={styles.row}>
+                <Text style={styles.truckType}>{getTruckLabel(truck.type)}</Text>
+                <Text style={styles.truckQuantity}>{truck.quantity}대</Text>
+              </View>
+            ))
+        ) : (
+          <Text style={styles.loadingText}>시뮬레이션을 시작하면 계산됩니다</Text>
+        )}
       </View>
 
       {/* 구분선 */}
@@ -163,6 +184,11 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     textAlign: 'right',
     color: '#333333',
+    lineHeight: 20,
+  },
+  loadingText: {
+    fontSize: 14,
+    color: '#828282',
     lineHeight: 20,
   },
   divider: {

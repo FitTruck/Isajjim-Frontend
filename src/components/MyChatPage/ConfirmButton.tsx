@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { TouchableOpacity, Text, StyleSheet, Alert, Platform } from 'react-native';
+import { BACKEND_DOMAIN } from '../../utils/Server';
+import { useEstimate } from '../../context/EstimateContext';
 
 interface Message {
   id: string;
@@ -17,37 +19,46 @@ interface ConfirmButtonProps {
 
 export default function ConfirmButton({ messages, onConfirm }: ConfirmButtonProps) {
   const [isConfirmed, setIsConfirmed] = useState(false);
+  const { requestData } = useEstimate();
 
   const handleConfirm = async () => {
-    const chatHistory = messages
-      // 견적서 제외
+    console.log('handleConfirm clicked'); // 디버깅용
+
+    const estimateId = requestData?.estimateId;
+    console.log('estimateId:', estimateId); // 디버깅용
+
+    if (!estimateId) {
+      console.log('estimateId is missing'); // 디버깅용
+      Alert.alert("오류", "견적 정보를 찾을 수 없습니다.");
+      return;
+    }
+
+    // 채팅 내역을 하나의 문자열로 변환
+    const chatHistoryString = messages
       .filter(msg => msg.type !== 'quote')
-      .map(msg => ({
-        sender: msg.isMe ? 'user' : 'company',
-        text: msg.text || '',
-        time: msg.time,
-        type: msg.type
-      }));
+      .map(msg => {
+        const speaker = msg.isMe ? '이용자' : '업체';
+        return `${speaker}: ${msg.text}`;
+      })
+      .join('\n');
 
     try {
-      console.log('--- 전송될 채팅 데이터 ---');
-      console.log(JSON.stringify(chatHistory, null, 2));
+      console.log('--- 전송될 채팅 ---');
+      console.log(chatHistoryString);
 
-      // const response = await fetch(`${BACKEND_DOMAIN}/api/v1/gcs/presigned`, {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify({
-      //     fileNames: imageList.map(img => img.fileName || `${uuidv4()}.jpg`)
-      //   })
-      // });
-      // const data = await response.json();
-      
-      const mockSummary = "• 5톤 트럭 진입 가능 여부: 골목 진입 가능하나 사전 공간 확보 필요\n• 특수 작업 필요 물품: 도자기 (고가, 특수포장 요망)\n• 출발지 작업 조건: 사다리차 사용 공간 확보 완료\n• 기타: 에어컨 이전 설치 불필요";
+      const response = await fetch(`${BACKEND_DOMAIN}/api/v1/estimates/${estimateId}/chat-summary`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(chatHistoryString) // 문자열을 JSON 형식으로 전송
+      });
+      const responseData = await response.json();
+      console.log('AI 요약본:', responseData);
 
       setIsConfirmed(true);
       
-      if (onConfirm) {
-        onConfirm(mockSummary);
+      if (onConfirm && responseData.data && responseData.data.summary) {
+        // 요약본을 반영하도록 하는 함수
+        onConfirm(responseData.data.summary);
       }
 
     } catch (error) {

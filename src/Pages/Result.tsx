@@ -1,4 +1,4 @@
-﻿import { useState, useEffect, useMemo, useRef } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { View, ScrollView, StyleSheet, Alert } from 'react-native';
 import { commonStyles } from '../styles/commonStyles';
 import { BACKEND_DOMAIN } from '../utils/Server';
@@ -7,7 +7,7 @@ import NextBtn3 from '../components/ResultPage/NextBtn3';
 import Header from '../components/common/Header';
 import Space3D from '../components/Space/Space3D';
 import { ChevronLeft, ChevronRight, X, Maximize } from 'lucide-react-native';
-import { SimulationFurniture, TruckType } from '../types/simulation';
+import { SimulationFurniture, SimulationTruckResult } from '../types/simulation';
 import MyTouch from "../components/common/MyTouch";
 import { useEstimate } from '../context/EstimateContext';
 
@@ -17,18 +17,9 @@ import { RootStackParamList } from '../types/navigation';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Result'>;
 
-// 트럭 타입 매핑 (백엔드 응답 → 시뮬레이션 타입)
-const mapTruckType = (backendType: string | null): TruckType => {
-  if (!backendType) return '2.5ton';
-  const normalized = backendType.toLowerCase().replace('_', '');
-  if (normalized.includes('1ton') || normalized === '1ton') return '1ton';
-  if (normalized.includes('5ton') || normalized === '5ton') return '5ton';
-  return '2.5ton';
-};
-
 export default function Result({ navigation }: Props) {
   const { requestData } = useEstimate();
-  
+
   // Context에서 데이터 추출
   const data = requestData?.images || [];
   const estimateId = requestData?.estimateId;
@@ -41,11 +32,11 @@ export default function Result({ navigation }: Props) {
   // results: ResultCard컴포넌트의 속성으로 전달할 값임
   const [results, setResults] = useState<any[]>([]);
 
-  // 견적서 컴포넌트에 전달할 값임
-  const [estimateData, setEstimateData] = useState<any>({}); // 딕셔너리값임
   const [updateStatus, setUpdateStatus] = useState<'prev' | 'updating' | 'done'>('prev');
   const [isSpaceModalVisible, setIsSpaceModalVisible] = useState(false);
   const [isSimulationPlaying, setIsSimulationPlaying] = useState(false);
+  // 시뮬레이션에서 계산된 트럭 정보
+  const [simulationTrucks, setSimulationTrucks] = useState<SimulationTruckResult[]>([]);
 
   // 첫 실행 시에 자동 실행됨.
   useEffect(() => {
@@ -80,21 +71,7 @@ export default function Result({ navigation }: Props) {
         })) : []
       }));
       setResults(mappedResultCard);
-
-      // 트럭 정보 설정 (Context에 이미 계산된 값이 있으면 사용)
-      if (truckInfo) {
-        setEstimateData({
-          truckType: truckInfo.type,
-          truckQuantity: truckInfo.quantity,
-        });
-      } else if (analysisResult.data.items) {
-        const truckItem = analysisResult.data.items.find((item: any) => item.category === "TRUCK");
-
-        setEstimateData({
-          truckType: truckItem ? truckItem.itemType : null,
-          truckQuantity: truckItem ? truckItem.quantity : null,
-        });
-      }
+      // 트럭 정보는 시뮬레이션(Space3D)에서 계산되어 onTrucksChange 콜백으로 전달됨
 
     } else {
       Alert.alert("오류", "분석결과를 불러올 수 없습니다.");
@@ -113,7 +90,7 @@ export default function Result({ navigation }: Props) {
 
     const furniture = results.flatMap((result) =>
       result.contents
-        .filter((c: any) => c.ply_url)  // PLY가 있는 것만
+        .filter((c: any) => c.ply_url && c.quantity > 0)  // PLY가 있고 quantity > 0인 것만
         .map((c: any): SimulationFurniture => ({
           furnitureId: c.furnitureId,
           label: c.label,
@@ -130,11 +107,6 @@ export default function Result({ navigation }: Props) {
     console.log('[시뮬레이션] PLY가 있는 가구:', furniture);
     return furniture;
   }, [results]);
-
-  // 시뮬레이션 트럭 타입
-  const simulationTruckType = useMemo((): TruckType => {
-    return mapTruckType(estimateData.truckType);
-  }, [estimateData.truckType]);
 
   const handleUpdateQuantity = async (furnitureId: number, newQuantity: number) => {
     if (!estimateId) return;
@@ -164,14 +136,7 @@ export default function Result({ navigation }: Props) {
       const resultOfUpdate = await response.json();
 
       if (response.ok && resultOfUpdate.code === 'OK') {
-
-        const truckItem = resultOfUpdate.data.items.find((item: any) => item.category === "TRUCK");
-
-        setEstimateData({
-          truckType: truckItem ? truckItem.itemType : null,
-          truckQuantity: truckItem ? truckItem.quantity : null,
-        });
-
+        // 트럭 정보는 시뮬레이션(Space3D)에서 자동 재계산됨
         // 업데이트 상태를 done으로 변경
         setUpdateStatus('done');
 
@@ -195,16 +160,14 @@ export default function Result({ navigation }: Props) {
     setIsSimulationPlaying(false);
   };
 
-  // mock 데이터 나중에 지워도 됨
-
   // 슬라이더 로직
   const scrollRef = useRef<ScrollView>(null);
   const [scrollIndex, setScrollIndex] = useState(0);
 
   const handleScroll = (direction: 'next' | 'prev') => {
     if (!scrollRef.current) return;
-    
-    const PAGE_WIDTH = 970; 
+
+    const PAGE_WIDTH = 970;
     let newIndex = scrollIndex;
 
     if (direction === 'next') {
@@ -223,6 +186,11 @@ export default function Result({ navigation }: Props) {
     }
   };
 
+  // 시뮬레이션 트럭 결과 콜백
+  const handleTrucksChange = (trucks: SimulationTruckResult[]) => {
+    setSimulationTrucks(trucks);
+  };
+
   return (
     <View style={commonStyles.container}>
       <ScrollView
@@ -237,7 +205,7 @@ export default function Result({ navigation }: Props) {
 
           {/* 왼쪽 및 오른쪽 컨테이너 */}
           <View style={styles.leftrightContainer}>
-            
+
             {/* 왼쪽 컨테이너 */}
             <View style={styles.leftContainer}>
               <ScrollView
@@ -262,16 +230,16 @@ export default function Result({ navigation }: Props) {
 
               {/* 네비게이션 버튼 */}
               {scrollIndex > 0 && (
-                <MyTouch 
-                  style={styles.arrowButtonLeft} 
+                <MyTouch
+                  style={styles.arrowButtonLeft}
                   onPress={() => handleScroll('prev')}
                 >
                   <ChevronLeft size={40} color="#333" />
                 </MyTouch>
               )}
               {scrollIndex < results.length - 1 && (
-                <MyTouch 
-                  style={styles.arrowButtonRight} 
+                <MyTouch
+                  style={styles.arrowButtonRight}
                   onPress={() => handleScroll('next')}
                 >
                   <ChevronRight size={40} color="#333" />
@@ -282,12 +250,12 @@ export default function Result({ navigation }: Props) {
               {/* 페이지 인디케이터 (Dots) */}
               <View style={styles.paginationContainer}>
                 {results.map((_, index) => (
-                  <View 
-                    key={index} 
+                  <View
+                    key={index}
                     style={[
-                      styles.dot, 
+                      styles.dot,
                       scrollIndex === index && styles.activeDot
-                    ]} 
+                    ]}
                   />
                 ))}
               </View>
@@ -299,12 +267,13 @@ export default function Result({ navigation }: Props) {
               styles.rightContainer,
               isSpaceModalVisible && { position: 'relative', zIndex: 10000 }
             ]}>
-              {/* 3D 시뮬레이션 */}
-              <View style={[styles.space3DContainer, isSpaceModalVisible && styles.expandedContainer]}>
+              {/* 3D 시뮬레이션 - 전체화면 스타일 분리 적용 */}
+              <View style={isSpaceModalVisible ? styles.expandedContainer : styles.space3DContainer}>
                 <Space3D
                   furniture={simulationFurniture}
                   autoPlay={isSimulationPlaying}
                   onAnimationComplete={handleSimulationComplete}
+                  onTrucksChange={handleTrucksChange}
                 />
                 <MyTouch
                   style={isSpaceModalVisible ? styles.closeButtonFixed : styles.expandButton}
@@ -320,7 +289,9 @@ export default function Result({ navigation }: Props) {
 
               {/* 다음 단계 버튼 */}
               <NextBtn3
-                data={truckInfo || { type: '', quantity: 0 }}
+                data={simulationTrucks.length > 0
+                  ? simulationTrucks
+                  : (truckInfo ? [truckInfo] : [{ type: '', quantity: 0 }])}
                 status={updateStatus}
                 onNavigateNext={handleNextStep}
               />
@@ -448,7 +419,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderWidth: 1,
     borderColor: '#F5F5F5',
-    
+
     // 그림자
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 0 },
