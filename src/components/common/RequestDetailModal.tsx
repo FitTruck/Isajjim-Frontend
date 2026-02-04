@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, Modal, ScrollView, TouchableOpacity, Platform } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { X, Sparkles } from 'lucide-react-native';
 import { RequestData, LocationInfo } from '../../context/EstimateContext';
 
 interface RequestDetailModalProps {
@@ -44,7 +44,7 @@ export default function RequestDetailModal({ visible, onClose, data }: RequestDe
           <View style={styles.header}>
             <Text style={styles.headerTitle}>내 요청사항</Text>
             <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-              <Ionicons name="close" size={24} color="#333" />
+              <X size={24} color="#333" />
             </TouchableOpacity>
           </View>
 
@@ -106,7 +106,7 @@ export default function RequestDetailModal({ visible, onClose, data }: RequestDe
             
             <View style={styles.aiSection}>
               <View style={styles.aiHeader}>
-                <Ionicons name="sparkles" size={16} color="#F0893B" />
+                <Sparkles size={16} color="#F0893B" />
                 <Text style={styles.aiTitle}>AI 요약 (확정 사항)</Text>
               </View>
               <Text style={styles.aiContent}>

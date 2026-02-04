@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { View, Text, Image, StyleSheet, TextInput, FlatList, Platform, Pressable } from "react-native";
-import { Ionicons } from '@expo/vector-icons';
+import { Search } from 'lucide-react-native';
 import { ChatItemData } from "../../Pages/MyChat";
 import MyTouch from "../common/MyTouch";
 
@@ -73,7 +73,7 @@ export default function ChatListPanel({ chatList, selectedChatId, onSelectChat }
           value={searchText}
           onChangeText={setSearchText}
         />
-        <Ionicons name="search" size={20} color="#999" />
+        <Search size={20} color="#999" />
       </Pressable>
 
       {/* 필터 바 */}

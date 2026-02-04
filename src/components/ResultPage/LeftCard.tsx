@@ -1,9 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { translateLabel, translateType } from '../../utils/Translator';
-import { Ionicons } from '@expo/vector-icons';
-
-
+import { Minus, Plus } from 'lucide-react-native';
 
 interface ResultCardProps {
   image: {
@@ -68,7 +66,7 @@ const ResultCard = ({ image, items, onQuantityChange }: ResultCardProps) => {
                   onQuantityChange(item.furnitureId, newQuantity);
                 }}
               >
-                <Ionicons name="remove" size={20} color="#333" />
+                <Minus size={20} color="#333" />
               </TouchableOpacity>
 
               {/* 수량 */}
@@ -82,7 +80,7 @@ const ResultCard = ({ image, items, onQuantityChange }: ResultCardProps) => {
                   onQuantityChange(item.furnitureId, newQuantity);
                 }}
               >
-                <Ionicons name="add" size={20} color="#333" />
+                <Plus size={20} color="#333" />
               </TouchableOpacity>
             </View>
           </View>
