@@ -11,7 +11,7 @@ interface RequestDetailModalProps {
 
 export default function RequestDetailModal({ visible, onClose, data }: RequestDetailModalProps) {
   
-  const renderLocationInfo = (title: string, info: LocationInfo) => (
+  const renderLocationInfo = (title: string, info?: LocationInfo) => (
     <View style={styles.section}>
       <Text style={styles.sectionTitle}>{title}</Text>
       <View style={styles.row}>
