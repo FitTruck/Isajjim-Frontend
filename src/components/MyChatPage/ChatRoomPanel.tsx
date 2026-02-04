@@ -108,8 +108,6 @@ export default function ChatRoomPanel({ data }: ChatRoomPanelProps) {
       if (replyStep === 0) {
         replyText = "확인 감사합니다.";
       } else if (replyStep === 1) {
-        replyText = "골목 사진을 보니 진입은 가능해보이나, 당일 사다리차 작업을 위해 미리 공간을 비워주시면 감사하겠습니다.";
-      } else if (replyStep === 2) {
         replyText = "알겠습니다 그럼 당일날 뵙겠습니다.";
       }
 
