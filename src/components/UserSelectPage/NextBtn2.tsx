@@ -5,6 +5,7 @@ import LoadingModal from './LoadingModal';
 import { useEstimate } from '../../context/EstimateContext';
 import { optimizeOBBMulti } from '../../binPacking/multiTruck';
 import { TruckPlacement } from '../../binPacking/types';
+import { translateLabel } from '../../utils/Translator';
 
 interface Props {
   navigation: any;
@@ -176,13 +177,21 @@ export default function NextBtn2({ navigation, estimateId, images, onShowAlert, 
 
           console.log("트럭 type: ", truckType);
           console.log("트럭 quantity: ", truckQuantity);
+          // 가구 목록 추출 및 매핑
+          const initialItems = furnitureInfo.data.images?.flatMap((img: any) => 
+            img.furnitureList?.map((f: any) => ({
+              name: translateLabel(f.label),
+              quantity: f.quantity
+            })) || []
+          ) || [];
+
           // 저장소로 보낼 값
           setRequestData({
             estimateId: estimateId,
             movingDate: targetDate,
             startLocation: startLocation,
             endLocation: endLocation,
-            items: [], // Result 페이지에서 다시 로드하거나 여기서 items 정보가 있다면 추가
+            items: initialItems, // 가구 목록 저장
             truckInfo: { type: truckType, quantity: truckQuantity },
             images: images,
             analysisResult: furnitureInfo
