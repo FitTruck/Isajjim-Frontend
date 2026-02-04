@@ -484,45 +484,49 @@ export function packMultiTruck(
   }
 
   // 2. 단일 트럭으로 불가 → 멀티 트럭 모드
+  // 우선순위: 5ton으로 최대한 채우고, 마지막 남은 것만 작은 트럭으로
+  // 예: 5t+1t → 5t+2.5t → 5t+5t → 5t+5t+1t → ...
   const trucks: TruckPlacement[] = [];
   let remainingItems = [...items];
 
   while (remainingItems.length > 0) {
-    // 남은 아이템에 최적인 트럭 찾기 (가장 높은 적재율)
-    let bestTruckType = '5ton';
-    let bestResult: PackingResult | null = null;
-    let bestUtilization = 0;
+    // 먼저 남은 아이템이 작은 트럭에 전부 들어가는지 확인 (마지막 트럭 최적화)
+    let fittedInSmaller = false;
 
-    // 역순으로 시도 (큰 트럭부터) - 더 많이 채울 수 있는 트럭 선택
-    for (const truckType of [...TRUCK_ORDER].reverse()) {
+    for (const truckType of TRUCK_ORDER) {
       const truckDims = TRUCK_PRESETS[truckType];
       const result = extremePointsPack(remainingItems, truckDims, options);
 
-      const truckVolume = truckDims.width * truckDims.depth * truckDims.height;
-      const placedVolume = result.placedItems.reduce(
-        (sum, b) => sum + b.width * b.depth * b.height,
-        0
-      );
-      const utilization = placedVolume / truckVolume;
-
-      // 모두 배치 가능하면 바로 이 트럭 선택
       if (result.success) {
-        bestTruckType = truckType;
-        bestResult = result;
-        bestUtilization = utilization;
-        break;
-      }
+        // 모든 남은 아이템이 이 트럭에 들어감
+        const truckVolume = truckDims.width * truckDims.depth * truckDims.height;
+        const placedVolume = result.placedItems.reduce(
+          (sum, b) => sum + b.width * b.depth * b.height,
+          0
+        );
+        const utilization = Math.round((placedVolume / truckVolume) * 1000) / 10;
 
-      // 더 높은 적재율이면 선택
-      if (utilization > bestUtilization) {
-        bestTruckType = truckType;
-        bestResult = result;
-        bestUtilization = utilization;
+        trucks.push({
+          type: truckType,
+          placements: result.placedItems,
+          utilization,
+        });
+        remainingItems = [];
+        fittedInSmaller = true;
+        break;
       }
     }
 
-    if (!bestResult || bestResult.placedItems.length === 0) {
-      // 아무것도 배치 못함 (아이템이 트럭보다 큼)
+    if (fittedInSmaller) {
+      break;
+    }
+
+    // 작은 트럭에 안 들어가면 5ton으로 최대한 채우기
+    const fiveTonDims = TRUCK_PRESETS['5ton'];
+    const fiveTonResult = extremePointsPack(remainingItems, fiveTonDims, options);
+
+    if (fiveTonResult.placedItems.length === 0) {
+      // 5ton에도 아무것도 못 넣음 - 실패
       return {
         success: false,
         trucks,
@@ -532,46 +536,22 @@ export function packMultiTruck(
       };
     }
 
-    // 트럭에 배치된 아이템 추가
+    const truckVolume = fiveTonDims.width * fiveTonDims.depth * fiveTonDims.height;
+    const placedVolume = fiveTonResult.placedItems.reduce(
+      (sum, b) => sum + b.width * b.depth * b.height,
+      0
+    );
+    const utilization = Math.round((placedVolume / truckVolume) * 1000) / 10;
+
     trucks.push({
-      type: bestTruckType,
-      placements: bestResult.placedItems,
-      utilization: Math.round(bestUtilization * 1000) / 10,
+      type: '5ton',
+      placements: fiveTonResult.placedItems,
+      utilization,
     });
 
-    // 남은 아이템 업데이트
-    const placedIds = new Set(bestResult.placedItems.map((p) => p.itemId));
+    // 배치된 아이템 제거
+    const placedIds = new Set(fiveTonResult.placedItems.map((p) => p.itemId));
     remainingItems = remainingItems.filter((item) => !placedIds.has(item.id));
-  }
-
-  // 트럭 수 최적화: 마지막 트럭이 적재율이 낮으면 더 작은 트럭으로 교체 시도
-  if (trucks.length > 1) {
-    const lastTruck = trucks[trucks.length - 1];
-    const lastItems = items.filter((item) =>
-      lastTruck.placements.some((p) => p.itemId === item.id)
-    );
-
-    for (const truckType of TRUCK_ORDER) {
-      if (truckType === lastTruck.type) break; // 같은 크기면 중단
-
-      const truckDims = TRUCK_PRESETS[truckType];
-      const result = extremePointsPack(lastItems, truckDims, options);
-
-      if (result.success) {
-        const truckVolume = truckDims.width * truckDims.depth * truckDims.height;
-        const placedVolume = result.placedItems.reduce(
-          (sum, b) => sum + b.width * b.depth * b.height,
-          0
-        );
-
-        trucks[trucks.length - 1] = {
-          type: truckType,
-          placements: result.placedItems,
-          utilization: Math.round((placedVolume / truckVolume) * 1000) / 10,
-        };
-        break;
-      }
-    }
   }
 
   const totalTrucks = trucks.length;
