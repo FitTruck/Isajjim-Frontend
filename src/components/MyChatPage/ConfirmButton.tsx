@@ -18,8 +18,11 @@ interface ConfirmButtonProps {
 
 export default function ConfirmButton({ messages, onConfirm }: ConfirmButtonProps) {
   const [isConfirmed, setIsConfirmed] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleConfirm = async () => {
+    if (isLoading || isConfirmed) return;
+    setIsLoading(true);
     console.log('handleConfirm clicked'); // 디버깅용
 
     // 채팅 내역을 하나의 문자열로 변환
@@ -46,6 +49,7 @@ export default function ConfirmButton({ messages, onConfirm }: ConfirmButtonProp
       console.log('AI 요약본:', responseData.data.summary);
 
       setIsConfirmed(true);
+      setIsLoading(false);
       
       if (onConfirm && responseData.data && responseData.data.summary) {
         // 요약본을 반영하도록 하는 함수
@@ -54,6 +58,7 @@ export default function ConfirmButton({ messages, onConfirm }: ConfirmButtonProp
 
     } catch (error) {
       console.error('Error sending chat history:', error);
+      setIsLoading(false);
       if (Platform.OS === 'web') {
         window.alert('전송 중 오류가 발생했습니다.');
       } else {
@@ -64,12 +69,12 @@ export default function ConfirmButton({ messages, onConfirm }: ConfirmButtonProp
 
   return (
     <TouchableOpacity 
-      style={styles.confirmButton} 
+      style={[styles.confirmButton, isLoading && styles.disabledButton]} 
       onPress={handleConfirm}
-      disabled={isConfirmed}
+      disabled={isLoading || isConfirmed}
     >
       <Text style={styles.confirmButtonText}>
-        {isConfirmed ? '확정' : '확정하기'}
+        {isLoading ? '진행중' : (isConfirmed ? '확정' : '확정하기')}
       </Text>
     </TouchableOpacity>
   );
@@ -83,6 +88,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 'auto',
     paddingVertical: 7,
     alignItems: 'center',
+  },
+  disabledButton: {
+    backgroundColor: '#666',
+    opacity: 0.7
   },
   confirmButtonText: {
     color: 'white',
