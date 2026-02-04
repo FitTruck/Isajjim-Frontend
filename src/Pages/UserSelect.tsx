@@ -145,211 +145,221 @@ export default function UserSelect({ navigation, route }: Props) {
           </View>
 
           
-          <DateSelector 
-            date={movingDate} 
-            onSelect={setMovingDate} 
-            isOpen={activeDropdown === 'dateSelector'}
-            onToggle={() => handleToggle('dateSelector')}
-          />
-          
-          {/* 양쪽 카드 컨테이너 */}
-          <View style={styles.cardsContainer}>
-
-            {/* 출발지 카드 영역 */}
+          <View style={styles.contentContainer}>
+          {/* 날짜 선택 섹션 (레이아웃을 아래 카드들과 맞추기 위해 동일한 구조 사용) */}
+          <View style={[styles.cardsContainer, { marginBottom: -30, zIndex: 20 }]}>
             <View style={styles.cardColumn}>
-              <Text style={styles.cardTitle}>출발지 정보</Text>
-              <View style={styles.card}>
-                
-                <AddressInput 
-                  label="출발지 주소"
-                  value={adress1}
-                  detailValue={detailAddress1}
-                  onSelect={(addr) => setAdress1(addr)}
-                  onChangeDetail={setDetailAddress1}
-                />
-
-                <Dropdown
-                  label="건물 유형"
-                  value={buildingType1}
-                  options={buildingTypeOptions} 
-                  onSelect={setBuildingType1}
-                  isOpen={activeDropdown === 'buildingType1'}
-                  onToggle={() => handleToggle('buildingType1')}
-                />
-
-                <Dropdown 
-                  label="층수"
-                  value={floor1}
-                  options={floorOptions}
-                  onSelect={setFloor1}
-                  isOpen={activeDropdown === 'floor1'}
-                  onToggle={() => handleToggle('floor1')}
-                />
-
-                <Dropdown 
-                  label="평수"
-                  value={roomSize1}
-                  options={roomSizeOptions}
-                  onSelect={setRoomSize1}
-                  isOpen={activeDropdown === 'roomSize1'}
-                  onToggle={() => handleToggle('roomSize1')}
-                />
-
-                <Dropdown 
-                  label="방 구조"
-                  value={roomType1}
-                  options={roomTypeOptions}
-                  onSelect={setRoomType1}
-                  isOpen={activeDropdown === 'roomType1'}
-                  onToggle={() => handleToggle('roomType1')}
-                />
-
-                <Dropdown 
-                  label="주차 공간"
-                  value={parking1}
-                  options={parkingOptions}
-                  onSelect={setParking1}
-                  isOpen={activeDropdown === 'parking1'}
-                  onToggle={() => handleToggle('parking1')}
-                />
-
-                <Dropdown 
-                  label="엘리베이터"
-                  value={elevator1}
-                  options={elevatorOptions}
-                  onSelect={setElevator1}
-                  isOpen={activeDropdown === 'elevator1'}
-                  onToggle={() => handleToggle('elevator1')}
-                />
-
-                <Dropdown 
-                  label="사다리차 사용"
-                  value={ladderTruck1}
-                  options={ladderTruckOptions}
-                  onSelect={setLadderTruck1}
-                  isOpen={activeDropdown === 'ladderTruck1'}
-                  onToggle={() => handleToggle('ladderTruck1')}
-                />
-
-                 <Dropdown 
-                  label="복층 여부"
-                  value={duplex1}
-                  options={duplexOptions}
-                  onSelect={setDuplex1}
-                  isOpen={activeDropdown === 'duplex1'}
-                  onToggle={() => handleToggle('duplex1')}
-                />
-
-                 <Dropdown 
-                  label="1층 별도 계단"
-                  value={groundStair1}
-                  options={groundStairOptions}
-                  onSelect={setGroundStair1}
-                  isOpen={activeDropdown === 'groundStair1'}
-                  onToggle={() => handleToggle('groundStair1')}
-                />
-
-              </View>
+              <DateSelector 
+                date={movingDate} 
+                onSelect={setMovingDate} 
+                isOpen={activeDropdown === 'dateSelector'}
+                onToggle={() => handleToggle('dateSelector')}
+              />
             </View>
-
-            {/* 도착지 카드 영역 */}
-            <View style={styles.cardColumn}>
-              <Text style={styles.cardTitle}>도착지 정보</Text>
-              <View style={styles.card}>
-
-                <AddressInput 
-                  label="도착지 주소"
-                  value={adress2}
-                  detailValue={detailAddress2}
-                  onSelect={(addr) => setAdress2(addr)}
-                  onChangeDetail={setDetailAddress2}
-                />
-
-                <Dropdown
-                  label="건물 유형"
-                  value={buildingType2}
-                  options={buildingTypeOptions} 
-                  onSelect={setBuildingType2}
-                  isOpen={activeDropdown === 'buildingType2'}
-                  onToggle={() => handleToggle('buildingType2')}
-                />
-
-                <Dropdown 
-                  label="층수"
-                  value={floor2}
-                  options={floorOptions}
-                  onSelect={setFloor2}
-                  isOpen={activeDropdown === 'floor2'}
-                  onToggle={() => handleToggle('floor2')}
-                />
-
-                <Dropdown 
-                  label="평수"
-                  value={roomSize2}
-                  options={roomSizeOptions}
-                  onSelect={setRoomSize2}
-                  isOpen={activeDropdown === 'roomSize2'}
-                  onToggle={() => handleToggle('roomSize2')}
-                />
-
-                <Dropdown 
-                  label="방 구조"
-                  value={roomType2}
-                  options={roomTypeOptions}
-                  onSelect={setRoomType2}
-                  isOpen={activeDropdown === 'roomType2'}
-                  onToggle={() => handleToggle('roomType2')}
-                />
-
-                <Dropdown 
-                  label="주차 공간"
-                  value={parking2}
-                  options={parkingOptions}
-                  onSelect={setParking2}
-                  isOpen={activeDropdown === 'parking2'}
-                  onToggle={() => handleToggle('parking2')}
-                />
-
-                <Dropdown 
-                  label="엘리베이터"
-                  value={elevator2}
-                  options={elevatorOptions}
-                  onSelect={setElevator2}
-                  isOpen={activeDropdown === 'elevator2'}
-                  onToggle={() => handleToggle('elevator2')}
-                />
-
-                <Dropdown 
-                  label="사다리차 사용"
-                  value={ladderTruck2}
-                  options={ladderTruckOptions}
-                  onSelect={setLadderTruck2}
-                  isOpen={activeDropdown === 'ladderTruck2'}
-                  onToggle={() => handleToggle('ladderTruck2')}
-                />
-
-                 <Dropdown 
-                  label="복층 여부"
-                  value={duplex2}
-                  options={duplexOptions}
-                  onSelect={setDuplex2}
-                  isOpen={activeDropdown === 'duplex2'}
-                  onToggle={() => handleToggle('duplex2')}
-                />
-
-                 <Dropdown 
-                  label="1층 별도 계단"
-                  value={groundStair2}
-                  options={groundStairOptions}
-                  onSelect={setGroundStair2}
-                  isOpen={activeDropdown === 'groundStair2'}
-                  onToggle={() => handleToggle('groundStair2')}
-                />
-
-              </View>
-            </View>
+            {/* 오른쪽 빈 공간으로 레이아웃 균형 맞춤 */}
+            <View style={styles.cardColumn} />
           </View>
+          
+            {/* 양쪽 카드 컨테이너 */}
+            <View style={styles.cardsContainer}>
 
+              {/* 출발지 카드 영역 */}
+              <View style={styles.cardColumn}>
+                <Text style={styles.cardTitle}>출발지 정보</Text>
+                <View style={styles.card}>
+                  
+                  <AddressInput 
+                    label="출발지 주소"
+                    value={adress1}
+                    detailValue={detailAddress1}
+                    onSelect={(addr) => setAdress1(addr)}
+                    onChangeDetail={setDetailAddress1}
+                  />
+
+                  <Dropdown
+                    label="건물 유형"
+                    value={buildingType1}
+                    options={buildingTypeOptions} 
+                    onSelect={setBuildingType1}
+                    isOpen={activeDropdown === 'buildingType1'}
+                    onToggle={() => handleToggle('buildingType1')}
+                  />
+
+                  <Dropdown 
+                    label="층수"
+                    value={floor1}
+                    options={floorOptions}
+                    onSelect={setFloor1}
+                    isOpen={activeDropdown === 'floor1'}
+                    onToggle={() => handleToggle('floor1')}
+                  />
+
+                  <Dropdown 
+                    label="평수"
+                    value={roomSize1}
+                    options={roomSizeOptions}
+                    onSelect={setRoomSize1}
+                    isOpen={activeDropdown === 'roomSize1'}
+                    onToggle={() => handleToggle('roomSize1')}
+                  />
+
+                  <Dropdown 
+                    label="방 구조"
+                    value={roomType1}
+                    options={roomTypeOptions}
+                    onSelect={setRoomType1}
+                    isOpen={activeDropdown === 'roomType1'}
+                    onToggle={() => handleToggle('roomType1')}
+                  />
+
+                  <Dropdown 
+                    label="주차 공간"
+                    value={parking1}
+                    options={parkingOptions}
+                    onSelect={setParking1}
+                    isOpen={activeDropdown === 'parking1'}
+                    onToggle={() => handleToggle('parking1')}
+                  />
+
+                  <Dropdown 
+                    label="엘리베이터"
+                    value={elevator1}
+                    options={elevatorOptions}
+                    onSelect={setElevator1}
+                    isOpen={activeDropdown === 'elevator1'}
+                    onToggle={() => handleToggle('elevator1')}
+                  />
+
+                  <Dropdown 
+                    label="사다리차 사용"
+                    value={ladderTruck1}
+                    options={ladderTruckOptions}
+                    onSelect={setLadderTruck1}
+                    isOpen={activeDropdown === 'ladderTruck1'}
+                    onToggle={() => handleToggle('ladderTruck1')}
+                  />
+
+                  <Dropdown 
+                    label="복층 여부"
+                    value={duplex1}
+                    options={duplexOptions}
+                    onSelect={setDuplex1}
+                    isOpen={activeDropdown === 'duplex1'}
+                    onToggle={() => handleToggle('duplex1')}
+                  />
+
+                  <Dropdown 
+                    label="1층 별도 계단"
+                    value={groundStair1}
+                    options={groundStairOptions}
+                    onSelect={setGroundStair1}
+                    isOpen={activeDropdown === 'groundStair1'}
+                    onToggle={() => handleToggle('groundStair1')}
+                  />
+
+                </View>
+              </View>
+
+              {/* 도착지 카드 영역 */}
+              <View style={styles.cardColumn}>
+                <Text style={styles.cardTitle}>도착지 정보</Text>
+                <View style={styles.card}>
+
+                  <AddressInput 
+                    label="도착지 주소"
+                    value={adress2}
+                    detailValue={detailAddress2}
+                    onSelect={(addr) => setAdress2(addr)}
+                    onChangeDetail={setDetailAddress2}
+                  />
+
+                  <Dropdown
+                    label="건물 유형"
+                    value={buildingType2}
+                    options={buildingTypeOptions} 
+                    onSelect={setBuildingType2}
+                    isOpen={activeDropdown === 'buildingType2'}
+                    onToggle={() => handleToggle('buildingType2')}
+                  />
+
+                  <Dropdown 
+                    label="층수"
+                    value={floor2}
+                    options={floorOptions}
+                    onSelect={setFloor2}
+                    isOpen={activeDropdown === 'floor2'}
+                    onToggle={() => handleToggle('floor2')}
+                  />
+
+                  <Dropdown 
+                    label="평수"
+                    value={roomSize2}
+                    options={roomSizeOptions}
+                    onSelect={setRoomSize2}
+                    isOpen={activeDropdown === 'roomSize2'}
+                    onToggle={() => handleToggle('roomSize2')}
+                  />
+
+                  <Dropdown 
+                    label="방 구조"
+                    value={roomType2}
+                    options={roomTypeOptions}
+                    onSelect={setRoomType2}
+                    isOpen={activeDropdown === 'roomType2'}
+                    onToggle={() => handleToggle('roomType2')}
+                  />
+
+                  <Dropdown 
+                    label="주차 공간"
+                    value={parking2}
+                    options={parkingOptions}
+                    onSelect={setParking2}
+                    isOpen={activeDropdown === 'parking2'}
+                    onToggle={() => handleToggle('parking2')}
+                  />
+
+                  <Dropdown 
+                    label="엘리베이터"
+                    value={elevator2}
+                    options={elevatorOptions}
+                    onSelect={setElevator2}
+                    isOpen={activeDropdown === 'elevator2'}
+                    onToggle={() => handleToggle('elevator2')}
+                  />
+
+                  <Dropdown 
+                    label="사다리차 사용"
+                    value={ladderTruck2}
+                    options={ladderTruckOptions}
+                    onSelect={setLadderTruck2}
+                    isOpen={activeDropdown === 'ladderTruck2'}
+                    onToggle={() => handleToggle('ladderTruck2')}
+                  />
+
+                  <Dropdown 
+                    label="복층 여부"
+                    value={duplex2}
+                    options={duplexOptions}
+                    onSelect={setDuplex2}
+                    isOpen={activeDropdown === 'duplex2'}
+                    onToggle={() => handleToggle('duplex2')}
+                  />
+
+                  <Dropdown 
+                    label="1층 별도 계단"
+                    value={groundStair2}
+                    options={groundStairOptions}
+                    onSelect={setGroundStair2}
+                    isOpen={activeDropdown === 'groundStair2'}
+                    onToggle={() => handleToggle('groundStair2')}
+                  />
+
+                </View>
+              </View>
+            </View>
+
+          </View>
+          
           {/* 다음단계 버튼 */}
           <NextBtn 
             navigation={navigation}
@@ -394,6 +404,12 @@ export default function UserSelect({ navigation, route }: Props) {
 }
 
 const styles = StyleSheet.create({
+  contentContainer: {
+    flexDirection: 'column',
+    width: '100%',
+    alignItems: 'center',
+    gap: 30,
+  },
   cardsContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
@@ -410,7 +426,7 @@ const styles = StyleSheet.create({
   card: {
     width: '100%',
     backgroundColor: 'white',
-    borderRadius: 12,
+    borderRadius: 4,
     padding: 30,
     borderWidth: 1,
     borderColor: '#E0E0E0',

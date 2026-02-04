@@ -32,6 +32,7 @@ export default function AddressInput({
   onChangeDetail,
 }: AddressInputProps) {
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isFocused, setIsFocused] = useState(false);
 
   const handleComplete = (data: AddressData) => {
     let addr = '';
@@ -132,9 +133,18 @@ export default function AddressInput({
       </TouchableOpacity>
       
       {/* 상세 주소 입력 */}
-      <View style={[styles.inputBox, styles.detailInputBox]}>
+      <View style={[
+        styles.inputBox, 
+        styles.detailInputBox,
+        isFocused && { borderColor: '#F0893B' }
+      ]}>
         <TextInput 
-          style={styles.textInput}
+          onFocus={() => setIsFocused(true)}
+          onBlur={() => setIsFocused(false)} 
+          style={[
+            styles.textInput, 
+            Platform.OS === 'web' && ({ outlineStyle: 'none' } as any)
+          ]}
           value={detailValue || ''} // 보여지는 값임.
           // 변경된 텍스트를 자동으로 인자로 하여 보낸다고 함.
           onChangeText={onChangeDetail}
@@ -189,7 +199,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     borderWidth: 1,
     borderColor: '#E0E0E0',
-    borderRadius: 8,
+    borderRadius: 4,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',

@@ -172,12 +172,10 @@ export default function DateSelector({ date, onSelect, isOpen: controlledOpen, o
 
 const styles = StyleSheet.create({
   container: {
-    marginBottom: 40,
-    width: '100%',
-    paddingHorizontal: 40,
-    maxWidth: 1280,
-    alignSelf: 'center',
+    marginBottom: 20, // 마진 줄임 (UserSelect에서 제어 가능하도록)
+    width: '70%',
     position: 'relative',
+    zIndex: 100, // 드롭다운 등과 겹침 문제 방지
   },
   label: {
     fontSize: 22,
@@ -188,12 +186,12 @@ const styles = StyleSheet.create({
   },
   inputBox: {
     width: '100%',
-    maxWidth: 300,
+    // maxWidth: 300, // UserSelect 레이아웃에 맞춤
     height: 50,
     backgroundColor: 'white',
     borderWidth: 1,
     borderColor: '#DDD',
-    borderRadius: 8,
+    borderRadius: 4,
     paddingHorizontal: 15,
     flexDirection: 'row',
     alignItems: 'center',
@@ -213,7 +211,7 @@ const styles = StyleSheet.create({
   calendarContainer: {
     position: 'absolute',
     top: '100%',
-    left: 40, 
+    left: 0, 
     marginTop: 4,
     width: 320,
     backgroundColor: 'white',
