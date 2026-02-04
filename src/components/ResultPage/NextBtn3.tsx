@@ -13,6 +13,16 @@ interface NextBtn3Props {
   onNavigateNext: () => void;
 }
 
+// 트럭 타입 한글 변환
+const getTruckLabel = (type: string): string => {
+  const labels: Record<string, string> = {
+    '1ton': '1톤 트럭',
+    '2.5ton': '2.5톤 트럭',
+    '5ton': '5톤 트럭',
+  };
+  return labels[type] || type;
+};
+
 const NextBtn3 = ({ data, status, onNavigateNext }: NextBtn3Props) => {
   // useRef : Estimate 컴포넌트가 리렌더링 되어도 변수값 유지
   // useRef가 반환하는 값의 속성 중에 current가 있고 그 current값은 Animated.Value(0)의 값임
@@ -78,7 +88,7 @@ const NextBtn3 = ({ data, status, onNavigateNext }: NextBtn3Props) => {
 
         {data.map((truck, index) => (
           <View key={index} style={styles.row}>
-            <Text style={styles.truckType}>{truck.type}</Text>
+            <Text style={styles.truckType}>{getTruckLabel(truck.type)}</Text>
             <Text style={styles.truckQuantity}>{truck.quantity}대</Text>
           </View>
         ))}
