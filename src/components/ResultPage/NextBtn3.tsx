@@ -23,6 +23,12 @@ const getTruckLabel = (type: string): string => {
   return labels[type] || type;
 };
 
+// 트럭 타입에서 톤수 추출 (정렬용)
+const getTruckTonnage = (type: string): number => {
+  const match = type.match(/^([\d.]+)ton$/);
+  return match ? parseFloat(match[1]) : Infinity;
+};
+
 const NextBtn3 = ({ data, status, onNavigateNext }: NextBtn3Props) => {
   // useRef : Estimate 컴포넌트가 리렌더링 되어도 변수값 유지
   // useRef가 반환하는 값의 속성 중에 current가 있고 그 current값은 Animated.Value(0)의 값임
@@ -85,10 +91,11 @@ const NextBtn3 = ({ data, status, onNavigateNext }: NextBtn3Props) => {
           </View>
         </View>
 
-        {/* 유효한 트럭 정보만 표시 (type이 있고 quantity > 0) */}
+        {/* 유효한 트럭 정보만 표시 (type이 있고 quantity > 0), 톤수 오름차순 정렬 */}
         {data.filter(truck => truck.type && truck.quantity > 0).length > 0 ? (
           data
               .filter(truck => truck.type && truck.quantity > 0)
+              .sort((a, b) => getTruckTonnage(a.type) - getTruckTonnage(b.type))
               .map((truck, index) => (
               <View key={index} style={styles.row}>
                   <Text style={styles.truckType}>{getTruckLabel(truck.type)}</Text>
