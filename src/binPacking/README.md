@@ -154,18 +154,25 @@ isSupported = supportRatio >= 0.7
 
 ```
 src/binPacking/
-├── index.ts        # 모듈 진입점 (exports)
-├── types.ts        # TypeScript 타입 정의
-├── constants.ts    # 트럭 규격, 상수
-├── packer.ts       # EP 알고리즘 메인 로직
-├── support.ts      # 지지 규칙, 충돌/경계 검사
-├── multiTruck.ts   # 멀티 트럭 선택 로직
-└── README.md       # 이 문서
+├── index.ts           # 모듈 진입점 (exports)
+├── types.ts           # TypeScript 타입 정의
+├── constants.ts       # 트럭 규격, 상수
+├── packer.ts          # EP 알고리즘 메인 로직
+├── support.ts         # 지지 규칙, 충돌/경계 검사
+├── multiTruck.ts      # 멀티 트럭 선택 로직
+├── server.ts          # Express 시각화 서버
+├── data/
+│   ├── index.ts            # 데이터 모듈 exports
+│   ├── sampleFurniture.ts  # 샘플 가구 데이터
+│   └── serverConstants.ts  # 서버용 트럭 규격 (m 단위)
+├── __tests__/
+│   └── packer.test.ts      # Jest 단위 테스트
+└── README.md          # 이 문서
 ```
 
 ### 파일별 역할
 
-| 파일 | 역할 | 주요 함수 |
+| 파일 | 역할 | 주요 함수/타입 |
 |------|------|----------|
 | `index.ts` | 모듈 exports | - |
 | `types.ts` | 타입 정의 | `OBBItem`, `PlacedBox`, `PackingResult` |
@@ -173,6 +180,8 @@ src/binPacking/
 | `packer.ts` | 핵심 알고리즘 | `extremePointsPack()`, `optimizeOBB()`, `packMultiTruck()` |
 | `support.ts` | 물리 검사 | `checkSupport()`, `checkOverlap()`, `checkBoundary()` |
 | `multiTruck.ts` | 멀티 트럭 | `selectTrucksForAllItems()`, `optimizeOBBMulti()` |
+| `server.ts` | 시각화 서버 | Express API 엔드포인트 |
+| `data/` | 테스트 데이터 | `TRUCK_SPECS_M`, `getSampleFurniture()` |
 
 ---
 
@@ -412,3 +421,65 @@ const simulationFurniture = results.flatMap(r =>
 - [ ] 깨지기 쉬운 물품 보호
 - [ ] 접근성 고려 (자주 사용하는 물건 앞쪽)
 - [ ] 6방향 회전 지원
+
+---
+
+## 시각화 서버
+
+`server.ts`는 독립 실행 가능한 Express 서버로, 웹 기반 3D 시뮬레이터를 제공합니다.
+
+### 실행 방법
+
+```bash
+npx ts-node src/binPacking/server.ts
+```
+
+### API 엔드포인트
+
+| 메서드 | 경로 | 설명 |
+|--------|------|------|
+| GET | `/` | 시뮬레이터 HTML 페이지 |
+| GET | `/api/trucks` | 트럭 프리셋 조회 |
+| GET | `/api/data/:estimateId` | 샘플 가구 데이터 |
+| POST | `/api/optimize` | 단일 트럭 최적화 |
+| POST | `/api/optimize-multi` | 멀티 트럭 최적화 |
+
+### API 요청 예시
+
+```bash
+# 단일 트럭 최적화
+curl -X POST http://localhost:3001/api/optimize \
+  -H "Content-Type: application/json" \
+  -d '{
+    "items": [
+      {"id": "sofa", "width": 2.0, "depth": 0.9, "height": 0.85},
+      {"id": "table", "width": 1.2, "depth": 0.8, "height": 0.75}
+    ],
+    "unit": "m"
+  }'
+
+# 멀티 트럭 최적화
+curl -X POST http://localhost:3001/api/optimize-multi \
+  -H "Content-Type: application/json" \
+  -d '{
+    "items": [...],
+    "unit": "m",
+    "support_ratio": 0.7
+  }'
+```
+
+---
+
+## 테스트
+
+```bash
+# Jest 테스트 실행
+npm test -- --testPathPattern=binPacking
+```
+
+테스트 커버리지:
+- 기본 배치 로직
+- 70% 지지 규칙
+- 트럭 경계 검사
+- 멀티 트럭 최적화
+- 대량 아이템 처리
