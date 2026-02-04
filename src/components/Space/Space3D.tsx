@@ -300,6 +300,16 @@ const Space3D: React.FC<Space3DProps> = ({
   const [simulationState, setSimulationState] = useState<'idle' | 'running' | 'completed'>('idle');
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
+  // 이전 트럭 상태 저장 (점진적 업데이트용)
+  const prevTrucksRef = useRef<{ types: string; count: number; totalPlacements: number }>({
+    types: '',
+    count: 0,
+    totalPlacements: 0
+  });
+
+  // scheduleNext 함수 ref (순환 의존성 방지)
+  const scheduleNextRef = useRef<() => void>(() => {});
+
   const hasSimulation = furniture && furniture.length > 0;
   const currentTruck = trucks[currentTruckIndex];
   const currentTruckType = currentTruck?.type || truckType || '2.5ton';
@@ -418,40 +428,75 @@ const Space3D: React.FC<Space3DProps> = ({
 
     console.log('=== binPacking 입력 (quantity 반영, cm) ===', items);
 
+    let newTrucks: TruckPlacement[];
+    let newMessage: string;
+
     if (truckType) {
       // 트럭 타입이 지정되면 단일 트럭 모드
       const result = optimizeOBB(items, truckType);
       console.log('=== binPacking 결과 (단일 트럭) ===', result);
 
-      setTrucks([{
+      newTrucks = [{
         type: truckType,
         placements: result.placedItems,
         utilization: result.volumeUtilization,
-      }]);
-      setPackingMessage(result.message);
+      }];
+      newMessage = result.message;
     } else {
       // 트럭 타입 미지정 → 멀티트럭 자동 최적화
       const result = packMultiTruck(items);
       console.log('=== binPacking 결과 (멀티트럭) ===', result);
 
-      setTrucks(result.trucks);
-      setPackingMessage(result.message);
+      newTrucks = result.trucks;
+      newMessage = result.message;
     }
 
-    // 새로운 결과면 애니메이션 리셋
-    if (timerRef.current) {
-      clearTimeout(timerRef.current);
-      timerRef.current = null;
-    }
-    setCurrentTruckIndex(0);
-    setIsPlaying(false);
-    setSimulationState('idle');
-    setAnimationKey((k) => k + 1);
-  }, [loadedFurniture, truckType, furniture]);
+    // 이전 트럭과 비교
+    const newTruckTypes = newTrucks.map(t => t.type).join(',');
+    const newTruckCount = newTrucks.length;
+    const newTotalPlacements = newTrucks.reduce((sum, t) => sum + t.placements.length, 0);
+    const prevTypes = prevTrucksRef.current.types;
+    const prevCount = prevTrucksRef.current.count;
+    const prevTotalPlacements = prevTrucksRef.current.totalPlacements;
 
-  // trucks 변경 시 truckVisibleCounts 초기화
+    const isSameTruckConfig = (prevTypes === newTruckTypes && prevCount === newTruckCount);
+    const hasNewPlacements = newTotalPlacements > prevTotalPlacements;
+
+    setTrucks(newTrucks);
+    setPackingMessage(newMessage);
+
+    if (!isSameTruckConfig) {
+      // 트럭 구성이 변경됨 → 전체 초기화
+      console.log('[시뮬레이션] 트럭 구성 변경 → 전체 초기화');
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+        timerRef.current = null;
+      }
+      setCurrentTruckIndex(0);
+      setIsPlaying(false);
+      setSimulationState('idle');
+      setAnimationKey((k) => k + 1);
+    } else if (hasNewPlacements && simulationState === 'completed') {
+      // 트럭 구성 동일 + 새 가구 추가됨 + 시뮬레이션 완료 상태
+      // → 새 가구만 애니메이션 실행
+      console.log('[시뮬레이션] 새 가구 추가 → 점진적 업데이트');
+      setIsPlaying(true);
+      setSimulationState('running');
+      setTimeout(() => scheduleNextRef.current(), 100);
+    }
+
+    prevTrucksRef.current = { types: newTruckTypes, count: newTruckCount, totalPlacements: newTotalPlacements };
+  }, [loadedFurniture, truckType, furniture, simulationState]);
+
+  // trucks 변경 시 truckVisibleCounts 초기화 (트럭 개수가 변경된 경우에만)
   useEffect(() => {
-    setTruckVisibleCounts(trucks.map(() => 0));
+    setTruckVisibleCounts(prev => {
+      if (prev.length !== trucks.length) {
+        return trucks.map(() => 0);
+      }
+      // 트럭 개수 동일 → 기존 visible counts 유지
+      return prev;
+    });
   }, [trucks]);
 
   // 트럭 결과가 변경되면 부모에게 알림
@@ -484,10 +529,11 @@ const Space3D: React.FC<Space3DProps> = ({
   // autoPlay 처리: 데이터 준비 완료 시 자동 재생
   useEffect(() => {
     const allZero = truckVisibleCounts.length > 0 && truckVisibleCounts.every(c => c === 0);
-    if (autoPlay && !isLoading && trucks.length > 0 && !isPlaying && allZero) {
+    // simulationState가 idle일 때만 자동 재생 (completed 상태에서 수량 변경 시 자동 재생 안 함)
+    if (autoPlay && !isLoading && trucks.length > 0 && !isPlaying && allZero && simulationState === 'idle') {
       play();
     }
-  }, [autoPlay, isLoading, trucks.length, truckVisibleCounts]);
+  }, [autoPlay, isLoading, trucks.length, truckVisibleCounts, simulationState]);
 
   // 최신 값을 참조하기 위한 ref
   const trucksRef = useRef(trucks);
@@ -543,6 +589,11 @@ const Space3D: React.FC<Space3DProps> = ({
       });
     }, 400);
   }, [onAnimationComplete]);
+
+  // scheduleNext를 ref에 저장 (binPacking useEffect에서 사용)
+  useEffect(() => {
+    scheduleNextRef.current = scheduleNext;
+  }, [scheduleNext]);
 
   const play = useCallback(() => {
     // 처음 트럭부터 시작
