@@ -68,6 +68,9 @@ export default function Result({ navigation }: Props) {
           height: f.height || 0,    // mm
           volume: f.volume || 0,    // m³
           ply_url: f.plyUrl || null,  // GCS PLY URL (백엔드: plyUrl)
+          // 객체 중심 좌표 (이미지 위 마커 표시용)
+          centerX: f.centerX,
+          centerY: f.centerY,
         })) : []
       }));
       setResults(mappedResultCard);

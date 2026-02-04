@@ -1,7 +1,15 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { translateLabel, translateType } from '../../utils/Translator';
 import { Ionicons } from '@expo/vector-icons';
+
+// 체크 마커 이미지
+const checkObjectImage = require('../../../assets/check_object.png');
+
+// 이미지 컨테이너 크기 (스타일과 동일하게 유지)
+const IMAGE_CONTAINER_WIDTH = 670;
+const IMAGE_CONTAINER_HEIGHT = 600;
+const MARKER_SIZE = 40; // 마커 크기
 
 
 
@@ -10,13 +18,15 @@ interface ResultCardProps {
     localUri: any;
     width: number;
     height: number;
-  }; 
-  
+  };
+
   items: Array<{ // 각 item에 대한 정보 배열
     furnitureId: number;
     label: string;
     type: string;
     quantity: number;
+    centerX?: number;
+    centerY?: number;
   }>;
 
   onQuantityChange: (furnitureId: number, newQuantity: number) => void;
@@ -33,14 +43,66 @@ const ResultCard = ({ image, items, onQuantityChange }: ResultCardProps) => {
     type: translateType(item.type)
   }));
 
+  // 이미지 스케일 및 오프셋 계산 (resizeMode="contain" 기준)
+  const imageLayout = useMemo(() => {
+    if (!image?.width || !image?.height) {
+      return { scale: 1, offsetX: 0, offsetY: 0, displayWidth: IMAGE_CONTAINER_WIDTH, displayHeight: IMAGE_CONTAINER_HEIGHT };
+    }
+
+    const originalWidth = image.width;
+    const originalHeight = image.height;
+
+    // contain 모드: 가로/세로 비율 유지하면서 컨테이너에 맞춤
+    const scaleX = IMAGE_CONTAINER_WIDTH / originalWidth;
+    const scaleY = IMAGE_CONTAINER_HEIGHT / originalHeight;
+    const scale = Math.min(scaleX, scaleY);
+
+    const displayWidth = originalWidth * scale;
+    const displayHeight = originalHeight * scale;
+
+    // 컨테이너 중앙 정렬 시 오프셋
+    const offsetX = (IMAGE_CONTAINER_WIDTH - displayWidth) / 2;
+    const offsetY = (IMAGE_CONTAINER_HEIGHT - displayHeight) / 2;
+
+    return { scale, offsetX, offsetY, displayWidth, displayHeight };
+  }, [image?.width, image?.height]);
+
+  // 좌표가 있는 아이템만 필터링 (마커 표시용)
+  const itemsWithCoordinates = items.filter(
+    item => item.centerX !== undefined && item.centerY !== undefined && item.quantity > 0
+  );
+
   return (
     <View style={styles.resultCardContainer}>
-      {/* Image */}
-      <Image
-        source={typeof image.localUri === 'string' ? { uri: image.localUri } : image.localUri} 
-        style={styles.cardImage} 
-        resizeMode="contain" 
-      />
+      {/* Image Container with Markers */}
+      <View style={styles.imageContainer}>
+        <Image
+          source={typeof image.localUri === 'string' ? { uri: image.localUri } : image.localUri}
+          style={styles.cardImage}
+          resizeMode="contain"
+        />
+
+        {/* 객체 위치 마커 오버레이 */}
+        {itemsWithCoordinates.map((item) => {
+          // 원본 좌표를 화면 좌표로 변환
+          const screenX = imageLayout.offsetX + (item.centerX! * imageLayout.scale) - (MARKER_SIZE / 2);
+          const screenY = imageLayout.offsetY + (item.centerY! * imageLayout.scale) - (MARKER_SIZE / 2);
+
+          return (
+            <Image
+              key={`marker-${item.furnitureId}`}
+              source={checkObjectImage}
+              style={[
+                styles.checkMarker,
+                {
+                  left: screenX,
+                  top: screenY,
+                }
+              ]}
+            />
+          );
+        })}
+      </View>
 
       {/* Content */}
       <View style={styles.resultCardContent}>
@@ -107,12 +169,30 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
 
-  // 이미지 부분(왼쪽)
-  cardImage: {
-    width: 670, 
-    height: 600,
+  // 이미지 컨테이너 (마커 오버레이를 위한 상대 위치)
+  imageContainer: {
+    width: IMAGE_CONTAINER_WIDTH,
+    height: IMAGE_CONTAINER_HEIGHT,
+    position: 'relative',
     borderTopLeftRadius: 10,
     borderBottomLeftRadius: 10,
+    overflow: 'hidden',
+  },
+
+  // 이미지 부분(왼쪽)
+  cardImage: {
+    width: IMAGE_CONTAINER_WIDTH,
+    height: IMAGE_CONTAINER_HEIGHT,
+    borderTopLeftRadius: 10,
+    borderBottomLeftRadius: 10,
+  },
+
+  // 체크 마커 스타일
+  checkMarker: {
+    position: 'absolute',
+    width: MARKER_SIZE,
+    height: MARKER_SIZE,
+    zIndex: 10,
   },
 
   // Content 부분(오른쪽)
