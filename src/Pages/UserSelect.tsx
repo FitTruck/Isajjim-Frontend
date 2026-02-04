@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, ScrollView, StyleSheet } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, Platform } from 'react-native';
 import { commonStyles } from '../styles/commonStyles';
 import Header from '../components/common/Header';
 import NextBtn from '../components/UserSelectPage/NextBtn2'; 
@@ -130,7 +130,10 @@ export default function UserSelect({ navigation, route }: Props) {
       )}
 
       <ScrollView 
-        contentContainerStyle={commonStyles.scrollContent}
+        contentContainerStyle={[
+          commonStyles.scrollContent, 
+          Platform.OS === 'web' ? { width: '100vw', maxWidth: '100vw', overflowX: 'hidden' } : {}
+        ] as any}
         stickyHeaderIndices={[0]}
       >
         <Header />
@@ -145,19 +148,19 @@ export default function UserSelect({ navigation, route }: Props) {
 
           
           <View style={styles.contentContainer}>
-          {/* 날짜 선택 섹션 (레이아웃을 아래 카드들과 맞추기 위해 동일한 구조 사용) */}
-          <View style={[styles.cardsContainer, { marginBottom: -30, zIndex: 20 }]}>
-            <View style={styles.cardColumn}>
-              <DateSelector 
-                date={movingDate} 
-                onSelect={setMovingDate} 
-                isOpen={activeDropdown === 'dateSelector'}
-                onToggle={() => handleToggle('dateSelector')}
-              />
+            {/* 날짜 선택 섹션 (레이아웃을 아래 카드들과 맞추기 위해 동일한 구조 사용) */}
+            <View style={[styles.cardsContainer, { marginBottom: -30, zIndex: 20 }]}>
+              <View style={styles.cardColumn}>
+                <DateSelector 
+                  date={movingDate} 
+                  onSelect={setMovingDate} 
+                  isOpen={activeDropdown === 'dateSelector'}
+                  onToggle={() => handleToggle('dateSelector')}
+                />
+              </View>
+              {/* 오른쪽 빈 공간으로 레이아웃 균형 맞춤 */}
+              <View style={styles.cardColumn} />
             </View>
-            {/* 오른쪽 빈 공간으로 레이아웃 균형 맞춤 */}
-            <View style={styles.cardColumn} />
-          </View>
           
             {/* 양쪽 카드 컨테이너 */}
             <View style={styles.cardsContainer}>
@@ -418,9 +421,9 @@ const styles = StyleSheet.create({
     zIndex: 10,
   },
   cardColumn: {
-    flex: 1,
+    width: 600, 
     flexDirection: 'column',
-    maxWidth: 600,
+
   },
   card: {
     width: '100%',

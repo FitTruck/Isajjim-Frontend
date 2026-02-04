@@ -62,34 +62,35 @@ export default function Header() {
 
   return (
     <View style={[styles.header, isMobile && styles.mobileHeader]}>
-      <MyTouch style={styles.logoContainer} onPress={onGoHome}>
-        <Image source={require('../../../assets/Logo.png')} style={styles.logoIcon} />
-        <Text style={[styles.logoText, isMobile && styles.mobileLogoText]}>이삿찜</Text>
-      </MyTouch>
+      <View style={styles.headerContent}>
+        <MyTouch style={styles.logoContainer} onPress={onGoHome}>
+          <Image source={require('../../../assets/Logo.png')} style={styles.logoIcon} />
+          <Text style={[styles.logoText, isMobile && styles.mobileLogoText]}>이삿찜</Text>
+        </MyTouch>
 
-      <View style={[styles.headerRight, isMobile && styles.mobileHeaderRight]}>  
-        <HoverableMenuItem 
-          label="내 견적" 
-          onPress={onGoMyEstimate} 
-          isActive={route.name === 'MyEstimate'} 
-          isMobile={isMobile} 
-        />
-        
-        <HoverableMenuItem 
-          label="채팅" 
-          onPress={onGoMyChat} 
-          isActive={route.name === 'MyChat'} 
-          isMobile={isMobile} 
-          showBadge={true}
-        />
+        <View style={[styles.headerRight, isMobile && styles.mobileHeaderRight]}>  
+          <HoverableMenuItem 
+            label="내 견적" 
+            onPress={onGoMyEstimate} 
+            isActive={route.name === 'MyEstimate'} 
+            isMobile={isMobile} 
+          />
+          
+          <HoverableMenuItem 
+            label="채팅" 
+            onPress={onGoMyChat} 
+            isActive={route.name === 'MyChat'} 
+            isMobile={isMobile} 
+            showBadge={true}
+          />
 
-        <HoverableMenuItem 
-          label="문의하기" 
-          onPress={() => {}} 
-          isMobile={isMobile} 
-        />
-      </View> 
-      
+          <HoverableMenuItem 
+            label="문의하기" 
+            onPress={() => {}} 
+            isMobile={isMobile} 
+          />
+        </View> 
+      </View>
     </View>
   );
 }
@@ -105,11 +106,21 @@ const styles = StyleSheet.create({
     zIndex: 100, 
     backgroundColor: 'rgb(255, 255, 255)', 
     paddingHorizontal: 30, // 왼쪽/오른쪽 여백 축소
+    paddingRight: 47,
     flexDirection: 'row', 
     alignItems: 'center',
-    justifyContent: 'space-between',
+    justifyContent: 'center', // 내부 컨텐츠 중앙 정렬
     borderBottomWidth: 1,
     borderBottomColor: 'rgba(233, 237, 243, 1)', 
+  },
+  headerContent: {
+    width: '100%',
+    maxWidth: 1240, 
+    height: '100%',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 0, 
   },
   mobileHeader: {
     height: 50,
