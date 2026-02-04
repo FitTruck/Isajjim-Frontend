@@ -6,8 +6,7 @@ interface LoadingModalProps {
 }
 
 const LoadingModal = ({ visible }: LoadingModalProps) => {
-  const message = "AI가 견적을 분석 중입니다...";
-  const subMessage = "10초에서 30초 정도 소요될 수 있습니다.";
+  const message = "AI가 견적을 분석 중입니다";
 
   return (
     <Modal
@@ -17,9 +16,8 @@ const LoadingModal = ({ visible }: LoadingModalProps) => {
     >
       <View style={styles.loadingOverlay}>
         <View style={styles.loadingBox}>
-          <ActivityIndicator size="large" color="white" />
+          <ActivityIndicator size="large" color="#F0893B" />
           <Text style={styles.loadingText}>{message}</Text>
-          <Text style={styles.loadingSubText}>{subMessage}</Text>
         </View>
       </View>
     </Modal>
@@ -29,34 +27,25 @@ const LoadingModal = ({ visible }: LoadingModalProps) => {
 const styles = StyleSheet.create({
   loadingOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)', // 반투명 검은 배경
+    backgroundColor: 'rgba(0, 0, 0, 0.2)', // 배경 투명도 조절
     justifyContent: 'center',
     alignItems: 'center',
   },
   loadingBox: {
-    backgroundColor: '#333333',
-    padding: 30,
-    borderRadius: 15,
+    backgroundColor: 'white',
+    paddingVertical: 35,
+    paddingHorizontal: 45,
+    borderRadius: 4,
     alignItems: 'center',
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
+    borderWidth: 1,
+    borderColor: '#EAEAEA',
   },
   loadingText: {
     marginTop: 20,
-    color: 'white',
+    color: '#333333', // 진한 회색
     fontSize: 18,
     fontWeight: '600',
-  },
-  loadingSubText: {
-    marginTop: 10,
-    color: '#cccccc',
-    fontSize: 14,
+    letterSpacing: -0.5,
   },
 });
 
