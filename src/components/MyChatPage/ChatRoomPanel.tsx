@@ -53,6 +53,7 @@ export default function ChatRoomPanel({ data }: ChatRoomPanelProps) {
   };
 
   const handleConfirmSuccess = (summary: string) => {
+    // context에 aiSummary 업데이트
     updateAiSummary(summary);
   };
 
