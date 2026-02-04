@@ -3,7 +3,7 @@ import { View, Text, Image, StyleSheet, TextInput, FlatList, KeyboardAvoidingVie
 import { ChatItemData } from "../../Pages/MyChat";
 import ConfirmButton from "./ConfirmButton";
 import RequestDetailModal from "../common/RequestDetailModal";
-import { Ionicons } from '@expo/vector-icons';
+import { FileText, MessageSquareMore, ChevronRight } from 'lucide-react-native';
 import { useEstimate, RequestData } from "../../context/EstimateContext";
 
 interface ChatRoomPanelProps {
@@ -156,8 +156,7 @@ export default function ChatRoomPanel({ data }: ChatRoomPanelProps) {
           <View style={styles.quoteBubble}>
             <View style={styles.quoteHeader}>
               <View style={styles.quoteIconCircle}>
-                 <Ionicons name="document-text-outline" size={16} color="white" />
-              </View>
+                <FileText size={16} color="white" />              </View>
               <Text style={styles.quoteTitle}>견적서</Text>
             </View>
 
@@ -175,14 +174,12 @@ export default function ChatRoomPanel({ data }: ChatRoomPanelProps) {
             <View style={styles.quoteDivider} />
 
             <View style={styles.quoteHelpRow}>
-              <Ionicons name="chatbubble-ellipses-outline" size={14} color="#A0A0A0" style={{marginTop: 2}} />
-              <Text style={styles.quoteHelpText}>나의 상황에 대해 상의해 보세요. 확정 시, AI가 요약하여 요청사항에 반영합니다.</Text>
+              <MessageSquareMore size={14} color="#A0A0A0" style={{marginTop: 2}} />              <Text style={styles.quoteHelpText}>나의 상황에 대해 상의해 보세요. 확정 시, AI가 요약하여 요청사항에 반영합니다.</Text>
             </View>
 
             <TouchableOpacity style={styles.quoteButton}>
               <Text style={styles.quoteButtonText}>업체 프로필 보기</Text>
-              <Ionicons name="chevron-forward" size={16} color="white" />
-            </TouchableOpacity>
+              <ChevronRight size={16} color="white" />            </TouchableOpacity>
           </View>
           <Text style={styles.messageTime}>{item.time}</Text>
         </View>

@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { StyleSheet, View, Text, Platform, Image, useWindowDimensions } from 'react-native';
-import Icon from '@expo/vector-icons/Feather';
+import { Upload } from 'lucide-react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { UploadedImage } from '../../types/common';
 
@@ -14,7 +14,7 @@ const UploadContent = ({ isDragging, isMobile }: { isDragging: boolean, isMobile
       {/* 드래그 아닐 때 */}
       <View style={[styles.contentLayer, { opacity: isDragging ? 0 : 1 }]}>
         <View style={[styles.iconContainer, isMobile && styles.mobileIconContainer]}>
-          <Icon name="upload" size={isMobile ? 32 : 48} color="#F0893B" />
+          <Upload size={isMobile ? 32 : 48} color="#F0893B" />
         </View>
         <Text style={[styles.uploadTitle, isMobile && styles.mobileUploadTitle]}>클릭 또는 드롭하여 이미지 업로드</Text>
         <Text style={[styles.uploadSubTitle, isMobile && styles.mobileUploadSubTitle]}>JPG, PNG, HEIC 형식 지원</Text>

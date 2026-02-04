@@ -6,7 +6,7 @@ import LeftCard from '../components/ResultPage/LeftCard';
 import NextBtn3 from '../components/ResultPage/NextBtn3';
 import Header from '../components/common/Header';
 import Space3D from '../components/Space/Space3D';
-import { Ionicons } from '@expo/vector-icons';
+import { ChevronLeft, ChevronRight, X, Maximize } from 'lucide-react-native';
 import { SimulationFurniture, TruckType } from '../types/simulation';
 import MyTouch from "../components/common/MyTouch";
 import { useEstimate } from '../context/EstimateContext';
@@ -266,7 +266,7 @@ export default function Result({ navigation }: Props) {
                   style={styles.arrowButtonLeft} 
                   onPress={() => handleScroll('prev')}
                 >
-                  <Ionicons name="chevron-back" size={40} color="#333" />
+                  <ChevronLeft size={40} color="#333" />
                 </MyTouch>
               )}
               {scrollIndex < results.length - 1 && (
@@ -274,7 +274,7 @@ export default function Result({ navigation }: Props) {
                   style={styles.arrowButtonRight} 
                   onPress={() => handleScroll('next')}
                 >
-                  <Ionicons name="chevron-forward" size={40} color="#333" />
+                  <ChevronRight size={40} color="#333" />
                 </MyTouch>
               )}
 
@@ -310,7 +310,11 @@ export default function Result({ navigation }: Props) {
                   style={isSpaceModalVisible ? styles.closeButtonFixed : styles.expandButton}
                   onPress={() => setIsSpaceModalVisible(!isSpaceModalVisible)}
                 >
-                  <Ionicons name={isSpaceModalVisible ? "close" : "expand"} size={isSpaceModalVisible ? 30 : 20} color={isSpaceModalVisible ? "#333333" : "#555"} />
+                  {isSpaceModalVisible ? (
+                      <X size={30} color="#333333" />
+                  ) : (
+                      <Maximize size={20} color="#555" />
+                  )}
                 </MyTouch>
               </View>
 
