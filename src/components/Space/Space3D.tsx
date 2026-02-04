@@ -307,39 +307,47 @@ const Space3D: React.FC<Space3DProps> = ({
       setLoadedFurniture(new Map());
       return;
     }
-
     const loadAllPLY = async () => {
       setIsLoading(true);
       const loaded = new Map<string, LoadedFurniture>();
 
-      for (let i = 0; i < furniture.length; i++) {
-        const f = furniture[i];
-        if (!f.ply_url) continue;
+      // 1. 모든 비동기 작업(Promise)을 배열로 생성
+      const loadPromises = furniture.map(async (f, i) => {
+        if (!f.ply_url) return null;
 
         const id = `${f.furnitureId}_${i}`;
-
         try {
-          // GCS PLY는 이미 Y-up으로 변환됨 → 좌표계 변환 비활성화
           const { geometry, material } = await loadPLY(f.ply_url, 0.008, false);
           geometry.center();
-
-          // PLY 바운딩박스 = 히트박스 (절대 크기, m 단위)
           const size = getGeometrySize(geometry);
 
-          loaded.set(id, {
+          return {
             id,
-            geometry,
-            material,
-            width: size.x,
-            depth: size.z,
-            height: size.y,
-          });
-
-          console.log(`[PLY 로드] ${id}: ${size.x.toFixed(2)}m x ${size.z.toFixed(2)}m x ${size.y.toFixed(2)}m`);
+            data: {
+              id,
+              geometry,
+              material,
+              width: size.x,
+              depth: size.z,
+              height: size.y,
+            }
+          };
         } catch (err) {
           console.error(`PLY 로드 실패: ${id}`, err);
+          return null;
         }
-      }
+      });
+
+      // 2. Promise.all로 모든 요청을 병렬로 처리
+      const results = await Promise.all(loadPromises);
+
+      // 3. 결과값을 Map에 세팅
+      results.forEach((result) => {
+        if (result) {
+          loaded.set(result.id, result.data);
+          console.log(`[PLY 로드 완료] ${result.id}`);
+        }
+      });
 
       setLoadedFurniture(loaded);
       setIsLoading(false);
@@ -603,7 +611,7 @@ const Space3D: React.FC<Space3DProps> = ({
             <View style={styles.controlsRow}>
               {simulationState === 'idle' && (
                 <TouchableOpacity style={styles.playButton} onPress={play}>
-                  <Text style={styles.buttonText}>▶ 시작</Text>
+                  <Text style={styles.buttonText}>적재 시작</Text>
                 </TouchableOpacity>
               )}
               {simulationState === 'running' && (
