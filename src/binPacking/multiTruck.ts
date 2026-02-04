@@ -83,37 +83,12 @@ export function selectTrucksForAllItems(
     }
   }
 
-  // 2. 멀티 트럭: 5ton으로 최대한 채우고, 나머지는 작은 트럭부터 시도
+  // 2. 멀티 트럭: 먼저 5ton으로 채우고, 남은 아이템에 대해서만 작은 트럭 체크
   const trucksResult: TruckPlacement[] = [];
   let remainingItems = [...items];
 
-  // 5ton 트럭으로 계속 채우기
   while (remainingItems.length > 0) {
-    // 먼저 남은 아이템이 작은 트럭에 다 들어가는지 확인
-    // (마지막 트럭은 가능한 작은 것으로)
-    let fittedInSmaller = false;
-
-    for (const truckType of TRUCK_ORDER) {
-      const truckDims = TRUCK_PRESETS[truckType];
-      const result = extremePointsPack(remainingItems, truckDims, packOptions);
-
-      if (result.success) {
-        // 모든 남은 아이템이 이 트럭에 들어감
-        const placement = packIntoTruck(remainingItems, truckType, packOptions);
-        if (placement) {
-          trucksResult.push(placement);
-          remainingItems = [];
-          fittedInSmaller = true;
-          break;
-        }
-      }
-    }
-
-    if (fittedInSmaller) {
-      break;
-    }
-
-    // 작은 트럭에 안 들어가면 5ton으로 최대한 채우기
+    // 5ton으로 최대한 채우기 (먼저 실행)
     const fiveTonPlacement = packIntoTruck(remainingItems, '5ton', packOptions);
 
     if (!fiveTonPlacement || fiveTonPlacement.placements.length === 0) {
@@ -126,6 +101,24 @@ export function selectTrucksForAllItems(
     // 배치된 아이템 제거
     const placedIds = new Set(fiveTonPlacement.placements.map((p) => p.itemId));
     remainingItems = remainingItems.filter((item) => !placedIds.has(item.id));
+
+    // 남은 아이템이 작은 트럭에 전부 들어가는지 확인 (마지막 트럭 최적화)
+    if (remainingItems.length > 0) {
+      for (const truckType of TRUCK_ORDER) {
+        const truckDims = TRUCK_PRESETS[truckType];
+        const result = extremePointsPack(remainingItems, truckDims, packOptions);
+
+        if (result.success) {
+          // 모든 남은 아이템이 이 트럭에 들어감
+          const placement = packIntoTruck(remainingItems, truckType, packOptions);
+          if (placement) {
+            trucksResult.push(placement);
+            remainingItems = [];
+            break;
+          }
+        }
+      }
+    }
   }
 
   // 결과 메시지 생성

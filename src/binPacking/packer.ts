@@ -484,44 +484,13 @@ export function packMultiTruck(
   }
 
   // 2. 단일 트럭으로 불가 → 멀티 트럭 모드
-  // 우선순위: 5ton으로 최대한 채우고, 마지막 남은 것만 작은 트럭으로
+  // 핵심: 먼저 5ton으로 채우고, 남은 아이템에 대해서만 작은 트럭 체크
   // 예: 5t+1t → 5t+2.5t → 5t+5t → 5t+5t+1t → ...
   const trucks: TruckPlacement[] = [];
   let remainingItems = [...items];
 
   while (remainingItems.length > 0) {
-    // 먼저 남은 아이템이 작은 트럭에 전부 들어가는지 확인 (마지막 트럭 최적화)
-    let fittedInSmaller = false;
-
-    for (const truckType of TRUCK_ORDER) {
-      const truckDims = TRUCK_PRESETS[truckType];
-      const result = extremePointsPack(remainingItems, truckDims, options);
-
-      if (result.success) {
-        // 모든 남은 아이템이 이 트럭에 들어감
-        const truckVolume = truckDims.width * truckDims.depth * truckDims.height;
-        const placedVolume = result.placedItems.reduce(
-          (sum, b) => sum + b.width * b.depth * b.height,
-          0
-        );
-        const utilization = Math.round((placedVolume / truckVolume) * 1000) / 10;
-
-        trucks.push({
-          type: truckType,
-          placements: result.placedItems,
-          utilization,
-        });
-        remainingItems = [];
-        fittedInSmaller = true;
-        break;
-      }
-    }
-
-    if (fittedInSmaller) {
-      break;
-    }
-
-    // 작은 트럭에 안 들어가면 5ton으로 최대한 채우기
+    // 5ton으로 최대한 채우기 (먼저 실행)
     const fiveTonDims = TRUCK_PRESETS['5ton'];
     const fiveTonResult = extremePointsPack(remainingItems, fiveTonDims, options);
 
@@ -552,6 +521,32 @@ export function packMultiTruck(
     // 배치된 아이템 제거
     const placedIds = new Set(fiveTonResult.placedItems.map((p) => p.itemId));
     remainingItems = remainingItems.filter((item) => !placedIds.has(item.id));
+
+    // 남은 아이템이 작은 트럭에 전부 들어가는지 확인 (마지막 트럭 최적화)
+    if (remainingItems.length > 0) {
+      for (const truckType of TRUCK_ORDER) {
+        const truckDims = TRUCK_PRESETS[truckType];
+        const result = extremePointsPack(remainingItems, truckDims, options);
+
+        if (result.success) {
+          // 모든 남은 아이템이 이 트럭에 들어감
+          const smallTruckVolume = truckDims.width * truckDims.depth * truckDims.height;
+          const smallPlacedVolume = result.placedItems.reduce(
+            (sum, b) => sum + b.width * b.depth * b.height,
+            0
+          );
+          const smallUtilization = Math.round((smallPlacedVolume / smallTruckVolume) * 1000) / 10;
+
+          trucks.push({
+            type: truckType,
+            placements: result.placedItems,
+            utilization: smallUtilization,
+          });
+          remainingItems = [];
+          break;
+        }
+      }
+    }
   }
 
   const totalTrucks = trucks.length;
