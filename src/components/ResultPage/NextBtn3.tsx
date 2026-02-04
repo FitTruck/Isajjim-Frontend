@@ -1,6 +1,6 @@
 ﻿import React, { useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Animated } from 'react-native';
-import { Truck, CheckCircle, ArrowRight } from 'lucide-react-native';
+import { Truck } from 'lucide-react-native';
 
 interface TruckData {
   type: string;
