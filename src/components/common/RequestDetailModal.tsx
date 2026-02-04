@@ -33,70 +33,74 @@ export default function RequestDetailModal({ visible, onClose, data }: RequestDe
     <View style={styles.section}>
       <Text style={styles.sectionTitle}>{title}</Text>
       
-      {/* 주소 (전체 너비) */}
-      <View style={styles.fullRow}>
-        <Text style={styles.gridLabel}>주소</Text>
-        <Text style={styles.gridValue}>
+      {/* 주소 (독립) */}
+      <View style={styles.receiptRow}>
+        <Text style={styles.receiptLabel}>주소</Text>
+        <Text style={styles.receiptValue}>
           {info?.address ? `${info.address} ${info.detailAddress || ''}`.trim() : '-'}
         </Text>
       </View>
 
-      {/* 그리드 컨테이너 */}
-      <View style={styles.gridContainer}>
-        {/* 건물 유형 */}
-        <View style={styles.gridItem}>
-          <Text style={styles.gridLabel}>건물 유형</Text>
-          <Text style={styles.gridValue}>{info?.buildingType ? (BuildingTypeMap[info.buildingType] || info.buildingType) : '-'}</Text>
-        </View>
+      <View style={styles.dashedLine} />
 
-        {/* 평수 */}
-        <View style={styles.gridItem}>
-          <Text style={styles.gridLabel}>평수</Text>
-          <Text style={styles.gridValue}>{info?.roomSize ? (RoomSizeMap[info.roomSize] || info.roomSize) : '-'}</Text>
+      {/* 2열 배치 (영수증 스타일: 한 줄에 2개 항목) */}
+      
+      {/* 1. 건물 유형 | 평수 */}
+      <View style={styles.pairRow}>
+        <View style={styles.pairItem}>
+          <Text style={styles.pairLabel}>건물 유형</Text>
+          <Text style={styles.pairValue}>{info?.buildingType ? (BuildingTypeMap[info.buildingType] || info.buildingType) : '-'}</Text>
         </View>
-
-        {/* 방 구조 */}
-        <View style={styles.gridItem}>
-          <Text style={styles.gridLabel}>방 구조</Text>
-          <Text style={styles.gridValue}>{info?.roomType ? (RoomTypeMap[info.roomType] || info.roomType) : '-'}</Text>
-        </View>
-
-        {/* 층수 */}
-        <View style={styles.gridItem}>
-          <Text style={styles.gridLabel}>층수</Text>
-          <Text style={styles.gridValue}>{info?.floor ? info.floor.replace('FL_', '').replace('_OR_MORE', '') + (info.floor.includes('BASEMENT') ? '' : '층') : '-'}</Text>
-        </View>
-
-        {/* 엘리베이터 */}
-        <View style={styles.gridItem}>
-          <Text style={styles.gridLabel}>엘리베이터</Text>
-          <Text style={styles.gridValue}>{getBoolText(info?.elevator)}</Text>
-        </View>
-
-        {/* 주차 공간 */}
-        <View style={styles.gridItem}>
-          <Text style={styles.gridLabel}>주차 공간</Text>
-          <Text style={styles.gridValue}>{getBoolText(info?.parking)}</Text>
-        </View>
-
-        {/* 사다리차 */}
-        <View style={styles.gridItem}>
-          <Text style={styles.gridLabel}>사다리차</Text>
-          <Text style={styles.gridValue}>{info?.ladderTruck ? (LadderTruckMap[info.ladderTruck] || info.ladderTruck) : '-'}</Text>
-        </View>
-
-        {/* 복층 여부 */}
-        <View style={styles.gridItem}>
-          <Text style={styles.gridLabel}>복층</Text>
-          <Text style={styles.gridValue}>{getBoolText(info?.duplex)}</Text>
-        </View>
-
-        {/* 1층 별도 계단 */}
-        <View style={styles.gridItem}>
-          <Text style={styles.gridLabel}>1층 계단</Text>
-          <Text style={styles.gridValue}>{getBoolText(info?.groundStair)}</Text>
+        <View style={styles.pairItemRight}>
+          <Text style={styles.pairLabel}>평수</Text>
+          <Text style={styles.pairValue}>{info?.roomSize ? (RoomSizeMap[info.roomSize] || info.roomSize) : '-'}</Text>
         </View>
       </View>
+
+      {/* 2. 방 구조 | 층수 */}
+      <View style={styles.pairRow}>
+        <View style={styles.pairItem}>
+          <Text style={styles.pairLabel}>방 구조</Text>
+          <Text style={styles.pairValue}>{info?.roomType ? (RoomTypeMap[info.roomType] || info.roomType) : '-'}</Text>
+        </View>
+        <View style={styles.pairItemRight}>
+          <Text style={styles.pairLabel}>층수</Text>
+          <Text style={styles.pairValue}>{info?.floor ? info.floor.replace('FL_', '').replace('_OR_MORE', '') + (info.floor.includes('BASEMENT') ? '' : '층') : '-'}</Text>
+        </View>
+      </View>
+
+      {/* 3. 엘리베이터 | 주차 */}
+      <View style={styles.pairRow}>
+        <View style={styles.pairItem}>
+          <Text style={styles.pairLabel}>엘리베이터</Text>
+          <Text style={styles.pairValue}>{getBoolText(info?.elevator)}</Text>
+        </View>
+        <View style={styles.pairItemRight}>
+          <Text style={styles.pairLabel}>주차</Text>
+          <Text style={styles.pairValue}>{getBoolText(info?.parking)}</Text>
+        </View>
+      </View>
+
+      {/* 4. 사다리차 | 1층 계단 */}
+      <View style={styles.pairRow}>
+        <View style={styles.pairItem}>
+          <Text style={styles.pairLabel}>사다리차</Text>
+          <Text style={styles.pairValue}>{info?.ladderTruck ? (LadderTruckMap[info.ladderTruck] || info.ladderTruck) : '-'}</Text>
+        </View>
+        <View style={styles.pairItemRight}>
+          <Text style={styles.pairLabel}>1층 계단</Text>
+          <Text style={styles.pairValue}>{getBoolText(info?.groundStair)}</Text>
+        </View>
+      </View>
+
+      {/* 5. 복층 (단독) */}
+      <View style={styles.pairRow}>
+        <View style={styles.pairItem}>
+          <Text style={styles.pairLabel}>복층</Text>
+          <Text style={styles.pairValue}>{getBoolText(info?.duplex)}</Text>
+        </View>
+      </View>
+
     </View>
     );
   };
@@ -200,7 +204,7 @@ const styles = StyleSheet.create({
   },
   modalContainer: {
     width: '90%',
-    maxWidth: 400,
+    maxWidth: 500, // 모달 너비 증가
     maxHeight: '85%',
     backgroundColor: '#fff',
     borderRadius: 4,
@@ -218,13 +222,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 16,
+    paddingVertical: 18, // 패딩 증가
     borderBottomWidth: 1,
     borderBottomColor: '#eee',
     position: 'relative',
   },
   headerTitle: {
-    fontSize: 18,
+    fontSize: 22, // 20 -> 22
     fontWeight: 'bold',
     color: '#333',
   },
@@ -241,32 +245,32 @@ const styles = StyleSheet.create({
     paddingBottom: 40,
   },
   section: {
-    marginBottom: 4,
+    marginBottom: 8,
   },
   sectionTitle: {
-    fontSize: 14,
+    fontSize: 20, // 18 -> 20
     fontWeight: '600',
-    color: '#888',
-    marginBottom: 12,
+    color: '#333',
+    marginBottom: 16,
   },
   dateValue: {
-    fontSize: 18,
+    fontSize: 24, // 22 -> 24
     fontWeight: 'bold',
     color: '#333',
   },
   row: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center', // 수직 중앙 정렬 추가
+    alignItems: 'center', 
     marginBottom: 8,
   },
   label: {
-    fontSize: 15,
+    fontSize: 16, 
     color: '#555',
-    minWidth: 70, // 라벨 최소 너비 확보
+    minWidth: 70, 
   },
   value: {
-    fontSize: 15,
+    fontSize: 16,
     color: '#333',
     fontWeight: '500',
     textAlign: 'right',
@@ -276,33 +280,33 @@ const styles = StyleSheet.create({
   divider: {
     height: 1,
     backgroundColor: '#eee',
-    marginVertical: 20,
+    marginVertical: 24,
   },
   itemRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 6,
+    marginBottom: 8,
   },
   itemName: {
-    fontSize: 15,
+    fontSize: 17, // 16 -> 17
     color: '#333',
   },
   itemQuantity: {
-    fontSize: 15,
+    fontSize: 17, // 16 -> 17
     color: '#333',
     fontWeight: '500',
   },
   truckType: {
-    fontSize: 15,
+    fontSize: 17, // 16 -> 17
     color: '#333',
   },
   truckQuantity: {
-    fontSize: 15,
+    fontSize: 17, // 16 -> 17
     fontWeight: '500',
     color: '#333',
   },
   emptyText: {
-    fontSize: 14,
+    fontSize: 15,
     color: '#ccc',
     fontStyle: 'italic',
   },
@@ -333,35 +337,57 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   aiTitle: {
-    fontSize: 14,
+    fontSize: 18, // 16 -> 18
     fontWeight: 'bold',
     color: '#EA6500',
   },
   aiContent: {
-    fontSize: 13,
+    fontSize: 16, // 15 -> 16
     color: '#555',
-    lineHeight: 20,
+    lineHeight: 24,
   },
-  // 그리드 스타일
-  fullRow: {
+  // 영수증 스타일 (Receipt Style)
+  receiptRow: {
     marginBottom: 16,
   },
-  gridContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-  },
-  gridItem: {
-    width: '48%', // 2열 배치 (간격 고려)
-    marginBottom: 16,
-  },
-  gridLabel: {
-    fontSize: 13,
+  receiptLabel: {
+    fontSize: 16, // 15 -> 16
     color: '#888',
+    marginBottom: 6,
+  },
+  receiptValue: {
+    fontSize: 19, // 17 -> 19
+    color: '#333',
+    fontWeight: '600',
+  },
+  dashedLine: {
+    borderBottomWidth: 1,
+    borderBottomColor: '#ddd',
+    borderStyle: 'dashed',
+    marginVertical: 16,
+    width: '100%',
+  },
+  pairRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 16,
+  },
+  pairItem: {
+    flex: 1,
+    paddingRight: 8,
+  },
+  pairItemRight: {
+    flex: 1,
+    paddingLeft: 8,
+    // alignItems: 'flex-end' 제거하여 좌측 정렬로 변경
+  },
+  pairLabel: {
+    fontSize: 15, // 14 -> 15
+    color: '#999',
     marginBottom: 4,
   },
-  gridValue: {
-    fontSize: 15,
+  pairValue: {
+    fontSize: 18, // 16 -> 18
     color: '#333',
     fontWeight: '600',
   },
