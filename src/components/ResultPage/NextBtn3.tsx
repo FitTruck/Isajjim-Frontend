@@ -30,38 +30,31 @@ const getTruckTonnage = (type: string): number => {
 };
 
 const NextBtn3 = ({ data, status, onNavigateNext }: NextBtn3Props) => {
-  // useRef : Estimate 컴포넌트가 리렌더링 되어도 변수값 유지
-  // useRef가 반환하는 값의 속성 중에 current가 있고 그 current값은 Animated.Value(0)의 값임
-  // Animated.Value(x) -> 값을 자연스럽게 그라데이션으로 변경 
   const updatingOpacity = useRef(new Animated.Value(0)).current; 
-  // 0인 상태로 시작하는 애니메이션 숫자
-  // updatingOpacity : 견적서 생성중... 텍스트의 투명도임.
-  const doneOpacity = useRef(new Animated.Value(1)).current; 
   // 1인 상태로 시작하는 애니메이션 숫자
-  // doneOpacity : 체크 아이콘의 투명도임.
+  const doneOpacity = useRef(new Animated.Value(1)).current; 
 
   // result화면에서 받아오는 status값이 변경될 때마다 실행되는 함수임. 컴포넌트도 다시 그림
   useEffect(() => {
     if (status === 'updating') {
-      // 체크 -> 생성중... (애니메이션 없이 즉시 변경)
-      updatingOpacity.setValue(1); //setValue(1) : 변수 값을 1로 즉시 변경(견적서 생성중... 텍스트를 보이게 하는 opacity 속성값으로 쓸 변수를 1로 바꿈)
-      doneOpacity.setValue(0); //setValue(0) : 변수 값을 0으로 즉시 변경(체크 아이콘을 보이게 하는 opacity 속성값으로 쓸 변수를 0으로 바꿈)
+      updatingOpacity.setValue(1); // 값을 1로 즉시 변경
+      doneOpacity.setValue(0); // 즉시 0으로 변경
     } else if (status === 'done') {
-      // 생성중... -> 체크 (부드럽게 페이드 효과)
       Animated.parallel([
-        Animated.timing(updatingOpacity, { //updatingOpacity 변수를 200ms동안 0으로 바꿈
+        // 값을 부드럽게 0으로 변경
+        Animated.timing(updatingOpacity, { 
           toValue: 0,
           duration: 200,
           useNativeDriver: true,
         }),
-        Animated.timing(doneOpacity, { //doneOpacity 변수를 400ms동안 1로 바꿈
+        // 값을 부드럽게 1로 변경
+        Animated.timing(doneOpacity, { 
           toValue: 1,
           duration: 400,
           useNativeDriver: true,
         }),
       ]).start();
-    } else {
-      // prev 상태 (초기 상태 혹은 리셋): 체크 표시만 보임
+    } else { // result페이지가 로딩 되자마자의 초기 상태.
       updatingOpacity.setValue(0);
       doneOpacity.setValue(1);
     }
@@ -94,13 +87,13 @@ const NextBtn3 = ({ data, status, onNavigateNext }: NextBtn3Props) => {
         {/* 유효한 트럭 정보만 표시 (type이 있고 quantity > 0), 톤수 오름차순 정렬 */}
         {data.filter(truck => truck.type && truck.quantity > 0).length > 0 ? (
           data
-              .filter(truck => truck.type && truck.quantity > 0)
-              .sort((a, b) => getTruckTonnage(a.type) - getTruckTonnage(b.type))
-              .map((truck, index) => (
-              <View key={index} style={styles.row}>
-                  <Text style={styles.truckType}>{getTruckLabel(truck.type)}</Text>
-                    <Text style={styles.truckQuantity}>{truck.quantity}대</Text>
-                  </View>
+            .filter(truck => truck.type && truck.quantity > 0)
+            .sort((a, b) => getTruckTonnage(a.type) - getTruckTonnage(b.type))
+            .map((truck, index) => (
+            <View key={index} style={styles.row}>
+              <Text style={styles.truckType}>{getTruckLabel(truck.type)}</Text>
+              <Text style={styles.truckQuantity}>{truck.quantity}대</Text>
+            </View>
             ))
         ) : (
           <Text style={styles.loadingText}>시뮬레이션을 시작하면 계산됩니다</Text>
