@@ -1,5 +1,5 @@
-import React, { useMemo } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView, Pressable } from 'react-native';
+import React, { useMemo, useState } from 'react';
 import { translateLabel, translateType } from '../../utils/Translator';
 import { Minus, Plus } from 'lucide-react-native';
 
@@ -29,6 +29,36 @@ interface ResultCardProps {
 
   onQuantityChange: (furnitureId: number, newQuantity: number) => void;
 }
+import { LucideIcon } from 'lucide-react-native';
+
+interface QuantityButtonProps {
+  onPress: () => void;
+  icon: LucideIcon;
+  disabled?: boolean;
+}
+
+const QuantityButton = ({ onPress, icon: Icon, disabled }: QuantityButtonProps) => {
+  const [isHovered, setIsHovered] = useState(false);
+
+  return (
+    <Pressable
+      onPress={onPress}
+      disabled={disabled}
+      // @ts-ignore
+      onHoverIn={() => setIsHovered(true)}
+      // @ts-ignore
+      onHoverOut={() => setIsHovered(false)}
+      style={({ pressed }) => [
+        styles.countButton,
+        // disabled 스타일 제거 (요청사항: disable되어도 스타일 동일)
+        !disabled && isHovered && styles.hoveredButton,
+        !disabled && pressed && styles.pressedButton,
+      ]}
+    >
+      <Icon size={20} color="#333" />
+    </Pressable>
+  );
+};
 
 const ResultCard = ({ image, items, onQuantityChange }: ResultCardProps) => {
 
@@ -115,45 +145,48 @@ const ResultCard = ({ image, items, onQuantityChange }: ResultCardProps) => {
           showsVerticalScrollIndicator={true}
           contentContainerStyle={{ paddingBottom: 20 }}
         >
-          {translatedItems.map((item) => (
-            <View key={item.furnitureId} style={styles.itemContainer}>
-              
-              {/* 아이템 정보 */}
-              <View style={styles.itemDetailContainer}>
-                <Text style={styles.itemTitle}>{item.label}</Text>
-              </View>
-
-              {/* 수량 조절 버튼 */}
-              <View style={styles.itemCountContainer}>
-
-                {/* - 버튼 */}
-                <TouchableOpacity
-                  style={styles.countButton}
-                  onPress={() => {
-                    if (item.quantity <= 0) return; // 이미 0이면 무시
-                    const newQuantity = item.quantity - 1;
-                    onQuantityChange(item.furnitureId, newQuantity);
-                  }}
-                >
-                  <Minus size={20} color="#333" />
-                </TouchableOpacity>
-
-                {/* 수량 */}
-                <Text style={styles.resultCardNumber}>{item.quantity}</Text>
+          {translatedItems.length > 0 ? (
+            translatedItems.map((item) => (
+              <View key={item.furnitureId} style={styles.itemContainer}>
                 
-                {/* + 버튼 */}
-                <TouchableOpacity 
-                  style={styles.countButton}
-                  onPress={() => {
-                    const newQuantity = item.quantity + 1;
-                    onQuantityChange(item.furnitureId, newQuantity);
-                  }}
-                >
-                  <Plus size={20} color="#333" />
-                </TouchableOpacity>
+                {/* 아이템 정보 */}
+                <View style={styles.itemDetailContainer}>
+                  <Text style={styles.itemTitle}>{item.label}</Text>
+                </View>
+  
+                {/* 수량 조절 버튼 */}
+                <View style={styles.itemCountContainer}>
+  
+                  {/* - 버튼 */}
+                  <QuantityButton 
+                    icon={Minus} 
+                    onPress={() => {
+                      if (item.quantity <= 0) return;
+                      const newQuantity = item.quantity - 1;
+                      onQuantityChange(item.furnitureId, newQuantity);
+                    }}
+                    disabled={item.quantity <= 0}
+                  />
+  
+                  {/* 수량 */}
+                  <Text style={styles.resultCardNumber}>{item.quantity}</Text>
+                  
+                  {/* + 버튼 */}
+                  <QuantityButton 
+                    icon={Plus} 
+                    onPress={() => {
+                      const newQuantity = item.quantity + 1;
+                      onQuantityChange(item.furnitureId, newQuantity);
+                    }}
+                  />
+                </View>
               </View>
+            ))
+          ) : (
+            <View style={styles.emptyContainer}>
+              <Text style={styles.emptyText}>인식된 가구가 없습니다.</Text>
             </View>
-          ))}
+          )}
         </ScrollView>
       </View>
     </View>
@@ -253,7 +286,7 @@ const styles = StyleSheet.create({
     color: '#9E9E9E',
   },
   itemCountContainer: {
-    width: 104,
+    width: 120,
     height: 38,
     backgroundColor: '#F5F5F7',
     borderRadius: 12,
@@ -275,11 +308,28 @@ const styles = StyleSheet.create({
     shadowRadius: 2,
     elevation: 2,
   },
+
+  hoveredButton: {
+    backgroundColor: '#FFF0E0', 
+  },
+  pressedButton: {
+    backgroundColor: '#E0E0E0',
+  },
   resultCardNumber: {
     fontSize: 16,
     fontWeight: '700',
     color: '#333',
     textAlign: 'center',
     width: 20,
+  },
+  emptyContainer: {
+    paddingVertical: 100,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  emptyText: {
+    fontSize: 16,
+    color: '#999',
+    fontWeight: '500',
   },
 });
