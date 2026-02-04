@@ -3,8 +3,6 @@ import { TouchableOpacity, Text, View, StyleSheet, Alert, Platform } from 'react
 import { BACKEND_DOMAIN } from '../../utils/Server';
 import LoadingModal from './LoadingModal';
 import { useEstimate } from '../../context/EstimateContext';
-import { optimizeOBBMulti } from '../../binPacking/multiTruck';
-import { TruckPlacement } from '../../binPacking/types';
 import { translateLabel } from '../../utils/Translator';
 
 interface Props {
@@ -144,39 +142,6 @@ export default function NextBtn2({ navigation, estimateId, images, onShowAlert, 
           const furnitureInfo = await response.json();
           console.log("가구 정보: ", furnitureInfo);
 
-          // 다중 트럭 계산 로직 적용
-          // 1. OBBItem으로 변환 (미터 단위 -> cm 단위 변환 가정)
-          const itemsForPacking: any[] = furnitureInfo.data.items.map((item: any) => ({
-            id: item.id || `item-${Math.random()}`,
-            width: (item.width || 0) * 100, 
-            depth: (item.depth || 0) * 100, 
-            height: (item.height || 0) * 100 
-          }));
-
-          // 2. 트럭 계산
-          const packingResult = optimizeOBBMulti(itemsForPacking);
-          
-          let truckType = "정보 없음";
-          let truckQuantity = 0;
-
-          if (packingResult.success) {
-            truckQuantity = packingResult.totalTrucks;
-            // 예: "5ton + 1ton" 형태의 문자열 생성
-            const typeMap: {[key: string]: string} = {
-              '1ton': '1톤 트럭',
-              '2.5ton': '2.5톤 트럭',
-              '5ton': '5톤 트럭'
-            };
-            const types = packingResult.trucks.map((t: TruckPlacement) => typeMap[t.type] || t.type);
-            truckType = types.join(' + ');
-            
-            console.log(`트럭 계산 결과: ${packingResult.message}`);
-          } else {
-            console.warn("트럭 계산 실패:", packingResult.message);
-          }
-
-          console.log("트럭 type: ", truckType);
-          console.log("트럭 quantity: ", truckQuantity);
           // 가구 목록 추출 및 매핑
           const initialItems = furnitureInfo.data.images?.flatMap((img: any) => 
             img.furnitureList?.map((f: any) => ({
@@ -192,7 +157,7 @@ export default function NextBtn2({ navigation, estimateId, images, onShowAlert, 
             startLocation: startLocation,
             endLocation: endLocation,
             items: initialItems, // 가구 목록 저장
-            truckInfo: { type: truckType, quantity: truckQuantity },
+            truckInfo: { type: '', quantity: 0 }, // 트럭 정보는 Result 페이지에서 계산됨
             images: images,
             analysisResult: furnitureInfo
           });
@@ -238,9 +203,10 @@ export default function NextBtn2({ navigation, estimateId, images, onShowAlert, 
 const styles = StyleSheet.create({
   nextBtnContainer: {
     width: '100%', 
-    alignItems: 'flex-end',
-    position: 'relative',
-    right: 330,
+    maxWidth: 1240, // 600 * 2 + 40 (gap)
+    alignSelf: 'center',
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
     marginBottom: 250,
   },
   nextBtn: {
