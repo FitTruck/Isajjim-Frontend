@@ -27,7 +27,7 @@ export interface TruckInfo {
 }
 
 export interface RequestData {
-  estimateId: number;
+  estimateId?: number | null;
   images?: any[];
   
   movingDate?: string | null;
@@ -51,9 +51,7 @@ export const EstimateProvider = ({ children }: { children: ReactNode }) => {
   const [requestData, setRequestData] = useState<RequestData | null>(null);
 
   const updateAiSummary = (summary: string) => {
-    if (requestData) {
-      setRequestData({ ...requestData, aiSummary: summary });
-    }
+    setRequestData(prev => prev ? { ...prev, aiSummary: summary } : { aiSummary: summary });
   };
 
   return (
