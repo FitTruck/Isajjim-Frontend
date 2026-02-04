@@ -176,7 +176,7 @@ const FurniturePoints: React.FC<FurniturePointsProps> = ({
       setCurrentY(startY);
 
       // 애니메이션
-      const duration = 400;
+      const duration = 270;
       const startTime = performance.now();
 
       const animate = () => {
@@ -279,6 +279,9 @@ const MultiTruckScene: React.FC<MultiTruckSceneProps> = ({
   );
 };
 
+// PLY 캐시 (ply_url → geometry/material) - 컴포넌트 외부에 선언하여 전역 캐시로 사용
+const plyCache = new Map<string, { geometry: THREE.BufferGeometry; material: THREE.PointsMaterial; width: number; depth: number; height: number }>();
+
 const Space3D: React.FC<Space3DProps> = ({
   furniture,
   truckType,
@@ -302,6 +305,7 @@ const Space3D: React.FC<Space3DProps> = ({
   const currentTruckType = currentTruck?.type || truckType || '2.5ton';
 
   // 1. PLY 로드 (AI 서버가 절대 크기 PLY 제공 → 스케일링 불필요)
+  // 캐시를 사용하여 같은 ply_url은 다시 다운로드하지 않음
   useEffect(() => {
     if (!furniture || furniture.length === 0) {
       setLoadedFurniture(new Map());
@@ -316,10 +320,39 @@ const Space3D: React.FC<Space3DProps> = ({
         if (!f.ply_url) return null;
 
         const id = `${f.furnitureId}_${i}`;
+
+        // 캐시 확인
+        const cached = plyCache.get(f.ply_url);
+        if (cached) {
+          console.log(`[PLY 캐시 히트] ${id} (${f.ply_url.slice(-30)})`);
+          return {
+            id,
+            data: {
+              id,
+              geometry: cached.geometry,
+              material: cached.material,
+              width: cached.width,
+              depth: cached.depth,
+              height: cached.height,
+            }
+          };
+        }
+
+        // 캐시 미스 → 다운로드
         try {
+          console.log(`[PLY 다운로드] ${id}`);
           const { geometry, material } = await loadPLY(f.ply_url, 0.008, false);
           geometry.center();
           const size = getGeometrySize(geometry);
+
+          // 캐시에 저장
+          plyCache.set(f.ply_url, {
+            geometry,
+            material,
+            width: size.x,
+            depth: size.z,
+            height: size.y,
+          });
 
           return {
             id,
@@ -508,7 +541,7 @@ const Space3D: React.FC<Space3DProps> = ({
 
         return newCounts;
       });
-    }, 600);
+    }, 400);
   }, [onAnimationComplete]);
 
   const play = useCallback(() => {
