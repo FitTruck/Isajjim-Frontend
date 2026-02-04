@@ -176,7 +176,7 @@ const FurniturePoints: React.FC<FurniturePointsProps> = ({
       setCurrentY(startY);
 
       // 애니메이션
-      const duration = 400;
+      const duration = 270;
       const startTime = performance.now();
 
       const animate = () => {
@@ -541,7 +541,7 @@ const Space3D: React.FC<Space3DProps> = ({
 
         return newCounts;
       });
-    }, 600);
+    }, 400);
   }, [onAnimationComplete]);
 
   const play = useCallback(() => {
