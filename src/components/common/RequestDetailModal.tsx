@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, Modal, ScrollView, TouchableOpacity, Platform } from 'react-native';
+import Markdown from 'react-native-markdown-display';
 import { X, Sparkles } from 'lucide-react-native';
 import { RequestData, LocationInfo } from '../../context/EstimateContext';
 
@@ -183,9 +184,15 @@ export default function RequestDetailModal({ visible, onClose, data }: RequestDe
                 <Sparkles size={16} color="#F0893B" />
                 <Text style={styles.aiTitle}>AI 요약 (확정 사항)</Text>
               </View>
-              <Text style={styles.aiContent}>
-                {data.aiSummary ? data.aiSummary : "아직 확정된 대화 내용이 없습니다.\n업체와 상담하여 특이사항을 확정해주세요."}
-              </Text>
+              {data.aiSummary ? (
+                <Markdown style={markdownStyles}>
+                  {data.aiSummary}
+                </Markdown>
+              ) : (
+                <Text style={styles.aiContent}>
+                  아직 확정된 대화 내용이 없습니다.{'\n'}업체와 상담하여 특이사항을 확정해주세요.
+                </Text>
+              )}
             </View>
 
           </ScrollView>
@@ -194,6 +201,18 @@ export default function RequestDetailModal({ visible, onClose, data }: RequestDe
     </Modal>
   );
 }
+
+const markdownStyles = StyleSheet.create({
+  body: {
+    fontSize: 16,
+    color: '#555',
+    lineHeight: 24,
+  },
+  strong: {
+    fontWeight: 'bold',
+    color: '#333',
+  },
+});
 
 const styles = StyleSheet.create({
   overlay: {
