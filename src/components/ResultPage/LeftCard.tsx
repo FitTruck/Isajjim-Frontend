@@ -105,7 +105,7 @@ const ResultCard = ({ image, items, onQuantityChange }: ResultCardProps) => {
       {/* Content */}
       <View style={styles.resultCardContent}>
         <View>
-          <Text style={styles.headerTitle}>가구 리스트</Text>
+          <Text style={styles.headerTitle}>가구 목록</Text>
           <View style={styles.contentDivider} />
         </View>
 
@@ -121,7 +121,6 @@ const ResultCard = ({ image, items, onQuantityChange }: ResultCardProps) => {
               {/* 아이템 정보 */}
               <View style={styles.itemDetailContainer}>
                 <Text style={styles.itemTitle}>{item.label}</Text>
-                <Text style={styles.itemSubtitle}>{item.type}</Text>
               </View>
 
               {/* 수량 조절 버튼 */}
