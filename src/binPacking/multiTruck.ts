@@ -55,9 +55,18 @@ export function selectTrucksForAllItems(
   const packOptions = { supportRatio, cornerFirst };
 
   // 1. 단일 트럭 시도 (작은 것부터: 1ton → 2.5ton → 5ton)
+  console.log('[멀티트럭] 아이템 수:', items.length);
+  if (items.length > 0) {
+    const totalVolume = items.reduce((sum, item) => sum + item.width * item.depth * item.height, 0);
+    console.log('[멀티트럭] 총 부피(cm³):', totalVolume.toFixed(0));
+    console.log('[멀티트럭] 1t 부피(cm³):', (170 * 280 * 170).toFixed(0));
+    console.log('[멀티트럭] 첫 아이템 크기:', items[0]);
+  }
   for (const truckType of TRUCK_ORDER) {
     const truckDims = TRUCK_PRESETS[truckType];
     const result = extremePointsPack(items, truckDims, packOptions);
+
+    console.log(`[멀티트럭] ${truckType} 시도: success=${result.success}, 배치=${result.placedItems.length}/${items.length}, 미배치=${result.unplacedItems.length}`);
 
     if (result.success) {
       const truckVolume = truckDims.width * truckDims.depth * truckDims.height;
