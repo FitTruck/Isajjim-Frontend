@@ -603,7 +603,7 @@ const Space3D: React.FC<Space3DProps> = ({
             <View style={styles.controlsRow}>
               {simulationState === 'idle' && (
                 <TouchableOpacity style={styles.playButton} onPress={play}>
-                  <Text style={styles.buttonText}>▶ 시작</Text>
+                  <Text style={styles.buttonText}>적재 시작</Text>
                 </TouchableOpacity>
               )}
               {simulationState === 'running' && (
