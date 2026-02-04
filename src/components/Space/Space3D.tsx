@@ -596,7 +596,7 @@ const Space3D: React.FC<Space3DProps> = ({
       {hasSimulation && (
         <View style={styles.controlsOverlay}>
           {isLoading ? (
-            <Text style={styles.loadingText}>PLY 로딩 중...</Text>
+            <Text style={styles.loadingText}>가구 가져오는 중...</Text>
           ) : trucks.length === 0 ? (
             <Text style={styles.loadingText}>배치 계산 중...</Text>
           ) : (
