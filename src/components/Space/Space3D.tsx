@@ -5,7 +5,7 @@ import { OrbitControls as OrbitControlsStd } from 'three-stdlib';
 import * as THREE from 'three';
 import TruckContainer from './TruckContainer';
 import { loadPLY, getGeometrySize } from './utils/plyLoader';
-import { Space3DProps, TruckType, TRUCK_DIMENSIONS } from '../../types/simulation';
+import { Space3DProps, TruckType, TRUCK_DIMENSIONS, SimulationTruckResult } from '../../types/simulation';
 import { optimizeOBB, packMultiTruck } from '../../binPacking/packer';
 import { OBBItem, PlacedBox, Orientation, TruckPlacement } from '../../binPacking/types';
 
@@ -28,12 +28,35 @@ interface LoadedFurniture {
   height: number;
 }
 
-interface ControlsProps {
-  truckType?: TruckType;
-  containerCenter?: [number, number, number];
+// 트럭 간 간격 (m)
+const TRUCK_SPACING_GAP = 1.5;
+
+// 트럭 X 위치 계산 (오른쪽으로 나열)
+const calculateTruckXOffset = (trucks: TruckPlacement[], index: number): number => {
+  let offset = 0;
+  for (let i = 0; i < index; i++) {
+    const dims = TRUCK_DIMENSIONS[trucks[i].type as TruckType];
+    offset += dims.width + TRUCK_SPACING_GAP;
+  }
+  return offset;
+};
+
+// Easing 함수
+function easeOutCubic(t: number): number {
+  return 1 - Math.pow(1 - t, 3);
 }
 
-const Controls: React.FC<ControlsProps> = ({ truckType, containerCenter }) => {
+interface AnimatedControlsProps {
+  truckType?: TruckType;
+  targetPosition: [number, number, number];
+  animationDuration?: number;
+}
+
+const AnimatedControls: React.FC<AnimatedControlsProps> = ({
+  truckType,
+  targetPosition,
+  animationDuration = 800,
+}) => {
   const { camera, gl } = useThree();
   const controlsRef = useRef<OrbitControlsStd>(null);
 
@@ -44,14 +67,66 @@ const Controls: React.FC<ControlsProps> = ({ truckType, containerCenter }) => {
     return { min: maxDim * 1.5, max: maxDim * 10 };
   }, [truckType]);
 
-  useEffect(() => {
-    if (controlsRef.current && containerCenter) {
-      controlsRef.current.target.set(containerCenter[0], containerCenter[1], containerCenter[2]);
-    }
-  }, [containerCenter]);
+  // 애니메이션 상태
+  const animState = useRef({
+    isAnimating: false,
+    startTime: 0,
+    startTarget: new THREE.Vector3(),
+    endTarget: new THREE.Vector3(),
+    startCamPos: new THREE.Vector3(),
+    endCamPos: new THREE.Vector3(),
+  });
 
+  // targetPosition 변경 시 애니메이션 시작
+  useEffect(() => {
+    if (!controlsRef.current) return;
+
+    const current = controlsRef.current.target.clone();
+    const target = new THREE.Vector3(...targetPosition);
+
+    if (current.distanceTo(target) < 0.01) return;
+
+    const offset = camera.position.clone().sub(current);
+
+    animState.current = {
+      isAnimating: true,
+      startTime: performance.now(),
+      startTarget: current,
+      endTarget: target,
+      startCamPos: camera.position.clone(),
+      endCamPos: target.clone().add(offset),
+    };
+  }, [targetPosition, camera]);
+
+  // 프레임마다 애니메이션 업데이트
   useFrame(() => {
-    controlsRef.current?.update();
+    if (!controlsRef.current) return;
+
+    if (animState.current.isAnimating) {
+      const elapsed = performance.now() - animState.current.startTime;
+      const progress = Math.min(elapsed / animationDuration, 1);
+      const eased = easeOutCubic(progress);
+
+      // 타겟 보간
+      controlsRef.current.target.lerpVectors(
+        animState.current.startTarget,
+        animState.current.endTarget,
+        eased
+      );
+
+      // 카메라 위치 보간
+      camera.position.lerpVectors(
+        animState.current.startCamPos,
+        animState.current.endCamPos,
+        eased
+      );
+
+      if (progress >= 1) {
+        animState.current.isAnimating = false;
+      }
+    }
+
+    controlsRef.current.update();
   });
 
   return (
@@ -60,7 +135,6 @@ const Controls: React.FC<ControlsProps> = ({ truckType, containerCenter }) => {
       args={[camera, gl.domElement]}
       enableDamping={true}
       dampingFactor={0.05}
-      autoRotateSpeed={2.0}
       minDistance={cameraDistance.min}
       maxDistance={cameraDistance.max}
       maxPolarAngle={Math.PI / 2.1}
@@ -152,40 +226,53 @@ const extractBaseId = (instanceId: string): string => {
   return instanceId.substring(0, lastUnderscoreIdx);
 };
 
-// 시뮬레이션 씬
-interface SimulationSceneProps {
-  truckType: TruckType;
-  placements: PlacedBox[];
+// 멀티 트럭 씬 (모든 완료 트럭 + 현재 트럭 렌더링)
+interface MultiTruckSceneProps {
+  trucks: TruckPlacement[];
+  currentTruckIndex: number;
+  truckVisibleCounts: number[];
   loadedFurniture: Map<string, LoadedFurniture>;
-  visibleCount: number;
   animationKey: number;
 }
 
-const SimulationScene: React.FC<SimulationSceneProps> = ({
-  truckType,
-  placements,
+const MultiTruckScene: React.FC<MultiTruckSceneProps> = ({
+  trucks,
+  currentTruckIndex,
+  truckVisibleCounts,
   loadedFurniture,
-  visibleCount,
   animationKey,
 }) => {
   return (
-    <group position={[0, 0, 0]}>
-      <TruckContainer truckType={truckType} />
+    <group>
+      {trucks.map((truck, truckIdx) => {
+        // 현재 트럭 이하만 렌더링
+        if (truckIdx > currentTruckIndex) return null;
 
-      {placements.map((placement, index) => {
-        // instanceId에서 baseId 추출하여 geometry/material 조회
-        const baseId = extractBaseId(placement.itemId);
-        const furniture = loadedFurniture.get(baseId);
-        if (!furniture) return null;
+        const xOffset = calculateTruckXOffset(trucks, truckIdx);
+        const visibleCount = truckVisibleCounts[truckIdx] || 0;
 
         return (
-          <FurniturePoints
-            key={`${placement.itemId}-${animationKey}`}
-            furniture={furniture}
-            placement={placement}
-            visible={index < visibleCount}
-            animationKey={animationKey}
-          />
+          <group key={truckIdx} position={[xOffset, 0, 0]}>
+            <TruckContainer truckType={truck.type as TruckType} />
+            {truck.placements.map((placement, index) => {
+              const baseId = extractBaseId(placement.itemId);
+              const furniture = loadedFurniture.get(baseId);
+              if (!furniture) return null;
+
+              // 완료된 트럭(truckIdx < currentTruckIndex)은 모든 아이템 항상 표시
+              const isCompletedTruck = truckIdx < currentTruckIndex;
+
+              return (
+                <FurniturePoints
+                  key={`${truckIdx}-${placement.itemId}`}
+                  furniture={furniture}
+                  placement={placement}
+                  visible={isCompletedTruck || index < visibleCount}
+                  animationKey={animationKey}
+                />
+              );
+            })}
+          </group>
         );
       })}
     </group>
@@ -197,12 +284,13 @@ const Space3D: React.FC<Space3DProps> = ({
   truckType,
   autoPlay = false,
   onAnimationComplete,
+  onTrucksChange,
 }) => {
   const [loadedFurniture, setLoadedFurniture] = useState<Map<string, LoadedFurniture>>(new Map());
   const [trucks, setTrucks] = useState<TruckPlacement[]>([]);
   const [currentTruckIndex, setCurrentTruckIndex] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
-  const [visibleCount, setVisibleCount] = useState(0);
+  const [truckVisibleCounts, setTruckVisibleCounts] = useState<number[]>([]);
   const [isPlaying, setIsPlaying] = useState(false);
   const [animationKey, setAnimationKey] = useState(0);
   const [packingMessage, setPackingMessage] = useState('');
@@ -211,7 +299,6 @@ const Space3D: React.FC<Space3DProps> = ({
 
   const hasSimulation = furniture && furniture.length > 0;
   const currentTruck = trucks[currentTruckIndex];
-  const placements = currentTruck?.placements || [];
   const currentTruckType = currentTruck?.type || truckType || '2.5ton';
 
   // 1. PLY 로드 (AI 서버가 절대 크기 PLY 제공 → 스케일링 불필요)
@@ -276,7 +363,8 @@ const Space3D: React.FC<Space3DProps> = ({
       const loadedItem = loadedFurniture.get(baseId);
       if (!loadedItem) return;
 
-      const qty = f.quantity || 1;
+      const qty = f.quantity ?? 1;
+      if (qty <= 0) return;  // quantity 0인 가구 건너뛰기
       for (let copyIndex = 0; copyIndex < qty; copyIndex++) {
         items.push({
           id: `${baseId}_${copyIndex}`,  // instanceId: baseId_copyIndex
@@ -310,12 +398,38 @@ const Space3D: React.FC<Space3DProps> = ({
     }
 
     // 새로운 결과면 애니메이션 리셋
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+      timerRef.current = null;
+    }
     setCurrentTruckIndex(0);
-    setVisibleCount(0);
     setIsPlaying(false);
     setSimulationState('idle');
     setAnimationKey((k) => k + 1);
   }, [loadedFurniture, truckType, furniture]);
+
+  // trucks 변경 시 truckVisibleCounts 초기화
+  useEffect(() => {
+    setTruckVisibleCounts(trucks.map(() => 0));
+  }, [trucks]);
+
+  // 트럭 결과가 변경되면 부모에게 알림
+  useEffect(() => {
+    if (onTrucksChange && trucks.length > 0) {
+      // 트럭 타입별로 집계
+      const truckCounts = trucks.reduce((acc, truck) => {
+        const type = truck.type as TruckType;
+        acc[type] = (acc[type] || 0) + 1;
+        return acc;
+      }, {} as Record<TruckType, number>);
+
+      const truckResults: SimulationTruckResult[] = Object.entries(truckCounts).map(
+        ([type, quantity]) => ({ type: type as TruckType, quantity })
+      );
+
+      onTrucksChange(truckResults);
+    }
+  }, [trucks, onTrucksChange]);
 
   // 타이머 클린업
   useEffect(() => {
@@ -328,46 +442,71 @@ const Space3D: React.FC<Space3DProps> = ({
 
   // autoPlay 처리: 데이터 준비 완료 시 자동 재생
   useEffect(() => {
-    if (autoPlay && !isLoading && trucks.length > 0 && !isPlaying && visibleCount === 0) {
+    const allZero = truckVisibleCounts.length > 0 && truckVisibleCounts.every(c => c === 0);
+    if (autoPlay && !isLoading && trucks.length > 0 && !isPlaying && allZero) {
       play();
     }
-  }, [autoPlay, isLoading, trucks.length]);
+  }, [autoPlay, isLoading, trucks.length, truckVisibleCounts]);
 
-  // 순차 애니메이션 (현재 트럭 → 다음 트럭)
+  // 최신 값을 참조하기 위한 ref
+  const trucksRef = useRef(trucks);
+  const currentTruckIndexRef = useRef(currentTruckIndex);
+
+  useEffect(() => {
+    trucksRef.current = trucks;
+  }, [trucks]);
+
+  useEffect(() => {
+    currentTruckIndexRef.current = currentTruckIndex;
+  }, [currentTruckIndex]);
+
+  // 순차 애니메이션 (현재 트럭 → 다음 트럭, 이전 트럭 유지)
   const scheduleNext = useCallback(() => {
     if (timerRef.current) {
       clearTimeout(timerRef.current);
     }
 
     timerRef.current = setTimeout(() => {
-      setVisibleCount((prev) => {
-        const next = prev + 1;
-        const currentPlacements = trucks[currentTruckIndex]?.placements || [];
+      // ref에서 최신 값 사용
+      const currentTrucks = trucksRef.current;
+      const currentIdx = currentTruckIndexRef.current;
+      const currentPlacements = currentTrucks[currentIdx]?.placements || [];
 
-        if (next < currentPlacements.length) {
+      setTruckVisibleCounts((prev) => {
+        const newCounts = [...prev];
+        const currentCount = newCounts[currentIdx] || 0;
+        const nextCount = currentCount + 1;
+        newCounts[currentIdx] = nextCount;
+
+        if (nextCount < currentPlacements.length) {
+          // 현재 트럭 계속 적재
           scheduleNext();
-        } else if (currentTruckIndex < trucks.length - 1) {
-          // 다음 트럭으로 이동
-          setTimeout(() => {
+        } else if (currentIdx < currentTrucks.length - 1) {
+          // 현재 트럭 적재 완료 → 다음 트럭으로 전환
+          // 현재 트럭의 visible count를 완전히 설정 (모든 아이템 표시)
+          newCounts[currentIdx] = currentPlacements.length;
+
+          timerRef.current = setTimeout(() => {
             setCurrentTruckIndex((idx) => idx + 1);
-            setVisibleCount(0);
-            setAnimationKey((k) => k + 1);
-            setTimeout(() => scheduleNext(), 500);
-          }, 800);
+            // animationKey는 리셋하지 않음 → 이전 가구 유지
+            timerRef.current = setTimeout(() => scheduleNext(), 800); // 카메라 이동 대기
+          }, 500);
         } else {
+          // 모든 트럭 완료
           setIsPlaying(false);
           setSimulationState('completed');
           onAnimationComplete?.();
         }
-        return next;
+
+        return newCounts;
       });
     }, 600);
-  }, [trucks, currentTruckIndex, onAnimationComplete]);
+  }, [onAnimationComplete]);
 
   const play = useCallback(() => {
     // 처음 트럭부터 시작
     setCurrentTruckIndex(0);
-    setVisibleCount(0);
+    setTruckVisibleCounts(trucks.map(() => 0));
     setAnimationKey((k) => k + 1);
     setIsPlaying(true);
     setSimulationState('running');
@@ -376,26 +515,24 @@ const Space3D: React.FC<Space3DProps> = ({
     setTimeout(() => {
       scheduleNext();
     }, 100);
-  }, [scheduleNext]);
+  }, [scheduleNext, trucks]);
 
   const reset = useCallback(() => {
     setIsPlaying(false);
     setCurrentTruckIndex(0);
-    setVisibleCount(0);
+    setTruckVisibleCounts(trucks.map(() => 0));
     setSimulationState('idle');
     setAnimationKey((k) => k + 1);
     if (timerRef.current) {
       clearTimeout(timerRef.current);
       timerRef.current = null;
     }
-  }, []);
+  }, [trucks]);
 
   // 트럭 이동
   const goToTruck = useCallback((index: number) => {
     if (isPlaying) return;
     setCurrentTruckIndex(index);
-    setVisibleCount(0);
-    setAnimationKey((k) => k + 1);
   }, [isPlaying]);
 
   // 카메라 위치
@@ -409,11 +546,12 @@ const Space3D: React.FC<Space3DProps> = ({
     return [distance, distance * 0.8, distance];
   }, [hasSimulation, currentTruckType]);
 
-  // 컨테이너 중앙 (카메라 타겟)
+  // 컨테이너 중앙 (카메라 타겟) - 현재 트럭 위치로 이동
   const containerCenter = useMemo((): [number, number, number] => {
     const dims = TRUCK_DIMENSIONS[currentTruckType as keyof typeof TRUCK_DIMENSIONS] || TRUCK_DIMENSIONS['2.5ton'];
-    return [0, dims.height / 2, 0];
-  }, [currentTruckType]);
+    const xOffset = calculateTruckXOffset(trucks, currentTruckIndex);
+    return [xOffset, dims.height / 2, 0];
+  }, [currentTruckType, trucks, currentTruckIndex]);
 
   return (
     <View style={styles.canvasContainer}>
@@ -437,18 +575,21 @@ const Space3D: React.FC<Space3DProps> = ({
         </mesh>
 
         {hasSimulation && !isLoading && trucks.length > 0 ? (
-          <SimulationScene
-            truckType={currentTruckType as any}
-            placements={placements}
+          <MultiTruckScene
+            trucks={trucks}
+            currentTruckIndex={currentTruckIndex}
+            truckVisibleCounts={truckVisibleCounts}
             loadedFurniture={loadedFurniture}
-            visibleCount={visibleCount}
             animationKey={animationKey}
           />
         ) : (
           <TruckContainer truckType="2.5ton" />
         )}
 
-        <Controls truckType={hasSimulation ? currentTruckType as any : undefined} containerCenter={containerCenter} />
+        <AnimatedControls
+          truckType={hasSimulation ? currentTruckType as TruckType : undefined}
+          targetPosition={containerCenter}
+        />
       </Canvas>
 
       {/* 컨트롤 UI */}
@@ -466,7 +607,7 @@ const Space3D: React.FC<Space3DProps> = ({
                 </TouchableOpacity>
               )}
               {simulationState === 'running' && (
-                <Text style={styles.loadingText}>로딩 중...</Text>
+                <Text style={styles.loadingText}>적재 중...</Text>
               )}
               {simulationState === 'completed' && (
                 <TouchableOpacity style={styles.resetButton} onPress={reset}>

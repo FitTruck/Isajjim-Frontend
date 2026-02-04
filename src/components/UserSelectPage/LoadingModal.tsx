@@ -7,7 +7,7 @@ interface LoadingModalProps {
 
 const LoadingModal = ({ visible }: LoadingModalProps) => {
   const message = "AI가 견적을 분석 중입니다...";
-  const subMessage = "잠시만 기다려주세요.";
+  const subMessage = "10초에서 30초 정도 소요될 수 있습니다.";
 
   return (
     <Modal
