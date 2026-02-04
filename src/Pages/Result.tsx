@@ -276,7 +276,7 @@ export default function Result({ navigation }: Props) {
               <View style={isSpaceModalVisible ? styles.expandedContainer : styles.space3DContainer}>
                 <Space3D
                   furniture={simulationFurniture}
-                  autoPlay={isSimulationPlaying}
+                  autoPlay={true}
                   onAnimationComplete={handleSimulationComplete}
                   onTrucksChange={handleTrucksChange}
                 />

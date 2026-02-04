@@ -642,17 +642,12 @@ const Space3D: React.FC<Space3DProps> = ({
             <Text style={styles.loadingText}>배치 계산 중...</Text>
           ) : (
             <View style={styles.controlsRow}>
-              {simulationState === 'idle' && (
-                <TouchableOpacity style={styles.playButton} onPress={play}>
-                  <Text style={styles.buttonText}>적재 시작</Text>
-                </TouchableOpacity>
-              )}
               {simulationState === 'running' && (
                 <Text style={styles.loadingText}>적재 중...</Text>
               )}
               {simulationState === 'completed' && (
-                <TouchableOpacity style={styles.resetButton} onPress={reset}>
-                  <Text style={styles.buttonText}>↺ 리셋</Text>
+                <TouchableOpacity style={styles.playButton} onPress={play}>
+                  <Text style={styles.buttonText}>다시 보기</Text>
                 </TouchableOpacity>
               )}
             </View>
@@ -683,12 +678,6 @@ const styles = StyleSheet.create({
   },
   playButton: {
     backgroundColor: '#F0893B',
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
-  },
-  resetButton: {
-    backgroundColor: 'rgba(100, 100, 200, 0.8)',
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 20,
