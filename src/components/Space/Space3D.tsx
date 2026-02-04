@@ -360,7 +360,8 @@ const Space3D: React.FC<Space3DProps> = ({
       const loadedItem = loadedFurniture.get(baseId);
       if (!loadedItem) return;
 
-      const qty = f.quantity || 1;
+      const qty = f.quantity ?? 1;
+      if (qty <= 0) return;  // quantity 0인 가구 건너뛰기
       for (let copyIndex = 0; copyIndex < qty; copyIndex++) {
         items.push({
           id: `${baseId}_${copyIndex}`,  // instanceId: baseId_copyIndex
