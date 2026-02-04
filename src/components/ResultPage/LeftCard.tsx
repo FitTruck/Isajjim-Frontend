@@ -166,6 +166,7 @@ export default ResultCard;
 const styles = StyleSheet.create({
   resultCardContainer: {
     width: 970,
+    height: IMAGE_CONTAINER_HEIGHT,
     borderRadius: 4,
     backgroundColor: 'white',
     
