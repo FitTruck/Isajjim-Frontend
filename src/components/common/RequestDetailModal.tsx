@@ -307,13 +307,13 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   itemName: {
-    fontSize: 17, // 16 -> 17
-    color: '#333',
+    fontSize: 16, // 16 -> 17
+    color: '#888',
   },
   itemQuantity: {
-    fontSize: 17, // 16 -> 17
+    fontSize: 19, // 16 -> 17
     color: '#333',
-    fontWeight: '500',
+    fontWeight: '600',
   },
   truckType: {
     fontSize: 17, // 16 -> 17
