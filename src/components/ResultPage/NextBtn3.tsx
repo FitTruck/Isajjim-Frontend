@@ -86,12 +86,19 @@ const NextBtn3 = ({ data, status, onNavigateNext }: NextBtn3Props) => {
           </View>
         </View>
 
-        {data.map((truck, index) => (
-          <View key={index} style={styles.row}>
-            <Text style={styles.truckType}>{getTruckLabel(truck.type)}</Text>
-            <Text style={styles.truckQuantity}>{truck.quantity}대</Text>
-          </View>
-        ))}
+        {/* 유효한 트럭 정보만 표시 (type이 있고 quantity > 0) */}
+        {data.filter(truck => truck.type && truck.quantity > 0).length > 0 ? (
+          data
+            .filter(truck => truck.type && truck.quantity > 0)
+            .map((truck, index) => (
+              <View key={index} style={styles.row}>
+                <Text style={styles.truckType}>{getTruckLabel(truck.type)}</Text>
+                <Text style={styles.truckQuantity}>{truck.quantity}대</Text>
+              </View>
+            ))
+        ) : (
+          <Text style={styles.loadingText}>시뮬레이션을 시작하면 계산됩니다</Text>
+        )}
       </View>
 
       {/* 구분선 */}
@@ -177,6 +184,11 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     textAlign: 'right',
     color: '#333333',
+    lineHeight: 20,
+  },
+  loadingText: {
+    fontSize: 14,
+    color: '#828282',
     lineHeight: 20,
   },
   divider: {
