@@ -222,8 +222,8 @@ const styles = StyleSheet.create({
   cardImage: {
     width: IMAGE_CONTAINER_WIDTH,
     height: IMAGE_CONTAINER_HEIGHT,
-    borderTopLeftRadius: 10,
-    borderBottomLeftRadius: 10,
+    borderTopLeftRadius: 4,
+    borderBottomLeftRadius: 4,
   },
 
   // 체크 마커 스타일

@@ -39,27 +39,43 @@ export interface RequestData {
   analysisResult?: any;
 }
 
+export interface ConfirmedCompany {
+  name: string;
+  logo: any;
+  price: string;
+}
+
 interface EstimateContextType {
   requestData: RequestData | null;
   setRequestData: React.Dispatch<React.SetStateAction<RequestData | null>>;
   updateAiSummary: (summary: string) => void;
   estimateStatus: 'pending' | 'active' | 'moving' | 'completed'| 'cancelled';
   setEstimateStatus: React.Dispatch<React.SetStateAction<'pending' | 'active' | 'moving' | 'completed'| 'cancelled'>>;
+  confirmedCompany: ConfirmedCompany | null;
+  setConfirmedCompany: React.Dispatch<React.SetStateAction<ConfirmedCompany | null>>;
 }
 
 const EstimateContext = createContext<EstimateContextType | undefined>(undefined);
 
 export const EstimateProvider = ({ children }: { children: ReactNode }) => {
   const [requestData, setRequestData] = useState<RequestData | null>(null);
-
   const [estimateStatus, setEstimateStatus] = useState<'pending' | 'active' | 'moving' | 'completed'| 'cancelled'>('active');
+  const [confirmedCompany, setConfirmedCompany] = useState<ConfirmedCompany | null>(null);
 
   const updateAiSummary = (summary: string) => {
     setRequestData(prev => prev ? { ...prev, aiSummary: summary } : { aiSummary: summary });
   };
 
   return (
-    <EstimateContext.Provider value={{ requestData, setRequestData, updateAiSummary, estimateStatus, setEstimateStatus }}>
+    <EstimateContext.Provider value={{
+      requestData, 
+      setRequestData, 
+      updateAiSummary, 
+      estimateStatus, 
+      setEstimateStatus,
+      confirmedCompany,
+      setConfirmedCompany
+    }}>
       {children}
     </EstimateContext.Provider>
   );

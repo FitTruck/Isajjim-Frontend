@@ -33,7 +33,7 @@ export default function ChatRoomPanel({ data }: ChatRoomPanelProps) {
   const flatListRef = useRef<FlatList>(null);
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
-  const { requestData, updateAiSummary, setEstimateStatus } = useEstimate();
+  const { requestData, updateAiSummary, setEstimateStatus, setConfirmedCompany } = useEstimate();
 
   // Context 데이터가 있으면 사용, 없으면 빈 값으로 초기화 (Error Case 대비)
   const displayData: RequestData = requestData ? {
@@ -62,6 +62,15 @@ export default function ChatRoomPanel({ data }: ChatRoomPanelProps) {
     updateAiSummary(summary);
     // 상태를 이사 진행 중으로 변경
     setEstimateStatus('moving');
+    // 확정된 업체 정보 저장
+    if (data) {
+      setConfirmedCompany({
+        name: data.companyName,
+        logo: data.logoUri,
+        price: data.price
+      });
+    }
+
     // MyEstimate 페이지로 이동
     navigation.navigate('MyEstimate');
   };

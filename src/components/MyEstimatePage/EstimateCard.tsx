@@ -20,7 +20,7 @@ interface EstimateCardProps {
 import { useEstimate, RequestData } from '../../context/EstimateContext';
 
 export default function EstimateCard({ status, date, locations, quoteInfo, timelineStep = 2 }: EstimateCardProps) {
-  const { requestData } = useEstimate();
+  const { requestData, confirmedCompany } = useEstimate();
   const [isRequestModalVisible, setIsRequestModalVisible] = useState(false);
   const displayData: RequestData = requestData ? {
      ...requestData
@@ -204,7 +204,7 @@ export default function EstimateCard({ status, date, locations, quoteInfo, timel
       <View style={[
         styles.rightSection, 
         (isCancelled || isCompletedStatus) && { backgroundColor: '#F4F4F4' },
-        isMoving && { backgroundColor: '#F0FFF7' },
+        isMoving && { backgroundColor: 'white', padding: 0 },
         isWaitingForQuotes && { justifyContent: 'center', alignItems: 'center' }
       ]}>
         {isCancelled ? (
@@ -217,10 +217,17 @@ export default function EstimateCard({ status, date, locations, quoteInfo, timel
           <View style={styles.rightTextContent}>
             <Text style={styles.cancelledText}>완료된 이사입니다.</Text>
           </View>
-        ) : isMoving && quoteInfo ? (
-          // Step 4: 이사 진행 중
-          <View style={styles.rightTextContent}>
-            <Text style={styles.movingText}>이사 진행 중입니다.</Text>
+        ) : isMoving ? (
+          // Step 4: 이사 진행 중 (무조건 확정 업체 정보 표시)
+          <View style={[styles.rightTextContent, { gap: 0 }]}> 
+            <View style={styles.confirmedProfileCircle}>
+              {confirmedCompany?.logo ? (
+                <Image source={confirmedCompany.logo} style={styles.confirmedProfileImage} />
+              ) : (
+                <Text style={styles.confirmedProfileText}>{confirmedCompany?.name?.[0] ?? ''}</Text>
+              )}
+            </View>
+            <Text style={styles.movingText}>{confirmedCompany?.name ?? ''}</Text>
           </View>
         ) : quoteInfo ? (
           isWaitingForQuotes ? (
@@ -281,15 +288,7 @@ export default function EstimateCard({ status, date, locations, quoteInfo, timel
 }
 
 const styles = StyleSheet.create({
-  cardContainer: {
-    width: 700,
-    height: 260,
-    backgroundColor: 'white',
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#D8D8D8',
-    flexDirection: 'row',
-  },
+  // cardContainer definition removed from here as it was duplicated at bottom
   leftSection: {
     flex: 1,
     padding: 28,
@@ -540,6 +539,16 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#333333',
   },
+  cardContainer: {
+    width: 700,
+    height: 260,
+    backgroundColor: 'white',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#D8D8D8',
+    flexDirection: 'row',
+    overflow: 'hidden',
+  },
   tag: {
     paddingHorizontal: 10,
     paddingVertical: 5,
@@ -563,8 +572,31 @@ const styles = StyleSheet.create({
     fontSize: 13,
   },
   movingText: {
-    color: '#606060',
-    fontSize: 13,
+    color: '#333',
+    fontSize: 20,
+    fontWeight: '700',
+    paddingVertical: 15,
+    textAlign: 'center',
+    width: '100%',
+    backgroundColor: 'white',
+  },
+  confirmedProfileCircle: {
+      flex: 1,
+      width: '100%',
+      backgroundColor: '#EAEAEA',
+      justifyContent: 'center',
+      alignItems: 'center',
+      overflow: 'hidden',
+  },
+  confirmedProfileImage: {
+    width: '100%',
+    height: '100%',
+    resizeMode: 'cover',
+  },
+  confirmedProfileText: {
+    fontSize: 40,
+    fontWeight: '700',
+    color: '#777',
   },
 
 });
