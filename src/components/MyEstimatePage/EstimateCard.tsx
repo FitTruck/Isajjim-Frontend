@@ -565,7 +565,8 @@ const styles = StyleSheet.create({
   rightTextContent: {
     alignItems: 'center',
     justifyContent: 'center',
-    flex: 1
+    flex: 1,
+    paddingVertical: 15,
   },
   cancelledText: {
     color: '#606060',
@@ -575,7 +576,7 @@ const styles = StyleSheet.create({
     color: '#333',
     fontSize: 20,
     fontWeight: '700',
-    paddingVertical: 15,
+    paddingVertical: 0,
     textAlign: 'center',
     width: '100%',
     backgroundColor: 'white',
@@ -583,7 +584,8 @@ const styles = StyleSheet.create({
   confirmedProfileCircle: {
       flex: 1,
       width: '100%',
-      backgroundColor: '#EAEAEA',
+      height: '100%',
+      padding: 10,
       justifyContent: 'center',
       alignItems: 'center',
       overflow: 'hidden',
@@ -592,6 +594,7 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
     resizeMode: 'cover',
+    borderRadius: 2
   },
   confirmedProfileText: {
     fontSize: 40,
