@@ -3,6 +3,8 @@
 이삿짐 트럭 적재 최적화를 위한 3D Bin Packing 라이브러리.
 Python `obb_packer.py`의 Extreme Points 알고리즘을 TypeScript로 변환.
 
+> **알고리즘 상세 문서**: 논문 기반 알고리즘과 독창적 구현에 대한 자세한 설명은 [ALGORITHM.md](./ALGORITHM.md)를 참조하세요.
+
 ## 목차
 
 1. [시스템 개요](#시스템-개요)
@@ -167,6 +169,7 @@ src/binPacking/
 │   └── serverConstants.ts  # 서버용 트럭 규격 (m 단위)
 ├── __tests__/
 │   └── packer.test.ts      # Jest 단위 테스트
+├── ALGORITHM.md       # 알고리즘 상세 문서
 └── README.md          # 이 문서
 ```
 
