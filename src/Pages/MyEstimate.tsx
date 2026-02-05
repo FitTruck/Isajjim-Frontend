@@ -6,10 +6,13 @@ import { RootStackParamList } from '../types/navigation';
 import EstimateCard from "../components/MyEstimatePage/EstimateCard";
 import SidePanel from "../components/MyEstimatePage/SidePanel";
 import MyTouch from "../components/common/MyTouch";
+import { useEstimate } from '../context/EstimateContext';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'MyEstimate'>;
 
 export default function MyEstimate({ navigation }: Props) {
+
+  const { estimateStatus } = useEstimate();
 
   return (
     <View style={commonStyles.container}>
@@ -61,20 +64,20 @@ export default function MyEstimate({ navigation }: Props) {
                 }}
               /> */}
 
-                {/* 견적 받는 중 */}
-                <EstimateCard 
-                  status="active"
-                  date="2026.03.02"
-                  locations={{ start: '서울시 강남구', end: '경기도 성남시' }}
-                  timelineStep={3}
-                  quoteInfo={{
-                    isLowest: true,
-                    price: '820,000원',
-                    rating: '4.9',
-                    tags: ['사다리차', '엘레베이터'],
-                    companyCount: 3
-                  }}
-                />
+              {/* 견적 받는 중 */}
+              <EstimateCard 
+                status={estimateStatus}
+                date="2026.03.02"
+                locations={{ start: '서울시 강남구', end: '경기도 성남시' }}
+                timelineStep={estimateStatus === 'moving' ? 4 : 3}
+                quoteInfo={{
+                  isLowest: true,
+                  price: '820,000원',
+                  rating: '4.9',
+                  tags: ['사다리차', '엘레베이터'],
+                  companyCount: 3
+                }}
+              />
 
               {/* 이사 진행 중 */}
               {/* <EstimateCard 
