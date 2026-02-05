@@ -67,16 +67,8 @@ export default function Main({ navigation }: Props) {
             <UploadBox
             // onFileSelected라는 함수는 newImages라는 매개변수가 있다는 점~
               onFilesSelected={onFilesSelected}
+              selectedImages={imageList}
             />
-
-            {/* 선택된 이미지 표시 */}
-            <View style={[styles.imageGrid, isMobile && styles.mobileImageGrid]}>
-              {imageList.map((item) => (
-                <View style={[styles.imageCard, isMobile && styles.mobileImageCard]}>
-                  <Image source={{ uri: item.localUri }} style={styles.thumbnail} />
-                </View>
-              ))}
-            </View>
             
             {/* 다음 단계 버튼 */}
             <NextBtn1
