@@ -43,6 +43,8 @@ interface EstimateContextType {
   requestData: RequestData | null;
   setRequestData: React.Dispatch<React.SetStateAction<RequestData | null>>;
   updateAiSummary: (summary: string) => void;
+  estimateStatus: 'pending' | 'active' | 'moving' | 'completed'| 'cancelled';
+  setEstimateStatus: React.Dispatch<React.SetStateAction<'pending' | 'active' | 'moving' | 'completed'| 'cancelled'>>;
 }
 
 const EstimateContext = createContext<EstimateContextType | undefined>(undefined);
@@ -50,12 +52,14 @@ const EstimateContext = createContext<EstimateContextType | undefined>(undefined
 export const EstimateProvider = ({ children }: { children: ReactNode }) => {
   const [requestData, setRequestData] = useState<RequestData | null>(null);
 
+  const [estimateStatus, setEstimateStatus] = useState<'pending' | 'active' | 'moving' | 'completed'| 'cancelled'>('active');
+
   const updateAiSummary = (summary: string) => {
     setRequestData(prev => prev ? { ...prev, aiSummary: summary } : { aiSummary: summary });
   };
 
   return (
-    <EstimateContext.Provider value={{ requestData, setRequestData, updateAiSummary }}>
+    <EstimateContext.Provider value={{ requestData, setRequestData, updateAiSummary, estimateStatus, setEstimateStatus }}>
       {children}
     </EstimateContext.Provider>
   );

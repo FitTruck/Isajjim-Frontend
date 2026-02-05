@@ -28,7 +28,7 @@ export default function ChatRoomPanel({ data }: ChatRoomPanelProps) {
   const [isRequestModalVisible, setIsRequestModalVisible] = useState(false);
   const flatListRef = useRef<FlatList>(null);
 
-  const { requestData, updateAiSummary } = useEstimate();
+  const { requestData, updateAiSummary, setEstimateStatus } = useEstimate();
 
   // Context 데이터가 있으면 사용, 없으면 빈 값으로 초기화 (Error Case 대비)
   const displayData: RequestData = requestData ? {
@@ -55,6 +55,8 @@ export default function ChatRoomPanel({ data }: ChatRoomPanelProps) {
   const handleConfirmSuccess = (summary: string) => {
     // context에 aiSummary 업데이트
     updateAiSummary(summary);
+    // 상태를 이사 진행 중으로 변경
+    setEstimateStatus('moving');
   };
 
   // 채팅방 변경 시 메시지 초기화 (mock 데이터)
