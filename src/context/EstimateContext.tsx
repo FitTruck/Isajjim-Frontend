@@ -43,6 +43,7 @@ export interface ConfirmedCompany {
   name: string;
   logo: any;
   price: string;
+  rating?: string;
 }
 
 interface EstimateContextType {

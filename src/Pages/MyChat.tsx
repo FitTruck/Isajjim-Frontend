@@ -17,6 +17,7 @@ export interface ChatItemData {
   isActive: boolean;
   isUnread: boolean;
   logoUri?: any;
+  rating: string;
 }
 // mock데이터
 const dummyChatList: ChatItemData[] = [
@@ -28,6 +29,7 @@ const dummyChatList: ChatItemData[] = [
     isActive: true,
     isUnread: false,
     logoUri: require('../../assets/smallisa.png'),
+    rating: '4.9',
   },
   {
     id: '1',
@@ -37,6 +39,7 @@ const dummyChatList: ChatItemData[] = [
     isActive: false,
     isUnread: true,
     logoUri: require('../../assets/back.png'),
+    rating: '4.8',
   },
   {
     id: '3',
@@ -46,6 +49,7 @@ const dummyChatList: ChatItemData[] = [
     isActive: false,
     isUnread: true,
     logoUri: require('../../assets/2424.png'),
+    rating: '4.7',
   },
 ];
 

@@ -236,9 +236,18 @@ export default function EstimateCard({ status, date, locations, quoteInfo, timel
                 <Text style={styles.confirmedProfileText}>{confirmedCompany?.name?.[0] ?? ''}</Text>
               )}
             </View>
-            <Text style={styles.movingText}>{confirmedCompany?.name ?? ''}</Text>
+            <View style={styles.movingInfoContainer}>
+              <Text style={styles.movingText}>{confirmedCompany?.name ?? ''}</Text>
+              <View style={styles.movingDetailRow}>
+                 <Image source={require('../../../assets/star.png')} style={{ width: 14, height: 14, marginTop: 1 }} resizeMode="contain" />
+                 <Text style={styles.movingRating}>{confirmedCompany?.rating ?? '-'}</Text>
+                 <View style={styles.verticalDivider} />
+                 <Text style={styles.movingPrice}>{confirmedCompany?.price ?? ''}</Text>
+              </View>
+            </View>
           </View>
         ) : quoteInfo ? (
+
           isWaitingForQuotes ? (
             // Step2 : 견적 대기 중
             <View style={[styles.receivedInfo, { marginRight: 12 }]}>
@@ -581,14 +590,39 @@ const styles = StyleSheet.create({
     color: '#606060',
     fontSize: 13,
   },
+  movingInfoContainer: {
+    width: '100%',
+    backgroundColor: 'white',
+    paddingVertical: 12,
+    alignItems: 'center',
+    gap: 4,
+  },
   movingText: {
     color: '#333',
     fontSize: 20,
     fontWeight: '700',
-    paddingVertical: 0,
     textAlign: 'center',
-    width: '100%',
-    backgroundColor: 'white',
+  },
+  movingDetailRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  movingRating: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#333',
+  },
+  verticalDivider: {
+    width: 1,
+    height: 12,
+    backgroundColor: '#EAEAEA',
+    marginHorizontal: 2,
+  },
+  movingPrice: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#F0893B',
   },
   confirmedProfileCircle: {
       flex: 1,
