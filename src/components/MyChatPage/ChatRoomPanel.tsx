@@ -19,6 +19,10 @@ interface Message {
   price: string;
 }
 
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../../types/navigation';
+
 export default function ChatRoomPanel({ data }: ChatRoomPanelProps) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputText, setInputText] = useState("");
@@ -27,6 +31,7 @@ export default function ChatRoomPanel({ data }: ChatRoomPanelProps) {
   const [replyStep, setReplyStep] = useState(0); // 응답 순서 관리
   const [isRequestModalVisible, setIsRequestModalVisible] = useState(false);
   const flatListRef = useRef<FlatList>(null);
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
   const { requestData, updateAiSummary, setEstimateStatus } = useEstimate();
 
@@ -57,6 +62,8 @@ export default function ChatRoomPanel({ data }: ChatRoomPanelProps) {
     updateAiSummary(summary);
     // 상태를 이사 진행 중으로 변경
     setEstimateStatus('moving');
+    // MyEstimate 페이지로 이동
+    navigation.navigate('MyEstimate');
   };
 
   // 채팅방 변경 시 메시지 초기화 (mock 데이터)
