@@ -136,7 +136,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     paddingVertical: 8,
     backgroundColor: '#F0893B',
-    borderRadius: 7,
+    borderRadius: 4,
     justifyContent: 'center', 
     alignItems: 'center',
     marginTop: -10,
@@ -151,8 +151,8 @@ const styles = StyleSheet.create({
   },
   nextBtnText: {
     color: 'white',
-    fontSize: 16,
-    fontWeight: '500',
+    fontSize: 17,
+    fontWeight: '400',
   },
   mobileNextBtnText: {
     fontSize: 15,

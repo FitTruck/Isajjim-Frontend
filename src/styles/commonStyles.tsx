@@ -5,7 +5,7 @@ export const commonStyles = StyleSheet.create({
   container: {
     width: '100%',
     flex: 1,
-    backgroundColor: '#ffffff',
+    backgroundColor: 'white',
     position: 'relative',
   },
   scrollContent: {
