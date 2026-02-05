@@ -9,6 +9,7 @@ import Result from './src/Pages/Result';
 import MyEstimate from './src/Pages/MyEstimate';
 import MyChat from './src/Pages/MyChat';
 import SimulationTest from './src/Pages/SimulationTest';
+import Intro from './src/Pages/Intro';
 
 // 각 화면의 매개변수 타입들을 정의하고 있는 타입 import
 import { RootStackParamList } from './src/types/navigation';
@@ -28,6 +29,7 @@ export default function App() {
     config: {
       // 주소에 뜨는 경로
       screens: {
+        Intro: 'intro',
         Main: 'main',
         UserSelect: 'user-select',
         Result: 'result',
@@ -44,7 +46,7 @@ export default function App() {
       <NavigationContainer linking={linking}>
         {/* Stack.Navigator: 각 화면을 스택처럼 쌓아 관리 */}
         <Stack.Navigator 
-          initialRouteName="Main" // 첫 화면의 name
+          initialRouteName="Intro" // 첫 화면의 name
           screenOptions={{
             headerShown: false, // 헤더 숨김
             contentStyle: { backgroundColor: 'white' }
@@ -52,6 +54,7 @@ export default function App() {
         >
           {/* Stack.Screen: 각 화면을 정의. 각각의 component에는 컴포넌트 명을 써야함 */}
           {/* name은 MainScreen이나 UserSelect에서 부를 때 파라미터와 일치해야함 */}
+          <Stack.Screen name="Intro" component={Intro} />
           <Stack.Screen name="Main" component={Main} />
           <Stack.Screen name="UserSelect" component={UserSelect} />
           <Stack.Screen
