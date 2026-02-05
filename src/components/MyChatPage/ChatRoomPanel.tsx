@@ -67,7 +67,8 @@ export default function ChatRoomPanel({ data }: ChatRoomPanelProps) {
       setConfirmedCompany({
         name: data.companyName,
         logo: data.logoUri,
-        price: data.price
+        price: data.price,
+        rating: data.rating
       });
     }
 
