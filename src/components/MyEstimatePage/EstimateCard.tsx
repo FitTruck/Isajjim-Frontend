@@ -164,7 +164,7 @@ export default function EstimateCard({ status, date, locations, quoteInfo, timel
         {/* 헤더: 상태 배지 & 등록일 */}
         <View style={styles.headerRow}>
           <View>{renderStatusBadge()}</View>
-          <Text style={styles.regDateText}>2026.01.29 등록</Text>
+          <Text style={styles.regDateText}>{new Date().toLocaleDateString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit' }).replace(/\./g, '.').replace(/\s/g, '')} 등록</Text>
         </View>
 
         {/* 날짜 행 */}
