@@ -104,14 +104,16 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     zIndex: 100, 
-    backgroundColor: 'rgb(255, 255, 255)', 
+    backgroundColor: 'rgba(255, 255, 255, 0.8)', 
+    // @ts-ignore
+    backdropFilter: 'blur(7px)',
     paddingHorizontal: 30, // 왼쪽/오른쪽 여백 축소
     paddingRight: 47,
     flexDirection: 'row', 
     alignItems: 'center',
     justifyContent: 'center', // 내부 컨텐츠 중앙 정렬
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(233, 237, 243, 1)', 
+    borderBottomColor: 'rgba(233, 237, 243, 0.5)', 
   },
   headerContent: {
     width: '100%',
