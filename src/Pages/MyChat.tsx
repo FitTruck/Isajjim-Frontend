@@ -21,22 +21,22 @@ export interface ChatItemData {
 // mock데이터
 const dummyChatList: ChatItemData[] = [
   {
-    id: '1',
-    companyName: '백마익스프레스',
-    price: '860,000원',
-    time: '방금',
-    isActive: true,
-    isUnread: false,
-    logoUri: require('../../assets/back.png'),
-  },
-  {
     id: '2',
     companyName: '작은 짐 이사',
     price: '820,000원',
+    time: '방금',
+    isActive: true,
+    isUnread: false,
+    logoUri: require('../../assets/smallisa.png'),
+  },
+  {
+    id: '1',
+    companyName: '백마익스프레스',
+    price: '860,000원',
     time: '1월 9일',
     isActive: false,
     isUnread: true,
-    logoUri: require('../../assets/smallisa.png'),
+    logoUri: require('../../assets/back.png'),
   },
   {
     id: '3',

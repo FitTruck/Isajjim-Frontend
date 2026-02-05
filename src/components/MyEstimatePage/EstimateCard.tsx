@@ -43,6 +43,15 @@ export default function EstimateCard({ status, date, locations, quoteInfo, timel
     aiSummary: undefined
   };
 
+  // Context에서 날짜와 위치 정보 가져오기 (있으면 사용, 없으면 props 사용)
+  const contextDate = requestData?.movingDate;
+  const contextStart = requestData?.startLocation?.address ? requestData.startLocation.address.split(' ').slice(0, 2).join(' ') : null;
+  const contextEnd = requestData?.endLocation?.address ? requestData.endLocation.address.split(' ').slice(0, 2).join(' ') : null;
+
+  const displayDate = contextDate || date;
+  const displayStart = contextStart || locations.start;
+  const displayEnd = contextEnd || locations.end;
+
   const isCancelled = status === 'cancelled';
   const isCompletedStatus = status === 'completed';
   const isMoving = status === 'moving';
@@ -160,16 +169,16 @@ export default function EstimateCard({ status, date, locations, quoteInfo, timel
 
         {/* 날짜 행 */}
         <View style={styles.dateRow}>
-          <Text style={styles.mainDateText}>{date}</Text>
+          <Text style={styles.mainDateText}>{displayDate}</Text>
           <Text style={styles.subDateText}>이사 예정</Text>
         </View>
 
         {/* 위치 정보 */}
         <View style={styles.locationRow}>
           <Image source={require('../../../assets/mapsflag.png')} style={styles.mapIcon} resizeMode="contain" />
-          <Text style={styles.locationText}>{locations.start}</Text>
+          <Text style={styles.locationText}>{displayStart}</Text>
           <Image source={require('../../../assets/right.png')} style={styles.arrowIcon} resizeMode="contain" />
-          <Text style={styles.locationText}>{locations.end}</Text>
+          <Text style={styles.locationText}>{displayEnd}</Text>
         </View>
 
         {/* 타임라인 */}
