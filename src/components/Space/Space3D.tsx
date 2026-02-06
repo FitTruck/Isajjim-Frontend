@@ -178,7 +178,7 @@ const FurniturePoints: React.FC<FurniturePointsProps> = ({
 
       if (isFirstAppearance) {
         startY = targetY + 1.5;
-        // 깜빡임 방지: 즉시 위치 설정
+        // 콜백 ref에서 이미 설정했으므로 확인만
         groupRef.current.position.y = startY;
         hasAppeared.current = true;
       } else {
@@ -217,16 +217,23 @@ const FurniturePoints: React.FC<FurniturePointsProps> = ({
     }
   }, [visible, targetY]);
 
-  if (!visible) return null;
+  // visible=false 시 hasAppeared 리셋 (컴포넌트는 언마운트되지 않으므로 수동 리셋 필요)
+  if (!visible) {
+    hasAppeared.current = false;
+    return null;
+  }
 
   return (
     <group
-      ref={groupRef}
-      // Y는 수동 제어하므로 초기값만 주거나 제외 (여기서는 position prop에 Y를 제외하고 X,Z만 바인딩 권장하지만, 
-      // R3F에서 [x,y,z] 배열 프로퍼티는 개별 갱신이 어려울 수 있으므로 개별 prop 사용)
+      ref={(node) => {
+        groupRef.current = node;
+        // 마운트 즉시 시작 위치 설정 (useEffect 전 첫 프레임 y=0 깜빡임 방지)
+        if (node && !hasAppeared.current) {
+          node.position.y = targetY + 1.5;
+        }
+      }}
       position-x={targetX}
       position-z={targetZ}
-      // position-y는 useEffect에서 제어하므로 prop으로 넘기지 않음 (초기 마운트 시에는 0이나 targetY 등 기본값)
       rotation={[0, rotationY, 0]}
     >
       <points geometry={furniture.geometry} material={furniture.material} />
