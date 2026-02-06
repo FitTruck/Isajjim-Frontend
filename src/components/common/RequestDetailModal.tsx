@@ -193,7 +193,7 @@ function RequestDetailModal({ visible, onClose, data }: RequestDetailModalProps)
             <View style={styles.aiSection}>
               <View style={styles.aiHeader}>
                 <Sparkles size={16} color="#F0893B" />
-                <Text style={styles.aiTitle}>AI 요약 (확정 사항)</Text>
+                <Text style={styles.aiTitle}>GEMINI 요약</Text>
               </View>
               {data.aiSummary ? (
                 <Markdown style={markdownStyles}>
