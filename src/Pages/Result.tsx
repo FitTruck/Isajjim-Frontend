@@ -140,7 +140,7 @@ export default function Result({ navigation }: Props) {
 
     // 박스 추가
     const boxes = Array.from({ length: boxQuantity }).map((_, i): SimulationFurniture => ({
-      furnitureId: `box_${Date.now()}_${i}`,
+      furnitureId: `box_${i}`,
       label: '박스',
       type: 'box',
       quantity: 1,
