@@ -288,9 +288,7 @@ export default function Result({ navigation }: Props) {
     const flatTypes: string[] = [];
     trucks.forEach(t => {
       const label = typeMap[t.type] || t.type;
-      for (let i = 0; i < t.quantity; i++) {
-        flatTypes.push(label);
-      }
+      flatTypes.push(label);
     });
 
     // 톤수 오름차순 정렬 (1톤 -> 2.5톤 -> 5톤)
