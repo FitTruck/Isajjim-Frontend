@@ -27,7 +27,7 @@ export default function ImageComparisonSlider({
   beforeImage,
   afterImage,
   afterVideo,
-  initialSlide = 0.5,
+  initialSlide = 0.8,
   height,
   width = '100%',
 }: ImageComparisonSliderProps) {
@@ -127,8 +127,7 @@ export default function ImageComparisonSlider({
       <View style={innerContainerStyle} onLayout={onLayout}>
         <GestureDetector gesture={composedGesture}>
           <Animated.View style={styles.imageWrapper}> 
-             {/* Wrap everything in GestureDetector to catch hover everywhere */}
-             
+
             {/* Background Image (After) */}
             <View style={styles.imageWrapper}>
               {afterVideo ? (
@@ -150,12 +149,13 @@ export default function ImageComparisonSlider({
               )}
               
               <View style={styles.afterLabelContainer}>
-                 <Animated.View style={afterLabelStyle}>
-                   <View style={styles.labelBadge}>
-                     <Text style={styles.labelText}>After</Text>
-                   </View>
-                 </Animated.View>
+                <Animated.View style={afterLabelStyle}>
+                  <View style={styles.labelBadge}>
+                    <Text style={styles.labelText}>After</Text>
+                  </View>
+                </Animated.View>
               </View>
+
             </View>
 
             {/* Foreground Image (Before) - Masked by width */}

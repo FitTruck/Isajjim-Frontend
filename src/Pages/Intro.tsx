@@ -58,7 +58,7 @@ export default function Intro({ navigation }: Props) {
                 beforeImage={require('../../assets/intro.jpg')} 
                 afterVideo={require('../../assets/intro.mov')} 
                 width={888}
-                initialSlide={0.5}
+                initialSlide={0.8}
               />
             </View>
           </View>
@@ -189,8 +189,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
-    paddingHorizontal: 32,
-    paddingVertical: 14,
+    paddingHorizontal: 27,
+    paddingVertical: 10,
     backgroundColor: '#F0893B',
     borderRadius: 50,
     shadowColor: '#F0893B',
@@ -207,7 +207,7 @@ const styles = StyleSheet.create({
   },
   startButtonText: {
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: '500',
     color: 'white',
   },
   mobileStartButtonText: {
