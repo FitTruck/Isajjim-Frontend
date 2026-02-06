@@ -357,7 +357,10 @@ const Space3D: React.FC<Space3DProps> = ({
       return;
     }
     const loadAllPLY = async () => {
-      setIsLoading(true);
+      // 이미 데이터가 있다면 로딩 표시 생략 (깜빡임 방지)
+      if (loadedFurniture.size === 0) {
+        setIsLoading(true);
+      }
       const loaded = new Map<string, LoadedFurniture>();
 
       // 1. 모든 비동기 작업(Promise)을 배열로 생성
@@ -733,7 +736,7 @@ const Space3D: React.FC<Space3DProps> = ({
           <shadowMaterial opacity={0.3} />
         </mesh>
 
-        {hasSimulation && !isLoading && trucks.length > 0 ? (
+        {hasSimulation && trucks.length > 0 ? (
           <MultiTruckScene
             trucks={trucks}
             currentTruckIndex={currentTruckIndex}
