@@ -545,24 +545,18 @@ const Space3D: React.FC<Space3DProps> = ({
     setTrucks(newTrucks);
     setPackingMessage(newMessage);
 
-    if (!isSameTruckConfig) {
-      // 트럭 구성이 변경됨 → 전체 초기화
-      console.log('[시뮬레이션] 트럭 구성 변경 → 전체 초기화');
+    if (!isSameTruckConfig || hasNewPlacements) {
+      // 트럭 구성 변경 OR 가구 변경 → 전체 초기화
+      console.log('[시뮬레이션] 변경 감지 → 전체 초기화');
       if (timerRef.current) {
         clearTimeout(timerRef.current);
         timerRef.current = null;
       }
       setCurrentTruckIndex(0);
+      setTruckVisibleCounts(newTrucks.map(() => 0));  // visible counts도 초기화
       setIsPlaying(false);
       setSimulationState('idle');
       setAnimationKey((k) => k + 1);
-    } else if (hasNewPlacements && simulationState === 'completed') {
-      // 트럭 구성 동일 + 새 가구 추가됨 + 시뮬레이션 완료 상태
-      // → 새 가구만 애니메이션 실행
-      console.log('[시뮬레이션] 새 가구 추가 → 점진적 업데이트');
-      setIsPlaying(true);
-      setSimulationState('running');
-      setTimeout(() => scheduleNextRef.current(), 100);
     }
 
     prevTrucksRef.current = { types: newTruckTypes, count: newTruckCount, totalPlacements: newTotalPlacements };
@@ -667,7 +661,7 @@ const Space3D: React.FC<Space3DProps> = ({
 
         return newCounts;
       });
-    }, 400);
+    }, 200);  // 애니메이션 속도 2배 빠르게 (400ms → 200ms)
   }, [onAnimationComplete]);
 
   // scheduleNext를 ref에 저장 (binPacking useEffect에서 사용)
@@ -714,16 +708,35 @@ const Space3D: React.FC<Space3DProps> = ({
     }
     const dims = TRUCK_DIMENSIONS[currentTruckType as keyof typeof TRUCK_DIMENSIONS] || TRUCK_DIMENSIONS['2.5ton'];
     const maxDim = Math.max(dims.width, dims.depth, dims.height);
-    const distance = maxDim * 2.5;
-    return [distance, distance * 0.8, distance];
-  }, [hasSimulation, currentTruckType]);
 
-  // 컨테이너 중앙 (카메라 타겟) - 현재 트럭 위치로 이동
+    // 멀티트럭일 때 거리 증가
+    let distance = maxDim * 2.5;
+    if (trucks.length > 1) {
+      // 전체 트럭 배치의 너비 계산
+      const totalWidth = calculateTruckXOffset(trucks, trucks.length - 1) + dims.width / 2;
+      distance = Math.max(distance, totalWidth * 1.2);
+    }
+
+    return [distance, distance * 0.8, distance];
+  }, [hasSimulation, currentTruckType, trucks]);
+
+  // 컨테이너 중앙 (카메라 타겟)
   const containerCenter = useMemo((): [number, number, number] => {
     const dims = TRUCK_DIMENSIONS[currentTruckType as keyof typeof TRUCK_DIMENSIONS] || TRUCK_DIMENSIONS['2.5ton'];
+
+    // 애니메이션 완료 후에는 모든 트럭의 중앙을 보도록
+    if (simulationState === 'completed' && trucks.length > 1) {
+      // 첫 트럭과 마지막 트럭의 중간점 계산
+      const firstTruckX = 0;
+      const lastTruckX = calculateTruckXOffset(trucks, trucks.length - 1);
+      const centerX = (firstTruckX + lastTruckX) / 2;
+      return [centerX, dims.height / 2, 0];
+    }
+
+    // 애니메이션 중에는 현재 트럭
     const xOffset = calculateTruckXOffset(trucks, currentTruckIndex);
     return [xOffset, dims.height / 2, 0];
-  }, [currentTruckType, trucks, currentTruckIndex]);
+  }, [currentTruckType, trucks, currentTruckIndex, simulationState]);
 
   return (
     <View style={styles.canvasContainer}>
