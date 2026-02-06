@@ -3,6 +3,8 @@
 이삿짐 트럭 적재 최적화를 위한 3D Bin Packing 라이브러리.
 Python `obb_packer.py`의 Extreme Points 알고리즘을 TypeScript로 변환.
 
+> **알고리즘 상세 문서**: 논문 기반 알고리즘과 독창적 구현에 대한 자세한 설명은 [ALGORITHM.md](./ALGORITHM.md)를 참조하세요.
+
 ## 목차
 
 1. [시스템 개요](#시스템-개요)
@@ -167,6 +169,7 @@ src/binPacking/
 │   └── serverConstants.ts  # 서버용 트럭 규격 (m 단위)
 ├── __tests__/
 │   └── packer.test.ts      # Jest 단위 테스트
+├── ALGORITHM.md       # 알고리즘 상세 문서
 └── README.md          # 이 문서
 ```
 
@@ -483,3 +486,87 @@ npm test -- --testPathPattern=binPacking
 - 트럭 경계 검사
 - 멀티 트럭 최적화
 - 대량 아이템 처리
+
+---
+
+## 참고 논문
+
+이 구현은 다음 논문의 Extreme Points 알고리즘을 기반으로 합니다:
+
+> **Crainic, T.G., Perboli, G., & Tadei, R. (2008)**
+> *"Extreme Point-Based Heuristics for Three-Dimensional Bin Packing"*
+> INFORMS Journal on Computing, 20(3), 368-384
+> https://doi.org/10.1287/ijoc.1070.0250
+
+이 논문은 3D Bin Packing 문제에서 Extreme Points 개념을 활용한 휴리스틱 알고리즘을 제안하며, 박스 배치 후 새로운 후보 위치(EP)를 효율적으로 생성하는 방법을 설명합니다.
+
+---
+
+## 독창적 구현
+
+표준 EP 알고리즘 대비 이삿짐 도메인에 특화된 독창적 구현:
+
+### 1. Configurable 지지 규칙 (70% Support)
+
+```typescript
+// 표준 EP: 지지 검사 없음 또는 100% full support
+// 본 구현: 70% 지지로 실용성과 안정성 균형
+checkSupport(x, y, z, w, d, placed, 0.7)
+```
+
+- 바닥 면적의 70% 이상이 아래 박스에 의해 지지되어야 배치 허용
+- `supportRatio` 옵션으로 조절 가능 (기본값 0.7)
+- 이사짐의 실제 적재 안정성을 고려한 실용적 기준
+
+### 2. 가구 특화 회전 제약
+
+```typescript
+// 표준 EP: 6방향 회전 (LWH, LHW, WLH, WHL, HLW, HWL)
+// 본 구현: 수평 회전만 허용 (LWH, WLH)
+const orientations = [Orientation.LWH, Orientation.WLH];
+```
+
+- 가구 전복 방지 (높이 축 고정)
+- 실제 이사 시 가구를 눕히지 않는 관행 반영
+
+### 3. 자연스러운 방향 우선 배치
+
+```typescript
+// depth >= width인 방향 선호 (점수에서 가산점)
+const natural = d >= w ? 0 : 1;
+const score = [cz, cx, cy, natural];  // 낮을수록 우선
+```
+
+- 가구가 트럭 안에서 자연스럽게 보이도록 배치
+- 소파, 침대 등이 긴 방향으로 배치되도록 유도
+
+### 4. Corner-First 배치 전략
+
+```typescript
+// 첫 번째 아이템을 뒤쪽-왼쪽 코너에 강제 배치
+if (!cornerPhaseDone) {
+  tryCornerPlacement(item, placed, truckW, truckD, truckH);
+}
+```
+
+- 공간 활용 극대화
+- 이사 시 큰 가구를 먼저 구석에 배치하는 실제 관행 반영
+
+### 5. 멀티 트럭 자동 최적화
+
+```typescript
+// 표준 EP: 단일 컨테이너만 고려
+// 본 구현: 자동 트럭 조합 + 마지막 트럭 다운사이징
+
+// 1. 단일 트럭 시도 (작은 것부터)
+for (const truckType of ['1ton', '2.5ton', '5ton']) { ... }
+
+// 2. 실패 시 5톤으로 채우고 남은 아이템에 최적 트럭 선택
+while (remainingItems.length > 0) {
+  pack5Ton(remainingItems);
+  trySmallestFittingTruck(remainingItems);
+}
+```
+
+- 비용 최적화 (불필요한 큰 트럭 방지)
+- 실제 이사 견적 산출에 필요한 트럭 조합 자동 계산
