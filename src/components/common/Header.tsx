@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, Image, TouchableOpacity, StyleSheet, useWindowDimensions, Pressable, Platform } from 'react-native';
+import { View, Text, Image, StyleSheet, useWindowDimensions, Pressable, Platform } from 'react-native';
 
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -69,26 +69,35 @@ export default function Header() {
         </MyTouch>
 
         <View style={[styles.headerRight, isMobile && styles.mobileHeaderRight]}>  
-          <HoverableMenuItem 
-            label="내 견적" 
-            onPress={onGoMyEstimate} 
-            isActive={route.name === 'MyEstimate'} 
-            isMobile={isMobile} 
-          />
-          
-          <HoverableMenuItem 
-            label="채팅" 
-            onPress={onGoMyChat} 
-            isActive={route.name === 'MyChat'} 
-            isMobile={isMobile} 
-            showBadge={true}
-          />
+          {route.name === 'Intro' ? (
+             <MyTouch style={styles.introStartButton} onPress={onGoHome}>
+                <Text style={styles.introStartButtonText}>시작하기</Text>
+             </MyTouch>
+          ) : (
+            <>
+              <HoverableMenuItem 
+                label="내 견적" 
+                onPress={onGoMyEstimate} 
+                isActive={route.name === 'MyEstimate'} 
+                isMobile={isMobile} 
+              />
+              
+              <HoverableMenuItem 
+                label="채팅" 
+                onPress={onGoMyChat} 
+                isActive={route.name === 'MyChat'} 
+                isMobile={isMobile} 
+                showBadge={route.name === 'MyEstimate' || route.name === 'MyChat'}
+              />
 
-          <HoverableMenuItem 
-            label="문의하기" 
-            onPress={() => {}} 
-            isMobile={isMobile} 
-          />
+              <HoverableMenuItem 
+                label="문의하기" 
+                onPress={() => {}} 
+                isMobile={isMobile} 
+              />
+            </>
+          )}
+
         </View> 
       </View>
     </View>
@@ -203,4 +212,17 @@ const styles = StyleSheet.create({
     transition: 'opacity 0.2s ease-out',
   },
   
+  introStartButton: {
+    backgroundColor: '#F0893B',
+    paddingHorizontal: 20,
+    paddingVertical: 8,
+    borderRadius: 30,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  introStartButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: '500',
+  },
 });
