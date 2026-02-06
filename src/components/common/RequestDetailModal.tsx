@@ -162,7 +162,7 @@ function RequestDetailModal({ visible, onClose, data }: RequestDetailModalProps)
                 }).map((item, index) => (
                   <View key={index} style={styles.itemRow}>
                     <Text style={styles.itemName}>{item.name}</Text>
-                    <Text style={styles.itemQuantity}>총 {item.quantity}개</Text>
+                    <Text style={styles.itemQuantity}>{item.quantity}개</Text>
                   </View>
                 ))
               ) : (
@@ -187,13 +187,13 @@ function RequestDetailModal({ visible, onClose, data }: RequestDetailModalProps)
 
             {/* AI 요약 (영수증 하단 느낌) */}
             <View style={styles.receiptFooterDivider}>
-                <View style={styles.footerDashLine} />
+              
             </View>
             
             <View style={styles.aiSection}>
               <View style={styles.aiHeader}>
                 <Sparkles size={16} color="#F0893B" />
-                <Text style={styles.aiTitle}>GEMINI 요약</Text>
+                <Text style={styles.aiTitle}>Gemini 요약</Text>
               </View>
               {data.aiSummary ? (
                 <Markdown style={markdownStyles}>
@@ -311,7 +311,7 @@ const styles = StyleSheet.create({
   },
   divider: {
     height: 1,
-    backgroundColor: '#eee',
+    backgroundColor: '#F0893B',
     marginVertical: 24,
   },
   itemRow: {
