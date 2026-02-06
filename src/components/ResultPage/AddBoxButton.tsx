@@ -79,10 +79,10 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   itemTitle: {
-    fontSize: 17,
+    fontSize: 15,
     fontFamily: 'inter', 
-    fontWeight: '700',
-    color: '#222',
+    fontWeight: '500',
+    color: '#535353',
     // marginBottom 제거 (수직 중앙 정렬 위해)
   },
   itemCountContainer: {
@@ -115,8 +115,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#E0E0E0',
   },
   resultCardNumber: {
-    fontSize: 16,
-    fontWeight: '700',
+    fontSize: 15,
+    fontWeight: '500',
     color: '#333',
     textAlign: 'center',
     width: 20,
