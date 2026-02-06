@@ -138,20 +138,22 @@ export default function Result({ navigation }: Props) {
         }))
     );
 
-    // 박스 추가
-    const boxes = Array.from({ length: boxQuantity }).map((_, i): SimulationFurniture => ({
-      furnitureId: `box_${i}`,
-      label: '박스',
-      type: 'box',
-      quantity: 1,
-      width: 500,  // mm
-      depth: 300,  // mm
-      height: 350, // mm
-      volume: 0.0525,
-      ply_url: 'BOX_PLACEHOLDER',
-    }));
+    // 박스 추가 - 단일 객체로 표현하고 quantity로 수량 관리
+    if (boxQuantity > 0) {
+      return [...furniture, {
+        furnitureId: 'box',  // 고정된 ID 사용
+        label: '박스',
+        type: 'box',
+        quantity: boxQuantity,  // 수량으로 관리
+        width: 500,  // mm
+        depth: 300,  // mm
+        height: 350, // mm
+        volume: 0.0525,
+        ply_url: 'BOX_PLACEHOLDER',
+      }];
+    }
 
-    return [...furniture, ...boxes];
+    return furniture;
   }, [results, boxQuantity]);
 
   const handleUpdateQuantity = async (furnitureId: number, newQuantity: number) => {

@@ -254,11 +254,19 @@ function easeOutBack(t: number): number {
   return 1 + c3 * Math.pow(t - 1, 3) + c1 * Math.pow(t - 1, 2);
 }
 
-// instanceId에서 baseId 추출 (예: "chair_0_2" → "chair_0")
+// instanceId에서 baseId 추출 (복제 인덱스만 제거)
+// 예: "123_0" → "123", "box_5" → "box", "456_2" → "456"
 const extractBaseId = (instanceId: string): string => {
   const lastUnderscoreIdx = instanceId.lastIndexOf('_');
   if (lastUnderscoreIdx === -1) return instanceId;
-  return instanceId.substring(0, lastUnderscoreIdx);
+
+  const suffix = instanceId.substring(lastUnderscoreIdx + 1);
+  // 마지막 부분이 숫자면 복제 인덱스로 간주하고 제거
+  if (/^\d+$/.test(suffix)) {
+    return instanceId.substring(0, lastUnderscoreIdx);
+  }
+
+  return instanceId;
 };
 
 // 멀티 트럭 씬 (모든 완료 트럭 + 현재 트럭 렌더링)
@@ -364,10 +372,11 @@ const Space3D: React.FC<Space3DProps> = ({
       const loaded = new Map<string, LoadedFurniture>();
 
       // 1. 모든 비동기 작업(Promise)을 배열로 생성
-      const loadPromises = furniture.map(async (f, i) => {
+      const loadPromises = furniture.map(async (f) => {
         if (!f.ply_url) return null;
 
-        const id = `${f.furnitureId}_${i}`;
+        // furnitureId를 직접 키로 사용 (배열 인덱스 제거)
+        const id = String(f.furnitureId);
 
         // BOX_PLACEHOLDER 처리 (박스 추가 기능)
         if (f.ply_url === 'BOX_PLACEHOLDER') {
@@ -479,8 +488,9 @@ const Space3D: React.FC<Space3DProps> = ({
 
     // quantity만큼 OBBItem 복제 생성 (m → cm for binPacking)
     const items: OBBItem[] = [];
-    furniture.forEach((f, furnitureIndex) => {
-      const baseId = `${f.furnitureId}_${furnitureIndex}`;
+    furniture.forEach((f) => {
+      // furnitureId를 직접 baseId로 사용 (배열 인덱스 제거)
+      const baseId = String(f.furnitureId);
       const loadedItem = loadedFurniture.get(baseId);
       if (!loadedItem) return;
 
@@ -488,7 +498,7 @@ const Space3D: React.FC<Space3DProps> = ({
       if (qty <= 0) return;  // quantity 0인 가구 건너뛰기
       for (let copyIndex = 0; copyIndex < qty; copyIndex++) {
         items.push({
-          id: `${baseId}_${copyIndex}`,  // instanceId: baseId_copyIndex
+          id: `${baseId}_${copyIndex}`,  // instanceId: furnitureId_copyIndex
           width: loadedItem.width * 100,   // m → cm
           depth: loadedItem.depth * 100,
           height: loadedItem.height * 100,
