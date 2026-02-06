@@ -42,7 +42,7 @@ export default function AddBoxButton({ quantity, onAdd, onRemove, style }: AddBo
     <View style={[styles.container, style]}>
       {/* 아이템 이름 (박스) */}
       <View style={styles.itemDetailContainer}>
-        <Text style={styles.itemTitle}>박스</Text>
+        <Text style={styles.itemTitle}>이사 박스</Text>
       </View>
 
       {/* 수량 조절 버튼 (LeftCard 스타일 그대로 적용) */}
