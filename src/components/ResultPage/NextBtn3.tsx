@@ -1,5 +1,5 @@
-﻿import React, { useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Animated } from 'react-native';
+﻿import React from 'react';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Truck } from 'lucide-react-native';
 import AddBoxButton from './AddBoxButton';
 
@@ -33,37 +33,7 @@ const getTruckTonnage = (type: string): number => {
   return match ? parseFloat(match[1]) : Infinity;
 };
 
-const NextBtn3 = ({ data, status, onNavigateNext, onAddBox, boxQuantity, onRemoveBox }: NextBtn3Props) => {
-  const updatingOpacity = useRef(new Animated.Value(0)).current; 
-  // 1인 상태로 시작하는 애니메이션 숫자
-  const doneOpacity = useRef(new Animated.Value(1)).current; 
-
-  // result화면에서 받아오는 status값이 변경될 때마다 실행되는 함수임. 컴포넌트도 다시 그림
-  useEffect(() => {
-    if (status === 'updating') {
-      updatingOpacity.setValue(1); // 값을 1로 즉시 변경
-      doneOpacity.setValue(0); // 즉시 0으로 변경
-    } else if (status === 'done') {
-      Animated.parallel([
-        // 값을 부드럽게 0으로 변경
-        Animated.timing(updatingOpacity, { 
-          toValue: 0,
-          duration: 200,
-          useNativeDriver: true,
-        }),
-        // 값을 부드럽게 1로 변경
-        Animated.timing(doneOpacity, { 
-          toValue: 1,
-          duration: 400,
-          useNativeDriver: true,
-        }),
-      ]).start();
-    } else { // result페이지가 로딩 되자마자의 초기 상태.
-      updatingOpacity.setValue(0);
-      doneOpacity.setValue(1);
-    }
-  }, [status]);
-
+const NextBtn3 = ({ data, onNavigateNext, onAddBox, boxQuantity, onRemoveBox }: NextBtn3Props) => {
   return (
     <View style={styles.container}>
       {/* 용달 정보 섹션 */}
@@ -72,19 +42,6 @@ const NextBtn3 = ({ data, status, onNavigateNext, onAddBox, boxQuantity, onRemov
           <View style={styles.headerTitleRow}>
             <Truck size={24} color="#333" style={{ marginRight: 8 }} />
             <Text style={styles.sectionHeader}>용달 정보</Text>
-          </View>
-          
-          <View style={styles.statusWrapper}>
-            <Animated.Text style={[{ 
-              opacity: updatingOpacity 
-            }, styles.updatingStatusText]}>
-              계산중...
-            </Animated.Text>
-            <Animated.View style={[{ 
-              opacity: doneOpacity 
-            }, styles.doneStatusIconWrapper]}>
-              {/* 계산 완료 시 아무것도 표시하지 않음 */}
-            </Animated.View>
           </View>
         </View>
 
@@ -143,26 +100,6 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: '700',
     color: '#333333',
-  },
-  statusWrapper: {
-    justifyContent: 'center',
-    height: 24,
-    width: 24, // 아이콘 크기에 맞게 조정
-    position: 'relative',
-  },
-  updatingStatusText: {
-    position: 'absolute',
-    fontSize: 12,
-    color: '#333333',
-    width: 80, 
-    right: 0,
-    textAlign: 'right',
-  },
-  doneStatusIconWrapper: {
-    position: 'absolute',
-    right: 0,
-    width: 24,
-    height: 24,
   },
   row: {
     width: '100%',
