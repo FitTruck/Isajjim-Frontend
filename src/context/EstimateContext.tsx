@@ -34,6 +34,7 @@ export interface RequestData {
   startLocation?: LocationInfo;
   endLocation?: LocationInfo;
   items?: Item[];
+  boxQuantity?: number;
   truckInfo?: TruckInfo | null;
   aiSummary?: string;
   analysisResult?: any;

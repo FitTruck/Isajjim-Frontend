@@ -13,6 +13,8 @@ interface NextBtn3Props {
   status: 'prev' | 'updating' | 'done';
   onNavigateNext: () => void;
   onAddBox: () => void;
+  boxQuantity: number;
+  onRemoveBox: () => void;
 }
 
 // 트럭 타입 한글 변환
@@ -31,7 +33,7 @@ const getTruckTonnage = (type: string): number => {
   return match ? parseFloat(match[1]) : Infinity;
 };
 
-const NextBtn3 = ({ data, status, onNavigateNext, onAddBox }: NextBtn3Props) => {
+const NextBtn3 = ({ data, status, onNavigateNext, onAddBox, boxQuantity, onRemoveBox }: NextBtn3Props) => {
   const updatingOpacity = useRef(new Animated.Value(0)).current; 
   // 1인 상태로 시작하는 애니메이션 숫자
   const doneOpacity = useRef(new Animated.Value(1)).current; 
@@ -102,7 +104,7 @@ const NextBtn3 = ({ data, status, onNavigateNext, onAddBox }: NextBtn3Props) => 
         )}
       </View>
 
-      <AddBoxButton onPress={onAddBox} />
+      <AddBoxButton quantity={boxQuantity} onAdd={onAddBox} onRemove={onRemoveBox} />
 
       {/* 구분선 */}
       <View style={styles.divider} />
@@ -199,6 +201,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#F0893B',
     borderRadius: 3,
     justifyContent: 'center',
+    marginTop: 5,
     alignItems: 'center',
   },
   compareButtonText: {

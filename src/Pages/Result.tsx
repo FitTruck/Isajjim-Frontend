@@ -38,6 +38,32 @@ export default function Result({ navigation }: Props) {
   const [isSimulationPlaying, setIsSimulationPlaying] = useState(false);
   // 시뮬레이션에서 계산된 트럭 정보
   const [simulationTrucks, setSimulationTrucks] = useState<SimulationTruckResult[]>([]);
+  // 박스 수량 상태 (가구 목록과 분리)
+  // 초기값은 Context에 저장된 '박스' 수량에서 가져옴
+  const [boxQuantity, setBoxQuantity] = useState(() => {
+    if (requestData?.boxQuantity !== undefined) return requestData.boxQuantity;
+    const boxItem = requestData?.items?.find(i => i.name === '박스');
+    return boxItem ? boxItem.quantity : 0;
+  });
+
+  const updateBoxContext = (qty: number) => {
+    setRequestData(prev => {
+      if (!prev) return prev;
+      let newItems = prev.items ? [...prev.items] : [];
+      const boxIndex = newItems.findIndex(i => i.name === '박스');
+      
+      if (boxIndex >= 0) {
+          if (qty > 0) {
+            newItems[boxIndex] = { ...newItems[boxIndex], quantity: qty };
+          } else {
+            newItems.splice(boxIndex, 1);
+          }
+      } else if (qty > 0) {
+          newItems.push({ name: '박스', quantity: qty, category: '기타', itemType: 'BOX' });
+      }
+      return { ...prev, items: newItems, boxQuantity: qty };
+    });
+  };
 
   // 첫 실행 시에 자동 실행됨.
   useEffect(() => {
@@ -90,7 +116,6 @@ export default function Result({ navigation }: Props) {
     }
 
     console.log('[시뮬레이션] results:', results);
-    console.log('[시뮬레이션] 전체 가구 목록:', results.flatMap(r => r.contents));
 
     const furniture = results.flatMap((result) =>
       result.contents
@@ -108,9 +133,21 @@ export default function Result({ navigation }: Props) {
         }))
     );
 
-    console.log('[시뮬레이션] PLY가 있는 가구:', furniture);
-    return furniture;
-  }, [results]);
+    // 박스 추가
+    const boxes = Array.from({ length: boxQuantity }).map((_, i): SimulationFurniture => ({
+      furnitureId: `box_${Date.now()}_${i}`,
+      label: '박스',
+      type: 'box',
+      quantity: 1,
+      width: 500,  // mm
+      depth: 300,  // mm
+      height: 350, // mm
+      volume: 0.0525,
+      ply_url: 'BOX_PLACEHOLDER',
+    }));
+
+    return [...furniture, ...boxes];
+  }, [results, boxQuantity]);
 
   const handleUpdateQuantity = async (furnitureId: number, newQuantity: number) => {
     if (!estimateId) return;
@@ -184,34 +221,17 @@ export default function Result({ navigation }: Props) {
   };
 
   const handleAddBox = () => {
-    setResults(prev => {
-      // 박스 아이템 생성 (50cm x 35cm x 40cm)
-      const newBox = {
-        furnitureId: Date.now(), // 임시 ID
-        label: '박스',
-        type: 'box',
-        quantity: 1,
-        width: 500,  // mm
-        depth: 300,  // mm
-        height: 350, // mm
-        volume: 0.0525, // m^3 (0.5 * 0.3 * 0.35)
-        ply_url: 'BOX_PLACEHOLDER', // 플레이스홀더 플래그
-        centerX: 0,
-        centerY: 0,
-      };
+    const newQty = boxQuantity + 1;
+    setBoxQuantity(newQty);
+    updateBoxContext(newQty);
+  };
 
-      if (prev.length === 0) {
-        return [{ image: null, contents: [newBox] }];
-      }
-
-      const newResults = [...prev];
-      // 첫 번째 카드에 추가
-      newResults[0] = {
-        ...newResults[0],
-        contents: [...newResults[0].contents, newBox]
-      };
-      return newResults;
-    });
+  const handleRemoveBox = () => {
+    if (boxQuantity > 0) {
+      const newQty = boxQuantity - 1;
+      setBoxQuantity(newQty);
+      updateBoxContext(newQty);
+    }
   };
 
   const handleNextStep = () => {
@@ -407,6 +427,8 @@ export default function Result({ navigation }: Props) {
                 status={updateStatus}
                 onNavigateNext={handleNextStep}
                 onAddBox={handleAddBox}
+                boxQuantity={boxQuantity}
+                onRemoveBox={handleRemoveBox}
               />
 
             </View>

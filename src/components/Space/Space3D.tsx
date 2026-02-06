@@ -375,7 +375,7 @@ const Space3D: React.FC<Space3DProps> = ({
              const height = 0.35; 
              const depth = 0.3; 
              // 세그먼트를 50으로 증가시켜 점 밀도 향상
-             const geometry = new THREE.BoxGeometry(width, height, depth, 50, 50, 50);
+             const geometry = new THREE.BoxGeometry(width, height, depth, 40, 40, 40);
              // 테두리용 지오메트리 (세그먼트 없는 박스로 생성)
              const edgesGeometry = new THREE.EdgesGeometry(new THREE.BoxGeometry(width, height, depth));
              // 점 크기를 키워 가시성 향상
