@@ -49,7 +49,8 @@ export default function App() {
           initialRouteName="Intro" // 첫 화면의 name
           screenOptions={{
             headerShown: false, // 헤더 숨김
-            contentStyle: { backgroundColor: 'white' }
+            contentStyle: { backgroundColor: 'white' },
+            title: '이삿찜'
           }}
         >
           {/* Stack.Screen: 각 화면을 정의. 각각의 component에는 컴포넌트 명을 써야함 */}
