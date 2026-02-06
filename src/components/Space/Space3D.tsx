@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useMemo, useState, useCallback } from 'react';
+import React, { useRef, useEffect, useLayoutEffect, useMemo, useState, useCallback } from 'react';
 import { View, TouchableOpacity, Text, StyleSheet } from 'react-native';
 import { Canvas, extend, useThree, useFrame } from '@react-three/fiber';
 import { OrbitControls as OrbitControlsStd } from 'three-stdlib';
@@ -158,7 +158,6 @@ const FurniturePoints: React.FC<FurniturePointsProps> = ({
 }) => {
   const groupRef = useRef<THREE.Group>(null);
   const hasAppeared = useRef(false);
-  const animFrameRef = useRef<number>(0);
 
   // 배치 위치 (cm → m)
   const targetX = placement.x / 100;
@@ -168,81 +167,64 @@ const FurniturePoints: React.FC<FurniturePointsProps> = ({
   // 회전
   const rotationY = placement.orientation === Orientation.WLH ? Math.PI / 2 : 0;
 
-  // visible 변경 시 애니메이션 제어
-  useEffect(() => {
-    if (!groupRef.current) return;
-
-    // 진행 중인 애니메이션 취소
-    if (animFrameRef.current) {
-      cancelAnimationFrame(animFrameRef.current);
-      animFrameRef.current = 0;
+  // 첫 paint 전에 시작 위치 설정 (y=0 깜빡임 방지)
+  // useLayoutEffect는 브라우저 paint 전에 동기적으로 실행됨
+  useLayoutEffect(() => {
+    if (visible && groupRef.current && !hasAppeared.current) {
+      groupRef.current.position.y = targetY + 1.5;
     }
-
-    if (!visible) {
-      groupRef.current.visible = false;
-      hasAppeared.current = false;
-      return;
-    }
-
-    const isFirstAppearance = !hasAppeared.current;
-    let startY = targetY;
-
-    if (isFirstAppearance) {
-      startY = targetY + 1.5;
-      groupRef.current.position.y = startY;
-      hasAppeared.current = true;
-    } else {
-      startY = groupRef.current.position.y;
-    }
-
-    // position 설정 후 visible (깜빡임 방지)
-    groupRef.current.visible = true;
-
-    // 목표 위치와 차이가 적으면 바로 설정하고 종료
-    if (Math.abs(startY - targetY) < 0.005) {
-      groupRef.current.position.y = targetY;
-      return;
-    }
-
-    // 애니메이션 실행
-    const duration = 270;
-    const startTime = performance.now();
-
-    const animate = () => {
-      const elapsed = performance.now() - startTime;
-      const progress = Math.min(elapsed / duration, 1);
-      const eased = easeOutBack(progress);
-      const newY = startY + (targetY - startY) * eased;
-
-      if (groupRef.current) {
-        groupRef.current.position.y = newY;
-      }
-
-      if (progress < 1) {
-        animFrameRef.current = requestAnimationFrame(animate);
-      } else {
-        if (groupRef.current) groupRef.current.position.y = targetY;
-        animFrameRef.current = 0;
-      }
-    };
-
-    animFrameRef.current = requestAnimationFrame(animate);
-
-    return () => {
-      if (animFrameRef.current) {
-        cancelAnimationFrame(animFrameRef.current);
-        animFrameRef.current = 0;
-      }
-    };
   }, [visible, targetY]);
 
-  // 항상 렌더링 (return null 하지 않음). Three.js visible을 imperative하게 관리.
-  // visible={false}: 초기 마운트 시 숨김. prop이 상수이므로 R3F가 re-render 시 재적용하지 않음.
-  // useEffect에서 position 설정 후 groupRef.current.visible = true로 표시.
+  // visible이 true가 될 때 애니메이션
+  useEffect(() => {
+    if (visible && groupRef.current) {
+      const isFirstAppearance = !hasAppeared.current;
+      let startY = targetY;
+
+      if (isFirstAppearance) {
+        startY = targetY + 1.5;
+        groupRef.current.position.y = startY;
+        hasAppeared.current = true;
+      } else {
+        startY = groupRef.current.position.y;
+      }
+
+      // 목표 위치와 차이가 적으면 바로 설정하고 종료
+      if (Math.abs(startY - targetY) < 0.005) {
+        groupRef.current.position.y = targetY;
+        return;
+      }
+
+      // 애니메이션 실행
+      const duration = 270;
+      const startTime = performance.now();
+
+      const animate = () => {
+        const elapsed = performance.now() - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        const eased = easeOutBack(progress);
+        const newY = startY + (targetY - startY) * eased;
+
+        if (groupRef.current) {
+          groupRef.current.position.y = newY;
+        }
+
+        if (progress < 1) {
+          requestAnimationFrame(animate);
+        } else {
+          if (groupRef.current) groupRef.current.position.y = targetY;
+        }
+      };
+
+      requestAnimationFrame(animate);
+    }
+  }, [visible, targetY]);
+
+  if (!visible) return null;
+
   return (
     <group
       ref={groupRef}
-      visible={false}
       position-x={targetX}
       position-z={targetZ}
       rotation={[0, rotationY, 0]}
@@ -283,12 +265,14 @@ interface MultiTruckSceneProps {
   trucks: TruckPlacement[];
   visibleItemIds: Set<string>;
   loadedFurniture: Map<string, LoadedFurniture>;
+  resetKey: number;
 }
 
 const MultiTruckScene: React.FC<MultiTruckSceneProps> = ({
   trucks,
   visibleItemIds,
   loadedFurniture,
+  resetKey,
 }) => {
   return (
     <group>
@@ -305,7 +289,7 @@ const MultiTruckScene: React.FC<MultiTruckSceneProps> = ({
 
               return (
                 <FurniturePoints
-                  key={`${truckIdx}-${placement.itemId}`}
+                  key={`${resetKey}-${truckIdx}-${placement.itemId}`}
                   furniture={furniture}
                   placement={placement}
                   visible={visibleItemIds.has(placement.itemId)}
@@ -335,6 +319,7 @@ const Space3D: React.FC<Space3DProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [visibleItemIds, setVisibleItemIds] = useState<Set<string>>(new Set());
   const [isPlaying, setIsPlaying] = useState(false);
+  const [resetKey, setResetKey] = useState(0);
   const [packingMessage, setPackingMessage] = useState('');
   const [simulationState, setSimulationState] = useState<'idle' | 'running' | 'completed'>('idle');
   const simulationStateRef = useRef<'idle' | 'running' | 'completed'>('idle');
@@ -552,6 +537,7 @@ const Space3D: React.FC<Space3DProps> = ({
       }
       setCurrentTruckIndex(0);
       setVisibleItemIds(new Set());
+      setResetKey(k => k + 1);
       pendingItemsRef.current = [];
       setIsPlaying(false);
       setSimulationState('idle');
@@ -700,6 +686,7 @@ const Space3D: React.FC<Space3DProps> = ({
     // 전체 초기화 → 처음부터 순차 애니메이션
     setCurrentTruckIndex(0);
     setVisibleItemIds(new Set());
+    setResetKey(k => k + 1);
     setIsPlaying(true);
     setSimulationState('running');
     simulationStateRef.current = 'running';
@@ -723,6 +710,7 @@ const Space3D: React.FC<Space3DProps> = ({
     setIsPlaying(false);
     setCurrentTruckIndex(0);
     setVisibleItemIds(new Set());
+    setResetKey(k => k + 1);
     setSimulationState('idle');
     simulationStateRef.current = 'idle';
     pendingItemsRef.current = [];
@@ -801,6 +789,7 @@ const Space3D: React.FC<Space3DProps> = ({
             trucks={trucks}
             visibleItemIds={visibleItemIds}
             loadedFurniture={loadedFurniture}
+            resetKey={resetKey}
           />
         ) : (
           <TruckContainer truckType="2.5ton" />
