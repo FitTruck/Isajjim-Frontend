@@ -20,7 +20,7 @@ export interface ChatItemData {
   rating: string;
 }
 // mock데이터
-const dummyChatList: ChatItemData[] = [
+export const dummyChatList: ChatItemData[] = [
   {
     id: '2',
     companyName: '작은 짐 이사',
@@ -35,7 +35,7 @@ const dummyChatList: ChatItemData[] = [
     id: '1',
     companyName: '백마익스프레스',
     price: '860,000원',
-    time: '1월 9일',
+    time: '방금',
     isActive: false,
     isUnread: true,
     logoUri: require('../../assets/back.png'),
@@ -45,7 +45,7 @@ const dummyChatList: ChatItemData[] = [
     id: '3',
     companyName: '2424닷컴',
     price: '900,000원',
-    time: '1월 8일',
+    time: '방금',
     isActive: false,
     isUnread: true,
     logoUri: require('../../assets/2424.png'),

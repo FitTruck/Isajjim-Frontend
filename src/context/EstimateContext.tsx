@@ -55,6 +55,8 @@ interface EstimateContextType {
   setEstimateStatus: React.Dispatch<React.SetStateAction<'pending' | 'active' | 'moving' | 'completed'| 'cancelled'>>;
   confirmedCompany: ConfirmedCompany | null;
   setConfirmedCompany: React.Dispatch<React.SetStateAction<ConfirmedCompany | null>>;
+  chatStartTime: string | null;
+  setChatStartTime: React.Dispatch<React.SetStateAction<string | null>>;
 }
 
 const EstimateContext = createContext<EstimateContextType | undefined>(undefined);
@@ -63,6 +65,7 @@ export const EstimateProvider = ({ children }: { children: ReactNode }) => {
   const [requestData, setRequestData] = useState<RequestData | null>(null);
   const [estimateStatus, setEstimateStatus] = useState<'pending' | 'active' | 'moving' | 'completed'| 'cancelled'>('active');
   const [confirmedCompany, setConfirmedCompany] = useState<ConfirmedCompany | null>(null);
+  const [chatStartTime, setChatStartTime] = useState<string | null>(null);
 
   const updateAiSummary = (summary: string) => {
     setRequestData(prev => prev ? { ...prev, aiSummary: summary } : { aiSummary: summary });
@@ -76,7 +79,9 @@ export const EstimateProvider = ({ children }: { children: ReactNode }) => {
       estimateStatus, 
       setEstimateStatus,
       confirmedCompany,
-      setConfirmedCompany
+      setConfirmedCompany,
+      chatStartTime,
+      setChatStartTime
     }}>
       {children}
     </EstimateContext.Provider>
