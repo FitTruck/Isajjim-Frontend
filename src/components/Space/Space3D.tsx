@@ -22,6 +22,8 @@ interface LoadedFurniture {
   id: string;
   geometry: THREE.BufferGeometry;
   material: THREE.PointsMaterial;
+  // 박스 테두리 렌더링을 위한 엣지 지오메트리 (옵션)
+  edgesGeometry?: THREE.EdgesGeometry;
   // PLY 바운딩박스 크기 (m) - AI 서버가 절대 크기로 제공
   width: number;
   depth: number;
@@ -157,7 +159,8 @@ const FurniturePoints: React.FC<FurniturePointsProps> = ({
   animationKey,
 }) => {
   const groupRef = useRef<THREE.Group>(null);
-  const [currentY, setCurrentY] = useState<number | null>(null);
+  const hasAppeared = useRef(false);
+  const prevAnimKey = useRef(animationKey);
 
   // 배치 위치 (cm → m)
   const targetX = placement.x / 100;
@@ -167,15 +170,37 @@ const FurniturePoints: React.FC<FurniturePointsProps> = ({
   // 회전
   const rotationY = placement.orientation === Orientation.WLH ? Math.PI / 2 : 0;
 
-  // visible이 true가 될 때 애니메이션 시작
+  // Animation Key 변경 시 리셋
+  if (prevAnimKey.current !== animationKey) {
+    hasAppeared.current = false;
+    prevAnimKey.current = animationKey;
+  }
+
+  // visible이 true가 될 때 or 위치 변경 시 애니메이션
   useEffect(() => {
     if (visible && groupRef.current) {
-      // 시작 위치 (위에서)
-      const startY = targetY + 1.5;
-      groupRef.current.position.y = startY;
-      setCurrentY(startY);
+      const isFirstAppearance = !hasAppeared.current;
+      
+      // 시작 Y 위치 결정
+      // 첫 등장이면 위에서 떨어짐, 아니면 현재 위치에서 시작
+      let startY = targetY;
+      
+      if (isFirstAppearance) {
+        startY = targetY + 1.5;
+        // 깜빡임 방지: 즉시 위치 설정
+        groupRef.current.position.y = startY;
+        hasAppeared.current = true;
+      } else {
+        startY = groupRef.current.position.y;
+      }
 
-      // 애니메이션
+      // 목표 위치와 차이가 적으면 바로 설정하고 종료
+      if (Math.abs(startY - targetY) < 0.005) {
+        groupRef.current.position.y = targetY;
+        return;
+      }
+
+      // 애니메이션 실행
       const duration = 270;
       const startTime = performance.now();
 
@@ -192,7 +217,8 @@ const FurniturePoints: React.FC<FurniturePointsProps> = ({
         if (progress < 1) {
           requestAnimationFrame(animate);
         } else {
-          setCurrentY(targetY);
+          // 보정
+          if (groupRef.current) groupRef.current.position.y = targetY;
         }
       };
 
@@ -205,10 +231,19 @@ const FurniturePoints: React.FC<FurniturePointsProps> = ({
   return (
     <group
       ref={groupRef}
-      position={[targetX, currentY ?? targetY, targetZ]}
+      // Y는 수동 제어하므로 초기값만 주거나 제외 (여기서는 position prop에 Y를 제외하고 X,Z만 바인딩 권장하지만, 
+      // R3F에서 [x,y,z] 배열 프로퍼티는 개별 갱신이 어려울 수 있으므로 개별 prop 사용)
+      position-x={targetX}
+      position-z={targetZ}
+      // position-y는 useEffect에서 제어하므로 prop으로 넘기지 않음 (초기 마운트 시에는 0이나 targetY 등 기본값)
       rotation={[0, rotationY, 0]}
     >
       <points geometry={furniture.geometry} material={furniture.material} />
+      {furniture.edgesGeometry && (
+        <lineSegments geometry={furniture.edgesGeometry}>
+           <lineBasicMaterial color="#CC6600" />
+        </lineSegments>
+      )}
     </group>
   );
 };
@@ -280,7 +315,7 @@ const MultiTruckScene: React.FC<MultiTruckSceneProps> = ({
 };
 
 // PLY 캐시 (ply_url → geometry/material) - 컴포넌트 외부에 선언하여 전역 캐시로 사용
-const plyCache = new Map<string, { geometry: THREE.BufferGeometry; material: THREE.PointsMaterial; width: number; depth: number; height: number }>();
+const plyCache = new Map<string, { geometry: THREE.BufferGeometry; material: THREE.PointsMaterial; edgesGeometry?: THREE.EdgesGeometry; width: number; depth: number; height: number }>();
 
 const Space3D: React.FC<Space3DProps> = ({
   furniture,
@@ -331,6 +366,37 @@ const Space3D: React.FC<Space3DProps> = ({
 
         const id = `${f.furnitureId}_${i}`;
 
+        // BOX_PLACEHOLDER 처리 (박스 추가 기능)
+        if (f.ply_url === 'BOX_PLACEHOLDER') {
+          let cached = plyCache.get('BOX_PLACEHOLDER');
+          if (!cached) {
+             // 50cm x 30cm x 35cm 박스 생성
+             const width = 0.5; 
+             const height = 0.35; 
+             const depth = 0.3; 
+             // 세그먼트를 50으로 증가시켜 점 밀도 향상
+             const geometry = new THREE.BoxGeometry(width, height, depth, 50, 50, 50);
+             // 테두리용 지오메트리 (세그먼트 없는 박스로 생성)
+             const edgesGeometry = new THREE.EdgesGeometry(new THREE.BoxGeometry(width, height, depth));
+             // 점 크기를 키워 가시성 향상
+             const material = new THREE.PointsMaterial({ size: 0.025, color: '#F0893B' });
+             cached = { geometry, material, edgesGeometry, width, depth, height };
+             plyCache.set('BOX_PLACEHOLDER', cached);
+          }
+          return {
+             id,
+             data: {
+               id,
+               geometry: cached.geometry,
+               material: cached.material,
+               edgesGeometry: cached.edgesGeometry,
+               width: cached.width,
+               depth: cached.depth,
+               height: cached.height,
+             }
+          };
+        }
+
         // 캐시 확인
         const cached = plyCache.get(f.ply_url);
         if (cached) {
@@ -341,6 +407,7 @@ const Space3D: React.FC<Space3DProps> = ({
               id,
               geometry: cached.geometry,
               material: cached.material,
+              edgesGeometry: cached.edgesGeometry,
               width: cached.width,
               depth: cached.depth,
               height: cached.height,

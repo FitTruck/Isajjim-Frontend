@@ -1,6 +1,7 @@
 ﻿import React, { useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Animated } from 'react-native';
 import { Truck } from 'lucide-react-native';
+import AddBoxButton from './AddBoxButton';
 
 interface TruckData {
   type: string;
@@ -11,6 +12,7 @@ interface NextBtn3Props {
   data: TruckData[];
   status: 'prev' | 'updating' | 'done';
   onNavigateNext: () => void;
+  onAddBox: () => void;
 }
 
 // 트럭 타입 한글 변환
@@ -29,7 +31,7 @@ const getTruckTonnage = (type: string): number => {
   return match ? parseFloat(match[1]) : Infinity;
 };
 
-const NextBtn3 = ({ data, status, onNavigateNext }: NextBtn3Props) => {
+const NextBtn3 = ({ data, status, onNavigateNext, onAddBox }: NextBtn3Props) => {
   const updatingOpacity = useRef(new Animated.Value(0)).current; 
   // 1인 상태로 시작하는 애니메이션 숫자
   const doneOpacity = useRef(new Animated.Value(1)).current; 
@@ -99,6 +101,8 @@ const NextBtn3 = ({ data, status, onNavigateNext }: NextBtn3Props) => {
           <Text style={styles.loadingText}>시뮬레이션을 시작하면 계산됩니다</Text>
         )}
       </View>
+
+      <AddBoxButton onPress={onAddBox} />
 
       {/* 구분선 */}
       <View style={styles.divider} />
@@ -192,7 +196,6 @@ const styles = StyleSheet.create({
   compareButton: {
     width: '100%',
     height: 42,
-    marginTop: 20,
     backgroundColor: '#F0893B',
     borderRadius: 3,
     justifyContent: 'center',

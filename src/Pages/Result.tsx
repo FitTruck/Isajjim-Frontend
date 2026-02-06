@@ -183,6 +183,37 @@ export default function Result({ navigation }: Props) {
     }
   };
 
+  const handleAddBox = () => {
+    setResults(prev => {
+      // 박스 아이템 생성 (50cm x 35cm x 40cm)
+      const newBox = {
+        furnitureId: Date.now(), // 임시 ID
+        label: '박스',
+        type: 'box',
+        quantity: 1,
+        width: 500,  // mm
+        depth: 300,  // mm
+        height: 350, // mm
+        volume: 0.0525, // m^3 (0.5 * 0.3 * 0.35)
+        ply_url: 'BOX_PLACEHOLDER', // 플레이스홀더 플래그
+        centerX: 0,
+        centerY: 0,
+      };
+
+      if (prev.length === 0) {
+        return [{ image: null, contents: [newBox] }];
+      }
+
+      const newResults = [...prev];
+      // 첫 번째 카드에 추가
+      newResults[0] = {
+        ...newResults[0],
+        contents: [...newResults[0].contents, newBox]
+      };
+      return newResults;
+    });
+  };
+
   const handleNextStep = () => {
     onNavigateNext();
   }
@@ -375,6 +406,7 @@ export default function Result({ navigation }: Props) {
                   : (truckInfo ? [truckInfo] : [{ type: '', quantity: 0 }])}
                 status={updateStatus}
                 onNavigateNext={handleNextStep}
+                onAddBox={handleAddBox}
               />
 
             </View>
