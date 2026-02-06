@@ -3,7 +3,7 @@
  */
 
 export interface SimulationFurniture {
-  furnitureId: number;
+  furnitureId: string | number;
   label: string;
   type: string;
   quantity: number;
@@ -27,6 +27,7 @@ export interface Space3DProps {
   truckType?: TruckType;
   autoPlay?: boolean;
   onAnimationComplete?: () => void;
+  onTrucksChange?: (trucks: SimulationTruckResult[]) => void;
 }
 
 // 트럭 치수 (m 단위)
