@@ -19,7 +19,7 @@ import { RootStackParamList } from '../types/navigation';
 type Props = NativeStackScreenProps<RootStackParamList, 'Result'>;
 
 export default function Result({ navigation }: Props) {
-  const { requestData, setRequestData } = useEstimate();
+  const { requestData, setRequestData, setChatStartTime } = useEstimate();
 
   // Context에서 데이터 추출
   const data = requestData?.images || [];
@@ -28,6 +28,11 @@ export default function Result({ navigation }: Props) {
   const truckInfo = requestData?.truckInfo;
 
   const onNavigateNext = () => {
+    // 채팅 시작 시간 설정 (현재 시간)
+    const now = new Date();
+    const timeString = now.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' });
+    setChatStartTime(timeString);
+    
     navigation.navigate('MyEstimate');
   };
   // results: ResultCard컴포넌트의 속성으로 전달할 값임

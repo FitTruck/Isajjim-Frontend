@@ -33,7 +33,7 @@ export default function ChatRoomPanel({ data }: ChatRoomPanelProps) {
   const flatListRef = useRef<FlatList>(null);
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
-  const { requestData, updateAiSummary, setEstimateStatus, setConfirmedCompany } = useEstimate();
+  const { requestData, updateAiSummary, setEstimateStatus, setConfirmedCompany, chatStartTime } = useEstimate();
 
   // Context 데이터가 있으면 사용, 없으면 빈 값으로 초기화 (Error Case 대비)
   const displayData: RequestData = requestData ? {
@@ -79,25 +79,26 @@ export default function ChatRoomPanel({ data }: ChatRoomPanelProps) {
   // 채팅방 변경 시 메시지 초기화 (mock 데이터)
   useEffect(() => {
     if (data) {
+      const initialTime = chatStartTime || '방금';
       setMessages([
         { 
           id: '1', 
           type: 'quote',
           isMe: false, 
-          time: '오후 12:50',
+          time: initialTime,
           price: data.price
         },
         { 
           id: '2', 
           type: 'intro',
           isMe: false, 
-          time: '오후 12:51',
+          time: initialTime,
           price: data.price,
           text: `안녕하세요.\n포장이사 전문 "${data.companyName}" 입니다.\n\n회원님들께 최고의 서비스를 드리겠습니다.\n\n 혹시 짐 중에서 분해가 필요한 가구(붙박이장 등)나 특수 가전(벽걸이 TV) 등이 있을까요?`
         },
       ]);
     }
-  }, [data]);
+  }, [data, chatStartTime]);
 
   const handleSend = () => {
     if (inputText.trim().length === 0) return;
