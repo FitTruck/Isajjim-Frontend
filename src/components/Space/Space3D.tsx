@@ -563,18 +563,19 @@ const Space3D: React.FC<Space3DProps> = ({
           });
         });
 
-        if (newPending.length > 0) {
-          console.log(`[시뮬레이션] 점진적 업데이트: ${newPending.length}개 새 아이템`);
-          pendingItemsRef.current = newPending;
-
-          // 시뮬레이션이 running 또는 completed 상태일 때만 자동 재개
-          if (simulationStateRef.current === 'running' || simulationStateRef.current === 'completed') {
-            setIsPlaying(true);
-            setSimulationState('running');
-            simulationStateRef.current = 'running';
-            // 약간의 딜레이 후 scheduleNext 시작
-            setTimeout(() => scheduleNextRef.current(), 100);
-          }
+        if (newPending.length > 0 &&
+            (simulationStateRef.current === 'running' || simulationStateRef.current === 'completed')) {
+          // 카메라 이동 없이 새 아이템만 순차 visible 처리
+          console.log(`[시뮬레이션] 점진적 업데이트: ${newPending.length}개 새 아이템 (카메라 유지)`);
+          newPending.forEach((item, idx) => {
+            setTimeout(() => {
+              setVisibleItemIds(prev => {
+                const next = new Set(prev);
+                next.add(item.itemId);
+                return next;
+              });
+            }, idx * 200);
+          });
         }
 
         return updated;
