@@ -158,6 +158,7 @@ const FurniturePoints: React.FC<FurniturePointsProps> = ({
 }) => {
   const groupRef = useRef<THREE.Group>(null);
   const hasAppeared = useRef(false);
+  const animFrameRef = useRef<number>(0);
 
   // 배치 위치 (cm → m)
   const targetX = placement.x / 100;
@@ -167,71 +168,81 @@ const FurniturePoints: React.FC<FurniturePointsProps> = ({
   // 회전
   const rotationY = placement.orientation === Orientation.WLH ? Math.PI / 2 : 0;
 
-  // visible이 true가 될 때 or 위치 변경 시 애니메이션
+  // visible 변경 시 애니메이션 제어
   useEffect(() => {
-    if (visible && groupRef.current) {
-      const isFirstAppearance = !hasAppeared.current;
+    if (!groupRef.current) return;
 
-      // 시작 Y 위치 결정
-      // 첫 등장이면 위에서 떨어짐, 아니면 현재 위치에서 시작
-      let startY = targetY;
-
-      if (isFirstAppearance) {
-        startY = targetY + 1.5;
-        // 콜백 ref에서 이미 설정했으므로 확인만
-        groupRef.current.position.y = startY;
-        hasAppeared.current = true;
-      } else {
-        startY = groupRef.current.position.y;
-      }
-
-      // 목표 위치와 차이가 적으면 바로 설정하고 종료
-      if (Math.abs(startY - targetY) < 0.005) {
-        groupRef.current.position.y = targetY;
-        return;
-      }
-
-      // 애니메이션 실행
-      const duration = 270;
-      const startTime = performance.now();
-
-      const animate = () => {
-        const elapsed = performance.now() - startTime;
-        const progress = Math.min(elapsed / duration, 1);
-        const eased = easeOutBack(progress);
-        const newY = startY + (targetY - startY) * eased;
-
-        if (groupRef.current) {
-          groupRef.current.position.y = newY;
-        }
-
-        if (progress < 1) {
-          requestAnimationFrame(animate);
-        } else {
-          // 보정
-          if (groupRef.current) groupRef.current.position.y = targetY;
-        }
-      };
-
-      requestAnimationFrame(animate);
+    // 진행 중인 애니메이션 취소
+    if (animFrameRef.current) {
+      cancelAnimationFrame(animFrameRef.current);
+      animFrameRef.current = 0;
     }
+
+    if (!visible) {
+      groupRef.current.visible = false;
+      hasAppeared.current = false;
+      return;
+    }
+
+    const isFirstAppearance = !hasAppeared.current;
+    let startY = targetY;
+
+    if (isFirstAppearance) {
+      startY = targetY + 1.5;
+      groupRef.current.position.y = startY;
+      hasAppeared.current = true;
+    } else {
+      startY = groupRef.current.position.y;
+    }
+
+    // position 설정 후 visible (깜빡임 방지)
+    groupRef.current.visible = true;
+
+    // 목표 위치와 차이가 적으면 바로 설정하고 종료
+    if (Math.abs(startY - targetY) < 0.005) {
+      groupRef.current.position.y = targetY;
+      return;
+    }
+
+    // 애니메이션 실행
+    const duration = 270;
+    const startTime = performance.now();
+
+    const animate = () => {
+      const elapsed = performance.now() - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      const eased = easeOutBack(progress);
+      const newY = startY + (targetY - startY) * eased;
+
+      if (groupRef.current) {
+        groupRef.current.position.y = newY;
+      }
+
+      if (progress < 1) {
+        animFrameRef.current = requestAnimationFrame(animate);
+      } else {
+        if (groupRef.current) groupRef.current.position.y = targetY;
+        animFrameRef.current = 0;
+      }
+    };
+
+    animFrameRef.current = requestAnimationFrame(animate);
+
+    return () => {
+      if (animFrameRef.current) {
+        cancelAnimationFrame(animFrameRef.current);
+        animFrameRef.current = 0;
+      }
+    };
   }, [visible, targetY]);
 
-  // visible=false 시 hasAppeared 리셋 (컴포넌트는 언마운트되지 않으므로 수동 리셋 필요)
-  if (!visible) {
-    hasAppeared.current = false;
-    return null;
-  }
-
+  // 항상 렌더링 (return null 하지 않음). Three.js visible을 imperative하게 관리.
+  // visible={false}: 초기 마운트 시 숨김. prop이 상수이므로 R3F가 re-render 시 재적용하지 않음.
+  // useEffect에서 position 설정 후 groupRef.current.visible = true로 표시.
   return (
     <group
-      ref={(node) => {
-        groupRef.current = node;
-        // 마운트 즉시 시작 위치 설정 (useEffect 전 첫 프레임 y=0 깜빡임 방지)
-        if (node && !hasAppeared.current) {
-          node.position.y = targetY + 1.5;
-        }
-      }}
+      ref={groupRef}
+      visible={false}
       position-x={targetX}
       position-z={targetZ}
       rotation={[0, rotationY, 0]}
