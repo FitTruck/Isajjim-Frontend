@@ -10,27 +10,24 @@ interface RequestDetailModalProps {
   data: RequestData;
 }
 
-export default function RequestDetailModal({ visible, onClose, data }: RequestDetailModalProps) {
-  
-  // 헬퍼 맵
-  const BuildingTypeMap: {[key: string]: string} = {
-    "VILLA": "빌라/연립", "OFFICETEL": "오피스텔", "HOUSE": "주택", "APARTMENT": "아파트", "COMMERCIAL": "상가/사무실"
-  };
-  const RoomSizeMap: {[key: string]: string} = {
-    "UNDER_10": "10평 이하", "BETWEEN_10_15": "10~15평", "BETWEEN_15_20": "15~20평", "BETWEEN_20_25": "20~25평", 
-    "BETWEEN_25_30": "25~30평", "BETWEEN_30_40": "30~40평", "BETWEEN_40_50": "40~50평", "OVER_50": "50평 이상"
-  };
-  const RoomTypeMap: {[key: string]: string} = {
-    "STUDIO": "원룸", "ONE_AND_HALF": "1.5룸", "TWO_ROOM": "2룸", "THREE_ROOM": "3룸", "FOUR_ROOM": "4룸", "FIVE_PLUS": "5룸 이상"
-  };
-  const LadderTruckMap: {[key: string]: string} = {
-    "REQUIRED": "필요", "NOT_REQUIRED": "필요없음", "NEED_CONFIRM": "확인 필요"
-  };
+const BuildingTypeMap: {[key: string]: string} = {
+  "VILLA": "빌라/연립", "OFFICETEL": "오피스텔", "HOUSE": "주택", "APARTMENT": "아파트", "COMMERCIAL": "상가/사무실"
+};
+const RoomSizeMap: {[key: string]: string} = {
+  "UNDER_10": "10평 이하", "BETWEEN_10_15": "10~15평", "BETWEEN_15_20": "15~20평", "BETWEEN_20_25": "20~25평", 
+  "BETWEEN_25_30": "25~30평", "BETWEEN_30_40": "30~40평", "BETWEEN_40_50": "40~50평", "OVER_50": "50평 이상"
+};
+const RoomTypeMap: {[key: string]: string} = {
+  "STUDIO": "원룸", "ONE_AND_HALF": "1.5룸", "TWO_ROOM": "2룸", "THREE_ROOM": "3룸", "FOUR_ROOM": "4룸", "FIVE_PLUS": "5룸 이상"
+};
+const LadderTruckMap: {[key: string]: string} = {
+  "REQUIRED": "필요", "NOT_REQUIRED": "필요없음", "NEED_CONFIRM": "확인 필요"
+};
 
-  const renderLocationInfo = (title: string, info?: LocationInfo) => {
-    const getBoolText = (val?: boolean | null) => val === true ? '있음' : val === false ? '없음' : '-';
-    
-    return (
+const getBoolText = (val?: boolean | null) => val === true ? '있음' : val === false ? '없음' : '-';
+
+const LocationInfoSection = React.memo(({ title, info }: { title: string, info?: LocationInfo }) => {
+  return (
     <View style={styles.section}>
       <Text style={styles.sectionTitle}>{title}</Text>
       
@@ -103,9 +100,11 @@ export default function RequestDetailModal({ visible, onClose, data }: RequestDe
       </View>
 
     </View>
-    );
-  };
+  );
+});
 
+function RequestDetailModal({ visible, onClose, data }: RequestDetailModalProps) {
+  
   return (
     <Modal
       visible={visible}
@@ -133,12 +132,12 @@ export default function RequestDetailModal({ visible, onClose, data }: RequestDe
             <View style={styles.divider} />
 
             {/* 출발지 정보 */}
-            {renderLocationInfo("출발지 정보", data.startLocation)}
+            <LocationInfoSection title="출발지 정보" info={data.startLocation} />
 
             <View style={styles.divider} />
 
             {/* 도착지 정보 */}
-            {renderLocationInfo("도착지 정보", data.endLocation)}
+            <LocationInfoSection title="도착지 정보" info={data.endLocation} />
 
             <View style={styles.divider} />
 
@@ -174,9 +173,7 @@ export default function RequestDetailModal({ visible, onClose, data }: RequestDe
 
             {/* AI 요약 (영수증 하단 느낌) */}
             <View style={styles.receiptFooterDivider}>
-              {[...Array(20)].map((_, i) => (
-                <View key={i} style={styles.dash} />
-              ))}
+                <View style={styles.footerDashLine} />
             </View>
             
             <View style={styles.aiSection}>
@@ -201,6 +198,8 @@ export default function RequestDetailModal({ visible, onClose, data }: RequestDe
     </Modal>
   );
 }
+
+export default React.memo(RequestDetailModal);
 
 const markdownStyles = StyleSheet.create({
   body: {
@@ -336,11 +335,12 @@ const styles = StyleSheet.create({
     marginTop: 24,
     marginBottom: 24,
   },
-  dash: {
-    width: 8,
+  footerDashLine: {
+    width: '100%',
     height: 1,
-    backgroundColor: '#ccc',
-    marginHorizontal: 2,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc',
+    borderStyle: 'dashed',
   },
   aiSection: {
     backgroundColor: '#FFF8F0',
