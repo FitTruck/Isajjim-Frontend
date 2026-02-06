@@ -145,10 +145,24 @@ function RequestDetailModal({ visible, onClose, data }: RequestDetailModalProps)
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>분석된 이삿짐 목록</Text>
               {data.items && data.items.length > 0 ? (
-                data.items.map((item, index) => (
+                Object.values(
+                  data.items.reduce((acc, item) => {
+                    if (acc[item.name]) {
+                      acc[item.name].quantity += item.quantity;
+                    } else {
+                      acc[item.name] = { ...item };
+                    }
+                    return acc;
+                  }, {} as Record<string, typeof data.items[0]>)
+                )
+                .sort((a, b) => {
+                  if (a.name === '박스') return 1;
+                  if (b.name === '박스') return -1;
+                  return 0;
+                }).map((item, index) => (
                   <View key={index} style={styles.itemRow}>
                     <Text style={styles.itemName}>{item.name}</Text>
-                    <Text style={styles.itemQuantity}>{item.quantity}개</Text>
+                    <Text style={styles.itemQuantity}>총 {item.quantity}개</Text>
                   </View>
                 ))
               ) : (
