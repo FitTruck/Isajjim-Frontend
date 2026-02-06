@@ -334,7 +334,7 @@ http://localhost:8081/simulation-test
 | Language | TypeScript |
 | 3D Rendering | Three.js, @react-three/fiber, @react-three/drei |
 | Navigation | React Navigation |
-| Storage | Firebase Storage |
+| Storage | Google Cloud Storage |
 | API | REST + SSE |
 
 ---
