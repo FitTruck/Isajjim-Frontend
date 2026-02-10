@@ -32,7 +32,7 @@ const HoverableMenuItem = ({ label, onPress, isActive, isMobile, showBadge = fal
       ]}>
         {label}
       </Text>
-      {showBadge && <View style={styles.Badge} />}
+      {showBadge && <View style={[styles.Badge, isMobile && styles.mobileBadge]} />}
       {isActive && <View style={styles.activeBar} />}
     </Pressable>
   );
@@ -190,6 +190,12 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 23,
     right: -11,
+  },
+  mobileBadge: {
+    width: 5,
+    height: 5,
+    top: 20,
+    right: -8,
   },
   menuItem: {
     position: 'relative',

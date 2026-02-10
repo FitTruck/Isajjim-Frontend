@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, ScrollView, Image, Platform } from "react-native";
+import { View, Text, StyleSheet, ScrollView, Image, Platform, useWindowDimensions } from "react-native";
 import { commonStyles } from "../styles/commonStyles";
 import Header from "../components/common/Header";
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -13,6 +13,8 @@ import { dummyChatList } from "./MyChat";
 type Props = NativeStackScreenProps<RootStackParamList, 'MyEstimate'>;
 
 export default function MyEstimate({ navigation }: Props) {
+  const { width } = useWindowDimensions();
+  const isMobile = width < 768;
 
   const { estimateStatus } = useEstimate();
   
@@ -98,26 +100,30 @@ export default function MyEstimate({ navigation }: Props) {
   return (
     <View style={commonStyles.container}>
       <ScrollView 
-        contentContainerStyle={[commonStyles.scrollContent, Platform.OS === 'web' && { width: '100vw', overflowX: 'hidden' } as any]}
+        contentContainerStyle={[
+          commonStyles.scrollContent, 
+          Platform.OS === 'web' && { width: '100vw', overflowX: 'hidden' } as any,
+          isMobile && { paddingHorizontal: 0 }
+        ]}
         stickyHeaderIndices={[0]}
       >
         {/* Header */}
         <Header />
 
         {/* 페이지 전체 컨테이너 */}
-        <View style={styles.mainWrapper}>
+        <View style={[styles.mainWrapper, isMobile && styles.mobileMainWrapper]}>
 
           {/* 타이틀 섹션 */}
-          <View style={styles.titleContainer}>
-            <Text style={styles.pageTitle}>내 견적</Text>
+          <View style={[styles.titleContainer, isMobile && styles.mobileTitleContainer]}>
+            <Text style={[styles.pageTitle, isMobile && styles.mobilePageTitle]}>내 견적</Text>
             <Text style={styles.pageSubtitle}>내 정보를 바탕으로 견적을 받습니다.</Text>
           </View>
 
           {/* leftrightContainer */}
-          <View style={styles.leftrightContainer}>
+          <View style={[styles.leftrightContainer, isMobile && styles.mobileLeftRightContainer]}>
 
             {/* 왼쪽 Content */}
-            <View style={styles.leftContent}>
+            <View style={[styles.leftContent, isMobile && styles.mobileLeftContent]}>
 
               {/* 필터 버튼 */}
               <View style={styles.filterButtonContainer}>
@@ -128,7 +134,7 @@ export default function MyEstimate({ navigation }: Props) {
               </View>
 
               {/* 견적 리스트 (카드들) */}
-              <View style={styles.cardList}>
+              <View style={[styles.cardList, isMobile && styles.mobileCardList]}>
 
               <EstimateCard 
                 status={displayStatus}
@@ -142,7 +148,7 @@ export default function MyEstimate({ navigation }: Props) {
             </View>
 
             {/* 오른쪽 Content */}
-            <View style={styles.rightContent}>
+            <View style={[styles.rightContent, isMobile && styles.mobileRightContent]}>
               <SidePanel />
             </View>
 
@@ -161,11 +167,21 @@ const styles = StyleSheet.create({
     marginBottom: 100,
     paddingTop: 80,
   },
+  mobileMainWrapper: {
+    marginTop: 0,
+    paddingTop: 40,
+    marginBottom: 40,
+  },
   leftrightContainer: {
     width: 1240,
     flexDirection: 'row',
     justifyContent: 'space-between',
     left: 0,
+  },
+  mobileLeftRightContainer: {
+    width: '100%',
+    flexDirection: 'column',
+    alignItems: 'center',
   },
   
   // 타이틀 섹션
@@ -175,6 +191,11 @@ const styles = StyleSheet.create({
     marginBottom: 30,
     flexDirection: 'column',
   },
+  mobileTitleContainer: {
+    width: '100%',
+    paddingLeft: 24,
+    marginBottom: 20,
+  },
   
   pageTitle: {
     fontSize: 30,
@@ -182,6 +203,10 @@ const styles = StyleSheet.create({
     color: '#323232',
     lineHeight: 34,
     marginBottom: 5,
+  },
+  mobilePageTitle: {
+    fontSize: 24,
+    lineHeight: 30,
   },
   pageSubtitle: {
     fontSize: 15,
@@ -192,6 +217,11 @@ const styles = StyleSheet.create({
   leftContent: {
     width: 700,
     marginLeft: 100,
+  },
+  mobileLeftContent: {
+    width: '100%',
+    marginLeft: 0,
+    paddingHorizontal: 20,
   },
 
   filterButtonContainer: {
@@ -228,10 +258,18 @@ const styles = StyleSheet.create({
   cardList: {
     gap: 15, 
   },
+  mobileCardList: {
+    width: '100%',
+  },
 
   // 오른쪽 컬럼
   rightContent: {
     width: 307,
     marginTop: 52,
+  },
+  mobileRightContent: {
+    width: '100%',
+    marginTop: 40,
+    paddingHorizontal: 20,
   }
 });

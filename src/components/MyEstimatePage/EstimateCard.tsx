@@ -1,5 +1,5 @@
 ﻿import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image, useWindowDimensions } from 'react-native';
 import RequestDetailModal from "../common/RequestDetailModal";
 
 interface EstimateCardProps {
@@ -20,6 +20,8 @@ interface EstimateCardProps {
 import { useEstimate, RequestData } from '../../context/EstimateContext';
 
 export default function EstimateCard({ status, date, locations, quoteInfo, timelineStep = 2 }: EstimateCardProps) {
+  const { width } = useWindowDimensions();
+  const isMobile = width < 768;
   const { requestData, confirmedCompany } = useEstimate();
   const [isRequestModalVisible, setIsRequestModalVisible] = useState(false);
   const displayData: RequestData = requestData ? {
@@ -158,9 +160,9 @@ export default function EstimateCard({ status, date, locations, quoteInfo, timel
   };
 
   return (
-    <View style={styles.cardContainer}>
+    <View style={[styles.cardContainer, isMobile && styles.mobileCardContainer]}>
       {/* 왼쪽 섹션 (이사 정보) */}
-      <View style={styles.leftSection}>
+      <View style={[styles.leftSection, isMobile && styles.mobileLeftSection]}>
         {/* 헤더: 상태 배지 & 등록일 */}
         <View style={styles.headerRow}>
           <View>{renderStatusBadge()}</View>
@@ -212,8 +214,9 @@ export default function EstimateCard({ status, date, locations, quoteInfo, timel
       {/* 오른쪽 섹션 (견적 정보) */}
       <View style={[
         styles.rightSection, 
+        isMobile && styles.mobileRightSection, 
         (isCancelled || isCompletedStatus) && { backgroundColor: '#F4F4F4' },
-        isMoving && { backgroundColor: 'white', padding: 0 },
+        isMoving && { backgroundColor: 'white', padding: isMobile ? 15 : 0 },
         isWaitingForQuotes && { justifyContent: 'center', alignItems: 'center' }
       ]}>
         {isCancelled ? (
@@ -228,16 +231,16 @@ export default function EstimateCard({ status, date, locations, quoteInfo, timel
           </View>
         ) : isMoving ? (
           // Step 4: 이사 진행 중 (무조건 확정 업체 정보 표시)
-          <View style={[styles.rightTextContent, { gap: 0 }]}> 
-            <View style={styles.confirmedProfileCircle}>
+          <View style={[styles.rightTextContent, isMobile && { flexDirection: 'row', alignItems: 'center', gap: 15, paddingVertical: 0 }]}> 
+            <View style={[styles.confirmedProfileCircle, isMobile && { width: 60, height: 60, flex: 0, padding: 0 }]}>
               {confirmedCompany?.logo ? (
                 <Image source={confirmedCompany.logo} style={styles.confirmedProfileImage} />
               ) : (
-                <Text style={styles.confirmedProfileText}>{confirmedCompany?.name?.[0] ?? ''}</Text>
+                <Text style={[styles.confirmedProfileText, isMobile && { fontSize: 24 }]}>{confirmedCompany?.name?.[0] ?? ''}</Text>
               )}
             </View>
-            <View style={styles.movingInfoContainer}>
-              <Text style={styles.movingText}>{confirmedCompany?.name ?? ''}</Text>
+            <View style={[styles.movingInfoContainer, isMobile && { alignItems: 'flex-start', paddingVertical: 0, flex: 1 }]}>
+              <Text style={[styles.movingText, isMobile && { fontSize: 18 }]}>{confirmedCompany?.name ?? ''}</Text>
               <View style={styles.movingDetailRow}>
                  <Image source={require('../../../assets/star.png')} style={{ width: 14, height: 14, marginTop: 1 }} resizeMode="contain" />
                  <Text style={styles.movingRating}>{confirmedCompany?.rating ?? '-'}</Text>
@@ -251,8 +254,8 @@ export default function EstimateCard({ status, date, locations, quoteInfo, timel
           isWaitingForQuotes ? (
             // Step2 : 견적 대기 중
             <View style={[styles.receivedInfo, { marginRight: 12 }]}>
-              <View style={styles.receivedIcon}>
-                <Image source={require('../../../assets/chat.png')} style={{ width: 30, height: 30 }} resizeMode="contain" />
+              <View style={[styles.receivedIcon, isMobile && { width: 40, height: 40 }]}>
+                <Image source={require('../../../assets/chat.png')} style={isMobile ? { width: 20, height: 20 } : { width: 30, height: 30 }} resizeMode="contain" />
               </View>
               <View style={{marginLeft: 14}}>
                 <Text style={styles.receivedLabel}>받은 견적서</Text>
@@ -261,32 +264,34 @@ export default function EstimateCard({ status, date, locations, quoteInfo, timel
             </View>
           ) : (
             // Step 3 : 견적 받는 중
-            <>
+            <View style={isMobile ? { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', width: '100%' } : { width: '100%' }}>
               {/* 받은 견적서 개수 헤더 */}
-              <View style={[styles.receivedInfo, { marginBottom: 12 }]}>
-                <View style={styles.receivedIcon}>
-                  <Image source={require('../../../assets/chat.png')} style={{ width: 30, height: 30 }} resizeMode="contain" />
+              <View style={[styles.receivedInfo, !isMobile && { marginBottom: 12 }]}>
+                <View style={[styles.receivedIcon, isMobile && { width: 46, height: 46 }]}>
+                  <Image source={require('../../../assets/chat.png')} style={isMobile ? { width: 22, height: 22 } : { width: 30, height: 30 }} resizeMode="contain" />
                 </View>
                 <View style={{marginLeft: 14}}>
                   <Text style={styles.receivedLabel}>받은 견적서</Text>
-                  <Text style={styles.receivedCount}>{quoteInfo.companyCount}개 업체</Text>
+                  <Text style={[styles.receivedCount, isMobile && { fontSize: 16 }]}>{quoteInfo.companyCount}개 업체</Text>
                 </View>
               </View>
 
-              {/* 태그들 (견적 박스 위로 이동) */}
-              <View style={styles.tagsRow}>
-                {quoteInfo.tags.map((tag, idx) => (
-                  <View key={idx} style={styles.tag}>
-                    <Text style={styles.tagText}>{tag}</Text>
-                  </View>
-                ))}
-              </View>
+              {/* 모바일: 태그 숨김 or 간소화 (여기선 숨김 for compactness) */}
+              {!isMobile && (
+                <View style={styles.tagsRow}>
+                  {quoteInfo.tags.map((tag, idx) => (
+                    <View key={idx} style={styles.tag}>
+                      <Text style={styles.tagText}>{tag}</Text>
+                    </View>
+                  ))}
+                </View>
+              )}
 
               {/* 최저가 / 가격 표시 */}
-              <View style={styles.quoteBox}>
-                <View style={styles.quoteBoxHeader}>
+              <View style={[styles.quoteBox, isMobile && { marginTop: 0, padding: 0, borderWidth: 0, backgroundColor: 'transparent',  alignItems: 'flex-end' }]}>
+                <View style={[styles.quoteBoxHeader, isMobile && { justifyContent: 'flex-end', flexDirection: 'column-reverse', alignItems: 'flex-end', gap: 2 }]}>
                   {quoteInfo.isLowest ? (
-                      <Text style={styles.lowestLabel}>최저가 업체</Text>
+                      <Text style={[styles.lowestLabel, isMobile && { fontSize: 13, color: '#333333' }]}>최저가 업체</Text>
                   ) : <View />}
                   
                   <View style={styles.ratingRow}>
@@ -295,9 +300,9 @@ export default function EstimateCard({ status, date, locations, quoteInfo, timel
                   </View>
                 </View>
                 
-                <Text style={styles.priceText}>{quoteInfo.price}</Text> 
+                <Text style={[styles.priceText, isMobile && { fontSize: 20, marginBottom: 0 }]}>{quoteInfo.price}</Text> 
               </View>
-            </>
+            </View>
           )
         ) : null}
       </View>
@@ -643,6 +648,24 @@ const styles = StyleSheet.create({
     fontSize: 40,
     fontWeight: '700',
     color: '#777',
+  },
+  
+  // Mobile Styles
+  mobileCardContainer: {
+    width: '100%',
+    height: 'auto',
+    flexDirection: 'column',
+  },
+  mobileLeftSection: {
+    width: '100%',
+    padding: 20,
+  },
+  mobileRightSection: {
+    width: '100%',
+    borderLeftWidth: 0,
+    borderTopWidth: 1,
+    borderTopColor: '#D8D8D8',
+    padding: 20,
   },
 
 });
