@@ -113,7 +113,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     zIndex: 100, 
-    backgroundColor: 'rgba(255, 255, 255, 0.8)', 
+    backgroundColor: 'rgba(255, 255, 255, 0.5)', 
     // @ts-ignore
     backdropFilter: 'blur(7px)',
     paddingHorizontal: 30, // 왼쪽/오른쪽 여백 축소
