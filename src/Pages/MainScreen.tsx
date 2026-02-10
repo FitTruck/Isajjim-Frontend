@@ -38,11 +38,10 @@ export default function Main({ navigation }: Props) {
         />
       )}
 
-      <ScrollView contentContainerStyle={[
-        commonStyles.scrollContent,
-        isMobile && { paddingTop: 20 }
-      ]}
-      stickyHeaderIndices={[0]} // 자식 컴포넌트들 중 첫 번째 컴포넌트를 고정시키겠다.
+      <ScrollView 
+        contentContainerStyle=
+        {commonStyles.scrollContent}
+        stickyHeaderIndices={[0]} // 자식 컴포넌트들 중 첫 번째 컴포넌트를 고정시키겠다.
       >
         {/* Header */}
         <Header />
@@ -76,37 +75,6 @@ export default function Main({ navigation }: Props) {
               onShowAlert={() => setIsAlertVisible(true)}
             />
           </View>
-
-          {/* 왜 이삿짐인가요? 섹션 */}
-          <View style={[styles.whyTitleSection, isMobile && styles.mobileWhyTitleSection]}>
-            <Text style={[styles.sectionTitle, isMobile && styles.mobileSectionTitle]}>왜 이삿짐인가요?</Text>
-          </View>
-
-          {/* 카드 섹션 */}
-          <View style={[styles.featuresSection, isMobile && styles.mobileFeaturesSection]}>
-            <View style={[styles.card, isMobile && styles.mobileCard]}>
-              <Text style={[styles.cardTitle, isMobile && styles.mobileCardTitle]}>2D 사진 분석</Text>
-              <Text style={[styles.cardDesc, isMobile && styles.mobileCardDesc]}>방 안의 짐을 사진으로 찍기만 하세요. AI가 물품의 크기와 수량을 자동으로 인식합니다.</Text>
-            </View>
-
-            <View style={[styles.card, isMobile && styles.mobileCard]}>
-              <Text style={[styles.cardTitle, isMobile && styles.mobileCardTitle]}>AI 자동 견적</Text>
-              <Text style={[styles.cardDesc, isMobile && styles.mobileCardDesc]}>수천 건의 데이터를 학습한 AI가 실제 이사 비용에 가장 근접한 견적을 산출합니다</Text>
-            </View>
-
-            <View style={[styles.card, isMobile && styles.mobileCard]}>
-              <Text style={[styles.cardTitle, isMobile && styles.mobileCardTitle]}>즉시 확인</Text>
-              <Text style={[styles.cardDesc, isMobile && styles.mobileCardDesc]}>상담 대기 시간 없이, 즉시 견적을 받아보세요.</Text>
-            </View>
-          </View>
-
-          {/* 3단계 견적 확인 */}
-          <View style={[styles.stepSection, isMobile && styles.mobileStepSection]}>
-            <View style={[styles.stepTitleContainer, isMobile && styles.mobileStepTitleContainer]}>
-              <Text style={[styles.stepTitleText, isMobile && styles.mobileStepTitleText]}>3단계로 끝나는 견적 확인</Text>
-            </View>
-          </View>
-
         </View>
       </ScrollView>
     </View>
