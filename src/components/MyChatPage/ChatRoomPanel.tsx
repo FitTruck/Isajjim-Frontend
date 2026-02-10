@@ -259,20 +259,20 @@ export default function ChatRoomPanel({ data, isMobile = false, onBack }: ChatRo
   return (
     <View style={[styles.rightPanel, isMobile && styles.mobileRightPanel]}>
       {/* 헤더 */}
-      <View style={styles.chatHeader}>
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+      <View style={[styles.chatHeader, isMobile && styles.mobileChatHeader]}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: isMobile ? 5 : 10, flex: 1, overflow: 'hidden' }}>
           {isMobile && onBack && (
-            <TouchableOpacity onPress={onBack} style={{ padding: 5, marginLeft: -5, marginRight: 5 }}>
+            <TouchableOpacity onPress={onBack} style={{ padding: 5, marginLeft: -5, marginRight: 0 }}>
               <ChevronLeft size={24} color="#333" />
             </TouchableOpacity>
           )}
-          <View>
-            <Text style={styles.headerCompanyName}>{data.companyName}</Text>
-            <Text style={styles.headerCompanyDesc}>보통 15분 내 응답, 응답률 100%</Text>
+          <View style={{ flex: 1 }}>
+            <Text style={styles.headerCompanyName} numberOfLines={1} ellipsizeMode="tail">{data.companyName}</Text>
+            <Text style={styles.headerCompanyDesc} numberOfLines={1} ellipsizeMode="tail">보통 15분 내 응답, 응답률 100%</Text>
           </View>
         </View>
 
-        <View style={styles.headerRightGroup}>
+        <View style={[styles.headerRightGroup, isMobile && { gap: 6 }]}>
           {!isMobile && (
             <View style={styles.headerPriceBlock}>
               <Text style={styles.headerPriceLabel}>제안 가격:</Text>
@@ -281,11 +281,11 @@ export default function ChatRoomPanel({ data, isMobile = false, onBack }: ChatRo
           )}
 
           <TouchableOpacity 
-            style={styles.headerRequestButton}
+            style={[styles.headerRequestButton, isMobile && { paddingHorizontal: 8 }]}
             onPress={() => setIsRequestModalVisible(true)}
           >
-            <Image source={require('../../../assets/docs.png')} style={styles.headerRequestIcon} resizeMode="contain" />
-            <Text style={styles.headerRequestText}>내 요청사항</Text>
+            <Image source={require('../../../assets/docs.png')} style={[styles.headerRequestIcon, isMobile && { marginRight: 0 }]} resizeMode="contain" />
+            {!isMobile && <Text style={styles.headerRequestText}>내 요청사항</Text>}
           </TouchableOpacity>
 
           {/* 확정하기 버튼 */}
