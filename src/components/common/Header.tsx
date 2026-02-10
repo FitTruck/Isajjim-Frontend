@@ -5,6 +5,7 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../types/navigation';
 import MyTouch from "./MyTouch";
+import { useEstimate } from '../../context/EstimateContext';
 
 // 호버 효과가 적용된 메뉴 아이템 컴포넌트
 const HoverableMenuItem = ({ label, onPress, isActive, isMobile, showBadge = false }: { label: string, onPress: () => void, isActive?: boolean, isMobile: boolean, showBadge?: boolean }) => {
@@ -43,6 +44,7 @@ export default function Header() {
   const isMobile = width < 768;
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const route = useRoute();
+  const { estimateStatus } = useEstimate();
 
   const onGoHome = () => {
     navigation.reset({
@@ -87,7 +89,7 @@ export default function Header() {
                 onPress={onGoMyChat} 
                 isActive={route.name === 'MyChat'} 
                 isMobile={isMobile} 
-                showBadge={route.name === 'MyEstimate' || route.name === 'MyChat'}
+                showBadge={estimateStatus === 'active'}
               />
 
               <HoverableMenuItem 

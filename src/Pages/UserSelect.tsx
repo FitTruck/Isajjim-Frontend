@@ -137,7 +137,7 @@ export default function UserSelect({ navigation, route }: Props) {
       >
         <Header />
 
-        <View style={[commonStyles.mainWrapper, isMobile && { width: 430 }]}>
+        <View style={[commonStyles.mainWrapper, isMobile && { paddingHorizontal: 20 }]}>
           
           {/* 타이틀 */}
           <View style={[commonStyles.mainSection, isMobile && styles.mobileMainSection]}>

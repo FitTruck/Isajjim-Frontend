@@ -290,14 +290,16 @@ export default function EstimateCard({ status, date, locations, quoteInfo, timel
               {/* 최저가 / 가격 표시 */}
               <View style={[styles.quoteBox, isMobile && { marginTop: 0, padding: 0, borderWidth: 0, backgroundColor: 'transparent',  alignItems: 'flex-end' }]}>
                 <View style={[styles.quoteBoxHeader, isMobile && { justifyContent: 'flex-end', flexDirection: 'column-reverse', alignItems: 'flex-end', gap: 2 }]}>
-                  {quoteInfo.isLowest ? (
-                      <Text style={[styles.lowestLabel, isMobile && { fontSize: 13, color: '#333333' }]}>최저가 업체</Text>
-                  ) : <View />}
-                  
+
                   <View style={styles.ratingRow}>
                     <Image source={require('../../../assets/star.png')} style={{ width: 14, height: 14 }} resizeMode="contain" />
                     <Text style={styles.ratingText}>{quoteInfo.rating}</Text>
                   </View>
+
+                  {quoteInfo.isLowest ? (
+                      <Text style={[styles.lowestLabel, isMobile && { fontSize: 13, color: '#333333' }]}>최저가 업체</Text>
+                  ) : <View />}
+
                 </View>
                 
                 <Text style={[styles.priceText, isMobile && { fontSize: 20, marginBottom: 0 }]}>{quoteInfo.price}</Text> 

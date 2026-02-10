@@ -16,7 +16,7 @@ export default function MyEstimate({ navigation }: Props) {
   const { width } = useWindowDimensions();
   const isMobile = width < 768;
 
-  const { estimateStatus } = useEstimate();
+  const { estimateStatus, setEstimateStatus } = useEstimate();
   
   // 시뮬레이션 상태 관리
   const [currentStatus, setCurrentStatus] = useState<'pending' | 'active' | 'moving' | 'completed'| 'cancelled'>('pending');
@@ -34,25 +34,27 @@ export default function MyEstimate({ navigation }: Props) {
     companyCount: 0
   });
 
-  // 시뮬레이션 로직
+  // 외부에서 상태가 변경되었을 때 처리 (moving/completed/cancelled)
   useEffect(() => {
-    // 실제 상태가 moving/completed/cancelled라면 시뮬레이션 무시하고 그 상태 따름
     if (estimateStatus === 'moving' || estimateStatus === 'completed' || estimateStatus === 'cancelled') {
       setCurrentStatus(estimateStatus);
-      return;
     }
+  }, [estimateStatus]);
 
+  // 시뮬레이션 로직 (컴포넌트 마운트 시 한 번만 실행)
+  useEffect(() => {
     // 0초: 견적 대기 중 (pending)
     setCurrentStatus('pending');
     setQuoteInfo(prev => ({ ...prev, companyCount: 0 }));
 
-    // 1초 후: 견적 받는 중 (active) + 1개 (2424닷컴)
+    // 3초 후: 견적 받는 중 (active) + 1개 (2424닷컴)
     const timer1 = setTimeout(() => {
       setCurrentStatus('active');
-      const company1 = dummyChatList.find(c => c.companyName === '2424닷컴'); // 2424닷컴
+      setEstimateStatus('active'); // Context 상태도 업데이트
+      const company1 = dummyChatList.find(c => c.companyName === '2424닷컴');
       if (company1) {
         setQuoteInfo({
-          isLowest: true, // 첫 번째니까 최저가? (시뮬레이션상)
+          isLowest: true,
           price: company1.price,
           rating: company1.rating,
           tags: ['사다리차', '엘레베이터'],
@@ -61,26 +63,26 @@ export default function MyEstimate({ navigation }: Props) {
       }
     }, 3000);
 
-    // 3초 후: 2개 (백마익스프레스) - 가격 비교하여 업데이트
+    // 5초 후: 2개 (백마익스프레스)
     const timer2 = setTimeout(() => {
       const company2 = dummyChatList.find(c => c.companyName === '백마익스프레스');
       if (company2) {
         setQuoteInfo(prev => ({
             ...prev,
-            price: company2.price, // 860,000 < 900,000
+            price: company2.price,
             rating: company2.rating,
             companyCount: 2
         }));
       }
     }, 5000);
 
-    // 4초 후: 3개 (작은 짐 이사)
+    // 7초 후: 3개 (작은 짐 이사)
     const timer3 = setTimeout(() => {
       const company3 = dummyChatList.find(c => c.companyName === '작은 짐 이사');
       if (company3) {
          setQuoteInfo(prev => ({
             ...prev,
-            price: company3.price, // 820,000 < 860,000
+            price: company3.price,
             rating: company3.rating,
             companyCount: 3
         }));
@@ -92,7 +94,7 @@ export default function MyEstimate({ navigation }: Props) {
       clearTimeout(timer2);
       clearTimeout(timer3);
     };
-  }, [estimateStatus]);
+  }, []); // 컴포넌트 마운트 시 한 번만 실행
 
   // 최종적으로 보여줄 상태
   const displayStatus = estimateStatus === 'active' || estimateStatus === 'pending' ? currentStatus : estimateStatus;

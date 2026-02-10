@@ -63,7 +63,7 @@ const EstimateContext = createContext<EstimateContextType | undefined>(undefined
 
 export const EstimateProvider = ({ children }: { children: ReactNode }) => {
   const [requestData, setRequestData] = useState<RequestData | null>(null);
-  const [estimateStatus, setEstimateStatus] = useState<'pending' | 'active' | 'moving' | 'completed'| 'cancelled'>('active');
+  const [estimateStatus, setEstimateStatus] = useState<'pending' | 'active' | 'moving' | 'completed'| 'cancelled'>('pending');
   const [confirmedCompany, setConfirmedCompany] = useState<ConfirmedCompany | null>(null);
   const [chatStartTime, setChatStartTime] = useState<string | null>(null);
 
