@@ -504,6 +504,7 @@ const styles = StyleSheet.create({
   },
   mobileRightContainer: {
     width: '100%',
+    paddingHorizontal: 20,
   },
 
   space3DContainer: {
