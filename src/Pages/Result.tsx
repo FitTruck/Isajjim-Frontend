@@ -503,7 +503,7 @@ const styles = StyleSheet.create({
     zIndex: 10,
   },
   mobileRightContainer: {
-    width: 305,
+    width: '100%',
   },
 
   space3DContainer: {
