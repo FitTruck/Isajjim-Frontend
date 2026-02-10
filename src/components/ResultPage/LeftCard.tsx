@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView, Pressable } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView, Pressable, useWindowDimensions } from 'react-native';
 import React, { useMemo, useState } from 'react';
 import { translateLabel, translateType } from '../../utils/Translator';
 import { Minus, Plus } from 'lucide-react-native';
@@ -61,6 +61,12 @@ const QuantityButton = ({ onPress, icon: Icon, disabled }: QuantityButtonProps) 
 };
 
 const ResultCard = ({ image, items, onQuantityChange }: ResultCardProps) => {
+  const { width: windowWidth } = useWindowDimensions();
+  const isMobile = windowWidth < 768; // Mobile breakpoint
+  
+  // 모바일에서 이미지 컨테이너 크기 조정
+  const mobileImageWidth = windowWidth - 40; // 좌우 패딩 20px씩
+  const mobileImageHeight = mobileImageWidth * (IMAGE_CONTAINER_HEIGHT / IMAGE_CONTAINER_WIDTH);
 
   // props로 받은 items를 직접 수정하지 않고, 렌더링 시 변환된 값을 사용하도록 함
   // 만약 데이터 자체를 변환해야 한다면 원본을 건드리지 않기 위해 map을 새로 돌리는 것이 좋음
@@ -74,26 +80,31 @@ const ResultCard = ({ image, items, onQuantityChange }: ResultCardProps) => {
   // 이미지 스케일 및 오프셋 계산 (resizeMode="contain" 기준)
   const imageLayout = useMemo(() => {
     if (!image?.width || !image?.height) {
-      return { scale: 1, offsetX: 0, offsetY: 0, displayWidth: IMAGE_CONTAINER_WIDTH, displayHeight: IMAGE_CONTAINER_HEIGHT };
+      const containerWidth = isMobile ? mobileImageWidth : IMAGE_CONTAINER_WIDTH;
+      const containerHeight = isMobile ? mobileImageHeight : IMAGE_CONTAINER_HEIGHT;
+      return { scale: 1, offsetX: 0, offsetY: 0, displayWidth: containerWidth, displayHeight: containerHeight };
     }
 
     const originalWidth = image.width;
     const originalHeight = image.height;
 
+    const containerWidth = isMobile ? mobileImageWidth : IMAGE_CONTAINER_WIDTH;
+    const containerHeight = isMobile ? mobileImageHeight : IMAGE_CONTAINER_HEIGHT;
+
     // contain 모드: 가로/세로 비율 유지하면서 컨테이너에 맞춤
-    const scaleX = IMAGE_CONTAINER_WIDTH / originalWidth;
-    const scaleY = IMAGE_CONTAINER_HEIGHT / originalHeight;
+    const scaleX = containerWidth / originalWidth;
+    const scaleY = containerHeight / originalHeight;
     const scale = Math.min(scaleX, scaleY);
 
     const displayWidth = originalWidth * scale;
     const displayHeight = originalHeight * scale;
 
     // 컨테이너 중앙 정렬 시 오프셋
-    const offsetX = (IMAGE_CONTAINER_WIDTH - displayWidth) / 2;
-    const offsetY = (IMAGE_CONTAINER_HEIGHT - displayHeight) / 2;
+    const offsetX = (containerWidth - displayWidth) / 2;
+    const offsetY = (containerHeight - displayHeight) / 2;
 
     return { scale, offsetX, offsetY, displayWidth, displayHeight };
-  }, [image?.width, image?.height]);
+  }, [image?.width, image?.height, isMobile, mobileImageWidth, mobileImageHeight]);
 
   // 좌표가 있는 아이템만 필터링 (마커 표시용)
   const itemsWithCoordinates = items.filter(
@@ -101,12 +112,24 @@ const ResultCard = ({ image, items, onQuantityChange }: ResultCardProps) => {
   );
 
   return (
-    <View style={styles.resultCardContainer}>
+    <View style={[styles.resultCardContainer, isMobile && styles.mobileResultCardContainer]}>
       {/* Image Container with Markers */}
-      <View style={styles.imageContainer}>
+      <View style={[
+        styles.imageContainer,
+        isMobile && {
+          width: mobileImageWidth,
+          height: mobileImageHeight,
+        }
+      ]}>
         <Image
           source={typeof image.localUri === 'string' ? { uri: image.localUri } : image.localUri}
-          style={styles.cardImage}
+          style={[
+            styles.cardImage,
+            isMobile && {
+              width: mobileImageWidth,
+              height: mobileImageHeight,
+            }
+          ]}
           resizeMode="contain"
         />
 
@@ -133,7 +156,7 @@ const ResultCard = ({ image, items, onQuantityChange }: ResultCardProps) => {
       </View>
 
       {/* Content */}
-      <View style={styles.resultCardContent}>
+      <View style={[styles.resultCardContent, isMobile && styles.mobileResultCardContent]}>
         <View>
           <Text style={styles.headerTitle}>가구 목록</Text>
           <View style={styles.contentDivider} />
@@ -141,9 +164,9 @@ const ResultCard = ({ image, items, onQuantityChange }: ResultCardProps) => {
 
         {/* 아이템 리스트 스크롤 영역 */}
         <ScrollView 
-          style={{ flex: 1, width: '100%' }}
+          style={isMobile ? { width: '100%', maxHeight: 200 } : { flex: 1, width: '100%' }}
           showsVerticalScrollIndicator={true}
-          contentContainerStyle={{ paddingBottom: 20 }}
+          contentContainerStyle={isMobile ? { flexGrow: 0, paddingBottom: 20 } : { paddingBottom: 20 }}
         >
           {translatedItems.length > 0 ? (
             translatedItems.map((item) => (
@@ -331,5 +354,18 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#999',
     fontWeight: '500',
+  },
+
+  // Mobile Styles
+  mobileResultCardContainer: {
+    width: '100%',
+    height: 'auto',
+    flexDirection: 'column',
+    borderRadius: 8,
+  },
+  mobileResultCardContent: {
+    width: '100%',
+    paddingHorizontal: 20,
+    paddingVertical: 24,
   },
 });
