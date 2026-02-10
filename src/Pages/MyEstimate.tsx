@@ -16,23 +16,10 @@ export default function MyEstimate({ navigation }: Props) {
   const { width } = useWindowDimensions();
   const isMobile = width < 768;
 
-  const { estimateStatus, setEstimateStatus } = useEstimate();
+  const { estimateStatus, setEstimateStatus, simulationStarted, setSimulationStarted, quoteInfo, setQuoteInfo, setChatList } = useEstimate();
   
   // 시뮬레이션 상태 관리
   const [currentStatus, setCurrentStatus] = useState<'pending' | 'active' | 'moving' | 'completed'| 'cancelled'>('pending');
-  const [quoteInfo, setQuoteInfo] = useState<{
-    isLowest: boolean;
-    price: string;
-    rating: string;
-    tags: string[];
-    companyCount: number;
-  }>({
-    isLowest: false,
-    price: '-',
-    rating: '-',
-    tags: [],
-    companyCount: 0
-  });
 
   // 외부에서 상태가 변경되었을 때 처리 (moving/completed/cancelled)
   useEffect(() => {
@@ -43,6 +30,16 @@ export default function MyEstimate({ navigation }: Props) {
 
   // 시뮬레이션 로직 (컴포넌트 마운트 시 한 번만 실행)
   useEffect(() => {
+    // 이미 시뮬레이션이 실행되었다면 다시 실행하지 않음
+    if (simulationStarted) {
+      // 대신 현재 상태를 Context 상태와 동기화
+      setCurrentStatus(estimateStatus);
+      return;
+    }
+
+    // 시뮬레이션 시작 플래그 설정
+    setSimulationStarted(true);
+
     // 0초: 견적 대기 중 (pending)
     setCurrentStatus('pending');
     setQuoteInfo(prev => ({ ...prev, companyCount: 0 }));
@@ -51,6 +48,12 @@ export default function MyEstimate({ navigation }: Props) {
     const timer1 = setTimeout(() => {
       setCurrentStatus('active');
       setEstimateStatus('active'); // Context 상태도 업데이트
+      
+      // 견적 받는 중 상태가 되면 모든 채팅을 unread로 설정
+      setChatList(prevList => 
+        prevList.map(chat => ({ ...chat, isUnread: true }))
+      );
+      
       const company1 = dummyChatList.find(c => c.companyName === '2424닷컴');
       if (company1) {
         setQuoteInfo({

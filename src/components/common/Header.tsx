@@ -44,7 +44,10 @@ export default function Header() {
   const isMobile = width < 768;
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const route = useRoute();
-  const { estimateStatus } = useEstimate();
+  const { estimateStatus, chatList } = useEstimate();
+
+  // 읽지 않은 채팅이 있는지 확인
+  const hasUnreadChats = chatList.some(chat => chat.isUnread);
 
   const onGoHome = () => {
     navigation.reset({
@@ -89,7 +92,7 @@ export default function Header() {
                 onPress={onGoMyChat} 
                 isActive={route.name === 'MyChat'} 
                 isMobile={isMobile} 
-                showBadge={estimateStatus === 'active'}
+                showBadge={estimateStatus === 'active' || hasUnreadChats}
               />
 
               <HoverableMenuItem 

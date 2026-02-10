@@ -1,25 +1,17 @@
 import { View, Text, ScrollView, StyleSheet, useWindowDimensions } from "react-native";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { commonStyles } from "../styles/commonStyles";
 import Header from "../components/common/Header";
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types/navigation';
 import ChatListPanel from "../components/MyChatPage/ChatListPanel";
 import ChatRoomPanel from "../components/MyChatPage/ChatRoomPanel";
+import { useEstimate, ChatItemData } from "../context/EstimateContext";
 
 type Props = NativeStackScreenProps<RootStackParamList, 'MyChat'>;
 
-export interface ChatItemData {
-  id: string;
-  companyName: string;
-  price: string;
-  time: string;
-  isActive: boolean;
-  isUnread: boolean;
-  logoUri?: any;
-  rating: string;
-}
-// mock데이터
+// export용 - 다른 곳에서 참조할 수 있도록 (MyEstimate에서 사용)
+export type { ChatItemData };
 export const dummyChatList: ChatItemData[] = [
   {
     id: '2',
@@ -27,7 +19,7 @@ export const dummyChatList: ChatItemData[] = [
     price: '820,000원',
     time: '방금',
     isActive: true,
-    isUnread: false,
+    isUnread: false, // 초기값은 false, 견적 받는 중 상태가 되면 true로 변경
     logoUri: require('../../assets/smallisa.png'),
     rating: '4.9',
   },
@@ -37,7 +29,7 @@ export const dummyChatList: ChatItemData[] = [
     price: '860,000원',
     time: '방금',
     isActive: false,
-    isUnread: true,
+    isUnread: false, // 초기값은 false, 견적 받는 중 상태가 되면 true로 변경
     logoUri: require('../../assets/back.png'),
     rating: '4.8',
   },
@@ -47,7 +39,7 @@ export const dummyChatList: ChatItemData[] = [
     price: '900,000원',
     time: '방금',
     isActive: false,
-    isUnread: true,
+    isUnread: false, // 초기값은 false, 견적 받는 중 상태가 되면 true로 변경
     logoUri: require('../../assets/2424.png'),
     rating: '4.7',
   },
@@ -57,21 +49,43 @@ export default function MyChat({ navigation }: Props) {
   const { width } = useWindowDimensions();
   const isMobile = width < 768;
 
+  // Context에서 chatList 가져오기
+  const { chatList, setChatList } = useEstimate();
+
   // 선택된 채팅 ID 상태 관리 (초기값 : 첫 번째 채팅방)
   // 모바일에서는 초기 진입 시 리스트를 보여주어야 하므로, 모바일인 경우 선택된 채팅방이 있어도 리스트 뷰로 시작하는 로직이 필요함.
   // 다만 '내부 로직 건들지 말라'는 요청이 있으므로 selectedChatId는 그대로 두고, 보이는 뷰만 제어함.
-  const [selectedChatId, setSelectedChatId] = useState<string | null>(dummyChatList[0].id);
+  const [selectedChatId, setSelectedChatId] = useState<string | null>(chatList[0]?.id || null);
   const [mobileView, setMobileView] = useState<'list' | 'room'>('list');
 
   // 선택된 ID에 해당하는 채팅 데이터 찾기
-  const selectedChatData = dummyChatList.find(item => item.id === selectedChatId) || null;
+  const selectedChatData = chatList.find(item => item.id === selectedChatId) || null;
 
   const handleSelectChat = (id: string) => {
     setSelectedChatId(id);
+    
+    // 채팅을 선택하면 해당 채팅의 isUnread를 false로 변경
+    setChatList(prevList => 
+      prevList.map(chat => 
+        chat.id === id ? { ...chat, isUnread: false } : chat
+      )
+    );
+    
     if (isMobile) {
       setMobileView('room');
     }
   };
+
+  // 웹 환경에서 초기 진입 시 첫 번째 채팅을 자동으로 읽음 처리
+  useEffect(() => {
+    if (!isMobile && selectedChatId) {
+      setChatList(prevList => 
+        prevList.map(chat => 
+          chat.id === selectedChatId ? { ...chat, isUnread: false } : chat
+        )
+      );
+    }
+  }, []); // 컴포넌트 마운트 시 한 번만 실행
 
   const handleMobileBack = () => {
     setMobileView('list');
@@ -102,7 +116,7 @@ export default function MyChat({ navigation }: Props) {
                 // 모바일 뷰
                 mobileView === 'list' ? (
                   <ChatListPanel 
-                    chatList={dummyChatList} 
+                    chatList={chatList} 
                     selectedChatId={selectedChatId}
                     onSelectChat={handleSelectChat}
                     isMobile={isMobile}
@@ -118,7 +132,7 @@ export default function MyChat({ navigation }: Props) {
                 // 데스크탑 뷰
                 <>
                   <ChatListPanel 
-                    chatList={dummyChatList} 
+                    chatList={chatList} 
                     selectedChatId={selectedChatId}
                     onSelectChat={handleSelectChat}
                   />
