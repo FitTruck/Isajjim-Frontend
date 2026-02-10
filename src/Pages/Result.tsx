@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
-import { View, ScrollView, StyleSheet, Alert } from 'react-native';
+import { View, ScrollView, StyleSheet, Alert, useWindowDimensions, Image } from 'react-native';
 import { commonStyles } from '../styles/commonStyles';
 import { BACKEND_DOMAIN } from '../utils/Server';
 import { translateLabel } from '../utils/Translator';
@@ -20,6 +20,8 @@ type Props = NativeStackScreenProps<RootStackParamList, 'Result'>;
 
 export default function Result({ navigation }: Props) {
   const { requestData, setRequestData, setChatStartTime } = useEstimate();
+  const { width } = useWindowDimensions();
+  const isMobile = width < 768;
 
   // Context에서 데이터 추출
   const data = requestData?.images || [];
@@ -256,7 +258,8 @@ export default function Result({ navigation }: Props) {
   const handleScroll = (direction: 'next' | 'prev') => {
     if (!scrollRef.current) return;
 
-    const PAGE_WIDTH = 970;
+    // Use dynamic width for page width
+    const PAGE_WIDTH = isMobile ? width : 970;
     let newIndex = scrollIndex;
 
     if (direction === 'next') {
@@ -328,9 +331,10 @@ export default function Result({ navigation }: Props) {
 
   return (
     <View style={commonStyles.container}>
-      <ScrollView
-        contentContainerStyle={commonStyles.scrollContent}
-        stickyHeaderIndices={[0]}
+      <ScrollView 
+        contentContainerStyle=
+        {commonStyles.scrollContent}
+        stickyHeaderIndices={[0]} // 자식 컴포넌트들 중 첫 번째 컴포넌트를 고정시키겠다.
       >
         {/* Header */}
         <Header />
@@ -339,21 +343,31 @@ export default function Result({ navigation }: Props) {
         <View style={commonStyles.mainWrapper}>
 
           {/* 왼쪽 및 오른쪽 컨테이너 */}
-          <View style={styles.leftrightContainer}>
+          <View style={[
+            styles.leftrightContainer,
+            isMobile && styles.mobileLeftRightContainer
+          ]}>
 
             {/* 왼쪽 컨테이너 */}
-            <View style={styles.leftContainer}>
+            <View style={[styles.leftContainer, isMobile && styles.mobileLeftContainer]}>
               <ScrollView
                 ref={scrollRef}
                 horizontal
                 pagingEnabled
                 showsHorizontalScrollIndicator={false}
-                scrollEnabled={false}
+                scrollEnabled={isMobile} // Enable scroll on mobile
               >
                 {/* 분석 카드 */}
                 {/* results -> 모든 항목 변경 : results로 바꿔야함, 바꿀 때 results 변수 자체명도 바뀌니까 주석처리 같이 해야함. */}
                 {results.map((result, index) => (
-                  <View key={index} style={{ width: 970, alignItems: 'center' }}>
+                  <View 
+                    key={index} 
+                    style={{ 
+                      width: isMobile ? width : 970, // Mobile width adjustment
+                      alignItems: 'center',
+                      paddingHorizontal: isMobile ? 20 : 0
+                    }}
+                  >
                     <LeftCard
                       image={result.image}
                       items={result.contents}
@@ -364,7 +378,7 @@ export default function Result({ navigation }: Props) {
               </ScrollView>
 
               {/* 네비게이션 버튼 */}
-              {scrollIndex > 0 && (
+              {!isMobile && scrollIndex > 0 && (
                 <MyTouch
                   style={styles.arrowButtonLeft}
                   onPress={() => handleScroll('prev')}
@@ -372,7 +386,7 @@ export default function Result({ navigation }: Props) {
                   <ChevronLeft size={40} color="#F0893B" />
                 </MyTouch>
               )}
-              {scrollIndex < results.length - 1 && (
+              {!isMobile && scrollIndex < results.length - 1 && (
                 <MyTouch
                   style={styles.arrowButtonRight}
                   onPress={() => handleScroll('next')}
@@ -402,6 +416,7 @@ export default function Result({ navigation }: Props) {
             {/* 오른쪽 컨테이너 */}
             <View style={[
               styles.rightContainer,
+              isMobile && styles.mobileRightContainer,
               isSpaceModalVisible && { position: 'relative', zIndex: 10000 }
             ]}>
               {/* 3D 시뮬레이션 - 전체화면 스타일 분리 적용 */}
@@ -456,6 +471,15 @@ const styles = StyleSheet.create({
     marginLeft: 100,
     height: 600
   },
+  mobileLeftRightContainer: {
+    flexDirection: 'column',
+    marginTop: 20,
+    gap: 40,
+    marginLeft: 0,
+    height: 'auto',
+    alignItems: 'center',
+    paddingBottom: 60,
+  },
 
   leftContainer: {
     width: 970,
@@ -465,14 +489,23 @@ const styles = StyleSheet.create({
 
     // 내부 요소
     flexDirection: 'row',
-    flexWrap: 'wrap',
+    flexWrap: 'wrap', // Mobile might need column wrap handling logic inside LeftCard or here? LeftCard seems to be the content.
     justifyContent: 'center',
     rowGap: 0,
   },
+  mobileLeftContainer: {
+    width: '100%',
+    paddingBottom: 20,
+  },
+  
   rightContainer: {
     width: 305,
     zIndex: 10,
   },
+  mobileRightContainer: {
+    width: 305,
+  },
+
   space3DContainer: {
     width: '100%',
     height: 307,
@@ -559,7 +592,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderWidth: 1,
     borderColor: '#F5F5F5',
-
+  
     // 그림자
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 0 },
