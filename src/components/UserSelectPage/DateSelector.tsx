@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Platform } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Platform, useWindowDimensions } from 'react-native';
 import { Calendar, ChevronLeft, ChevronRight } from 'lucide-react-native';
 
 interface Props {
@@ -10,6 +10,9 @@ interface Props {
 }
 
 export default function DateSelector({ date, onSelect, isOpen: controlledOpen, onToggle }: Props) {
+  const { width } = useWindowDimensions();
+  const isMobile = width < 768;
+
   const [internalOpen, setInternalOpen] = useState(false);
   const isControlled = controlledOpen !== undefined;
   const isOpen = isControlled ? controlledOpen : internalOpen;
@@ -84,7 +87,7 @@ export default function DateSelector({ date, onSelect, isOpen: controlledOpen, o
   const isSelected = !!date;
 
   return (
-    <View style={[styles.container, { zIndex: isOpen ? 2000 : 1 }]}>
+    <View style={[styles.container, { zIndex: isOpen ? 2000 : 1 }, isMobile && styles.mobileContainer]}>
       <Text style={styles.label}>이사 희망 날짜</Text>
       
       <TouchableOpacity 
@@ -98,7 +101,7 @@ export default function DateSelector({ date, onSelect, isOpen: controlledOpen, o
         <Calendar size={20} color={isOpen ? "#F0893B" : "#666"} />      </TouchableOpacity>
 
       {isOpen && (
-        <View style={styles.calendarContainer}>
+        <View style={[styles.calendarContainer, isMobile && styles.mobileCalendarContainer]}>
             {/* Header */}
             <View style={styles.header}>
               <TouchableOpacity onPress={handlePrevMonth} style={styles.arrowButton}>
@@ -138,7 +141,8 @@ export default function DateSelector({ date, onSelect, isOpen: controlledOpen, o
                     key={index}
                     style={[
                       styles.dayCell,
-                      isSelectedDay && styles.selectedDayCell
+                      isSelectedDay && styles.selectedDayCell,
+                      isMobile && styles.mobileDayCell
                     ]}
                     disabled={isPlaceholder}
                     onPress={() => {
@@ -176,6 +180,9 @@ const styles = StyleSheet.create({
     width: '70%',
     position: 'relative',
     zIndex: 100, // 드롭다운 등과 겹침 문제 방지
+  },
+  mobileContainer: {
+    width: '100%',
   },
   label: {
     fontSize: 22,
@@ -226,6 +233,9 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#E0E0E0',
   },
+  mobileCalendarContainer: {
+    width: '100%',
+  },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -268,6 +278,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 5,
     borderRadius: 20,
+  },
+  mobileDayCell: {
+    height: 40,
   },
   selectedDayCell: {
     backgroundColor: '#F0893B',
