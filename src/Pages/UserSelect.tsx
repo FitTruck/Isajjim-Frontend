@@ -137,7 +137,7 @@ export default function UserSelect({ navigation, route }: Props) {
       >
         <Header />
 
-        <View style={[commonStyles.mainWrapper, isMobile && { paddingHorizontal: 20 }]}>
+        <View style={[commonStyles.mainWrapper, isMobile && { width: 430 }]}>
           
           {/* 타이틀 */}
           <View style={[commonStyles.mainSection, isMobile && styles.mobileMainSection]}>
@@ -411,7 +411,7 @@ export default function UserSelect({ navigation, route }: Props) {
 const styles = StyleSheet.create({
   // Mobile Section Overrides
   mobileMainSection: {
-    marginTop: 100,
+    marginTop: 50,
     marginBottom: 40,
     alignItems: 'center',
   },
@@ -439,7 +439,7 @@ const styles = StyleSheet.create({
   mobileCardsContainer: {
     flexDirection: 'column',
     paddingHorizontal: 0,
-    gap: 20,
+    gap: 70,
     zIndex: 1, // Reset zIndex for stacking
   },
   cardColumn: {
@@ -474,7 +474,7 @@ const styles = StyleSheet.create({
     textAlign: 'left',
   },
   mobileCardTitle: {
-    fontSize: 20,
+    fontSize: 22,
     marginBottom: 16,
   },
 });

@@ -108,7 +108,8 @@ const styles = StyleSheet.create({
   header: {
     width: (Platform.OS === 'web' ? '100vw' : '100%') as any,
     height: 65, 
-    position: 'absolute',
+    alignSelf: 'stretch', // Ensure header fills width even if parent is centered
+    // position: 'absolute',
     top: 0,
     left: 0,
     right: 0,

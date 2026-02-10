@@ -39,8 +39,9 @@ export default function Main({ navigation }: Props) {
       )}
 
       <ScrollView 
-        contentContainerStyle=
-        {commonStyles.scrollContent}
+        contentContainerStyle={
+          commonStyles.scrollContent
+        }
         stickyHeaderIndices={[0]} // 자식 컴포넌트들 중 첫 번째 컴포넌트를 고정시키겠다.
       >
         {/* Header */}
@@ -228,29 +229,9 @@ const styles = StyleSheet.create({
     marginTop: 0,
   },
 
-  // --- 3D Loading Simulation ---
-  loadingSection: {
-    width: '100%',
-    marginVertical: 40,
-    alignItems: 'center',
-  },
-  loadingTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 20, // 이 줄이 쉼표가 없어서 추가해야 함
-    color: '#1D1D1F',
-  },
-  loadingContainer: {
-    width: '50%',
-    height: 600,
-    backgroundColor: '#000',
-    borderRadius: 10,
-    overflow: 'hidden',
-  },
-
   // --- Mobile ---
   mobileMainSection: {
-    marginTop: 110,
+    marginTop: 50,
     width: '100%',
     paddingHorizontal: 20,
     gap: 16,

@@ -11,6 +11,7 @@ export const commonStyles = StyleSheet.create({
   scrollContent: {
     flexGrow: 1,
     paddingTop: 0,
+    alignItems: 'center',
   },
   mainWrapper: {
     width: '100%',
@@ -21,12 +22,12 @@ export const commonStyles = StyleSheet.create({
 
   // --- 타이틀 ---
   mainSection: {
-    marginTop: 170,
+    marginTop: 150, // Reduced further to 50
     marginBottom: 80,
     width: 837,
     alignItems: 'center',
     alignSelf: 'center',
-    gap: 23,
+    gap: 10,
   },
   mainTitle: {
     fontSize: 45,

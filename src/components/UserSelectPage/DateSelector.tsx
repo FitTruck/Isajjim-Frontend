@@ -88,7 +88,7 @@ export default function DateSelector({ date, onSelect, isOpen: controlledOpen, o
 
   return (
     <View style={[styles.container, { zIndex: isOpen ? 2000 : 1 }, isMobile && styles.mobileContainer]}>
-      <Text style={styles.label}>이사 희망 날짜</Text>
+      <Text style={[styles.label, isMobile && {fontSize: 22}]}>이사 희망 날짜</Text>
       
       <TouchableOpacity 
         style={[styles.inputBox, isOpen && styles.inputBoxOpen]}

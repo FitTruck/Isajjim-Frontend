@@ -139,7 +139,7 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     justifyContent: 'center', 
     alignItems: 'center',
-    marginTop: -10,
+    marginTop: 0,
   },
   mobileNextBtn: {
     backgroundColor: '#F0893B',
@@ -147,7 +147,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderRadius: 8,
     alignItems: 'center',
-    marginTop: -10,
+    marginTop: 0,
   },
   nextBtnText: {
     color: 'white',
