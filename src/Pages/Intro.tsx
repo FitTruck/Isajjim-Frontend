@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, Image, useWindowDimensions, ScrollView } from 'react-native';
+import { commonStyles } from '../styles/commonStyles';
 import Header from '../components/common/Header';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types/navigation';
@@ -19,9 +20,12 @@ export default function Intro({ navigation }: Props) {
 
   return (
     <View style={styles.container}>
-      <Header />
-      
-      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+      <ScrollView 
+        contentContainerStyle={commonStyles.scrollContent}
+        stickyHeaderIndices={[0]} // 자식 컴포넌트들 중 첫 번째 컴포넌트를 고정시키겠다.
+      >
+        <Header />
+
         <View style={[
           styles.contentWrapper, 
           isMobile && styles.mobileContentWrapper,
@@ -87,7 +91,7 @@ const styles = StyleSheet.create({
   mobileContentWrapper: {
     flexDirection: 'column-reverse', 
     justifyContent: 'flex-end',
-    paddingTop: 100,
+    paddingTop: 200,
     paddingBottom: 40,
   },
   
