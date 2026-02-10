@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, ScrollView, StyleSheet, Platform } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, useWindowDimensions } from 'react-native';
 import { commonStyles } from '../styles/commonStyles';
 import Header from '../components/common/Header';
 import NextBtn from '../components/UserSelectPage/NextBtn2'; 
@@ -16,6 +16,8 @@ type Props = NativeStackScreenProps<RootStackParamList, 'UserSelect'>;
 export default function UserSelect({ navigation, route }: Props) {
   // 이미지 정보를 계속 들고 있어야 result에서 보여줄 수가 있다. 따로 다른 곳에 저장하고 있지 않음
   const { images, estimateId } = route.params;
+  const { width } = useWindowDimensions();
+  const isMobile = width < 768;
 
   // 드롭다운 제어
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
@@ -130,27 +132,28 @@ export default function UserSelect({ navigation, route }: Props) {
       )}
 
       <ScrollView 
-        contentContainerStyle={[
-          commonStyles.scrollContent, 
-          Platform.OS === 'web' ? { width: '100vw', maxWidth: '100vw', overflowX: 'hidden' } : {}
-        ] as any}
-        stickyHeaderIndices={[0]}
+        contentContainerStyle={commonStyles.scrollContent}
+        stickyHeaderIndices={[0]} // 자식 컴포넌트들 중 첫 번째 컴포넌트를 고정시키겠다.
       >
         <Header />
 
-        <View style={commonStyles.mainWrapper}>
+        <View style={[commonStyles.mainWrapper, isMobile && { paddingHorizontal: 20 }]}>
           
           {/* 타이틀 */}
-          <View style={commonStyles.mainSection}>
-            <Text style={commonStyles.mainTitle}>상세 기재 사항</Text>
-            <Text style={commonStyles.mainSubtitle}>정확한 견적을 위해 필요한 사항입니다</Text>
+          <View style={[commonStyles.mainSection, isMobile && styles.mobileMainSection]}>
+            <Text style={[commonStyles.mainTitle, isMobile && styles.mobileMainTitle]}>상세 기재 사항</Text>
+            <Text style={[commonStyles.mainSubtitle, isMobile && styles.mobileMainSubtitle]}>정확한 견적을 위해 필요한 사항입니다</Text>
           </View>
 
           
           <View style={styles.contentContainer}>
             {/* 날짜 선택 섹션 (레이아웃을 아래 카드들과 맞추기 위해 동일한 구조 사용) */}
-            <View style={[styles.cardsContainer, { marginBottom: -30, zIndex: 20 }]}>
-              <View style={styles.cardColumn}>
+            <View style={[
+              styles.cardsContainer, 
+              isMobile && styles.mobileCardsContainer,
+              { marginBottom: isMobile ? 0 : -30, zIndex: 20 }
+            ]}>
+              <View style={[styles.cardColumn, isMobile && styles.mobileCardColumn]}>
                 <DateSelector 
                   date={movingDate} 
                   onSelect={setMovingDate} 
@@ -158,17 +161,17 @@ export default function UserSelect({ navigation, route }: Props) {
                   onToggle={() => handleToggle('dateSelector')}
                 />
               </View>
-              {/* 오른쪽 빈 공간으로 레이아웃 균형 맞춤 */}
-              <View style={styles.cardColumn} />
+              {/* 오른쪽 빈 공간으로 레이아웃 균형 맞춤 (모바일에서는 숨김) */}
+              {!isMobile && <View style={styles.cardColumn} />}
             </View>
           
             {/* 양쪽 카드 컨테이너 */}
-            <View style={styles.cardsContainer}>
+            <View style={[styles.cardsContainer, isMobile && styles.mobileCardsContainer]}>
 
               {/* 출발지 카드 영역 */}
-              <View style={styles.cardColumn}>
-                <Text style={styles.cardTitle}>출발지 정보</Text>
-                <View style={styles.card}>
+              <View style={[styles.cardColumn, isMobile && styles.mobileCardColumn]}>
+                <Text style={[styles.cardTitle, isMobile && styles.mobileCardTitle]}>출발지 정보</Text>
+                <View style={[styles.card, isMobile && styles.mobileCard]}>
                   
                   <AddressInput 
                     label="출발지 주소"
@@ -263,9 +266,9 @@ export default function UserSelect({ navigation, route }: Props) {
               </View>
 
               {/* 도착지 카드 영역 */}
-              <View style={styles.cardColumn}>
-                <Text style={styles.cardTitle}>도착지 정보</Text>
-                <View style={styles.card}>
+              <View style={[styles.cardColumn, isMobile && styles.mobileCardColumn]}>
+                <Text style={[styles.cardTitle, isMobile && styles.mobileCardTitle]}>도착지 정보</Text>
+                <View style={[styles.card, isMobile && styles.mobileCard]}>
 
                   <AddressInput 
                     label="도착지 주소"
@@ -406,6 +409,19 @@ export default function UserSelect({ navigation, route }: Props) {
 }
 
 const styles = StyleSheet.create({
+  // Mobile Section Overrides
+  mobileMainSection: {
+    marginTop: 100,
+    marginBottom: 40,
+    alignItems: 'center',
+  },
+  mobileMainTitle: {
+    fontSize: 28,
+  },
+  mobileMainSubtitle: {
+    fontSize: 16,
+  },
+
   contentContainer: {
     flexDirection: 'column',
     width: '100%',
@@ -420,10 +436,18 @@ const styles = StyleSheet.create({
     paddingHorizontal: 40,
     zIndex: 10,
   },
+  mobileCardsContainer: {
+    flexDirection: 'column',
+    paddingHorizontal: 0,
+    gap: 20,
+    zIndex: 1, // Reset zIndex for stacking
+  },
   cardColumn: {
     width: 600, 
     flexDirection: 'column',
-
+  },
+  mobileCardColumn: {
+    width: '100%',
   },
   card: {
     width: '100%',
@@ -435,11 +459,22 @@ const styles = StyleSheet.create({
     elevation: 3,
     marginBottom: 40,
   },
+  mobileCard: {
+    width: '100%',
+    padding: 20,
+    marginBottom: 20,
+    elevation: 1,
+    shadowOpacity: 0.1,
+  },
   cardTitle: {
     fontSize: 22,
     fontWeight: 'bold',
     marginBottom: 20,
     color: '#333333',
     textAlign: 'left',
+  },
+  mobileCardTitle: {
+    fontSize: 20,
+    marginBottom: 16,
   },
 });
