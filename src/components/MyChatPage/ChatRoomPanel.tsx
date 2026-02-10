@@ -212,7 +212,11 @@ export default function ChatRoomPanel({ data, isMobile = false, onBack }: ChatRo
         // 두 번째 메시지 : 소개
         <View style={[styles.messageRow, styles.theirMessageRow]}>
           <View style={[styles.profileCircle, { opacity: 0 }]} />
-          <View style={[styles.messageBubble, styles.theirMessageBubble]}>
+          <View style={[
+            styles.messageBubble, 
+            styles.theirMessageBubble,
+            isMobile && { maxWidth: '60%' }
+          ]}>
             <Text style={[styles.messageText, styles.theirMessageText]}>
               {item.text}
             </Text>
@@ -239,7 +243,8 @@ export default function ChatRoomPanel({ data, isMobile = false, onBack }: ChatRo
         {item.isMe && <Text style={styles.messageTime}>{item.time}</Text>}
         <View style={[
           styles.messageBubble, 
-          item.isMe ? styles.myMessageBubble : styles.theirMessageBubble
+          item.isMe ? styles.myMessageBubble : styles.theirMessageBubble,
+          isMobile && { maxWidth: '75%' }
         ]}>
           <Text style={[
             styles.messageText, 
@@ -481,7 +486,7 @@ const styles = StyleSheet.create({
     color: '#555',
   },
   messageBubble: {
-    maxWidth: '39%',
+    maxWidth: '39%', // 웹 기본값
     padding: 15,
     borderRadius: 12,
   },
