@@ -275,15 +275,13 @@ export default function ChatRoomPanel({ data, isMobile = false, onBack }: ChatRo
             </View>
           )}
 
-          {!isMobile && (
-            <TouchableOpacity 
-              style={styles.headerRequestButton}
-              onPress={() => setIsRequestModalVisible(true)}
-            >
-              <Image source={require('../../../assets/docs.png')} style={styles.headerRequestIcon} resizeMode="contain" />
-              <Text style={styles.headerRequestText}>내 요청사항</Text>
-            </TouchableOpacity>
-          )}
+          <TouchableOpacity 
+            style={styles.headerRequestButton}
+            onPress={() => setIsRequestModalVisible(true)}
+          >
+            <Image source={require('../../../assets/docs.png')} style={styles.headerRequestIcon} resizeMode="contain" />
+            <Text style={styles.headerRequestText}>내 요청사항</Text>
+          </TouchableOpacity>
 
           {/* 확정하기 버튼 */}
           <ConfirmButton messages={messages} onConfirm={handleConfirmSuccess} />

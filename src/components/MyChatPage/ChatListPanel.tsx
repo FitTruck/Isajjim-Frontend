@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, Text, Image, StyleSheet, TextInput, FlatList, Platform, Pressable } from "react-native";
+import { View, Text, Image, StyleSheet, TextInput, FlatList, Platform, Pressable, TouchableOpacity } from "react-native";
 import { Search } from 'lucide-react-native';
 import { ChatItemData } from "../../Pages/MyChat";
 import MyTouch from "../common/MyTouch";
@@ -25,10 +25,11 @@ export default function ChatListPanel({ chatList, selectedChatId, onSelectChat, 
   // 채팅방 리스트 렌더링 함수
   const renderItem = ({ item }: { item: ChatItemData }) => {
     const isSelected = item.id === selectedChatId;
+    const ItemWrapper = (isMobile ? TouchableOpacity : MyTouch) as React.ComponentType<any>;
     
     return (
-      <MyTouch 
-        style={[styles.chatItem, isSelected && styles.chatItemActive]}
+      <ItemWrapper 
+        style={[styles.chatItem, isSelected && !isMobile && styles.chatItemActive]}
         onPress={() => onSelectChat(item.id)}
       >
         {item.logoUri ? (
@@ -54,7 +55,7 @@ export default function ChatListPanel({ chatList, selectedChatId, onSelectChat, 
         </View>
         {/* 안 읽었을 때 뜨는 점 */}
         {item.isUnread && <View style={styles.unreadDot} />}
-      </MyTouch>
+      </ItemWrapper>
     );
   };
 

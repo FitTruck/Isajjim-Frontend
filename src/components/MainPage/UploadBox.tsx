@@ -193,7 +193,7 @@ const styles = StyleSheet.create({
     }) as any,
   },
   mobileUploadContainer: {
-    width: 428,
+    width: '100%',
     height: 180,
     borderRadius: 16,
     padding: 16,
