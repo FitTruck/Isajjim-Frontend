@@ -157,11 +157,11 @@ export default function UploadBox({ onFilesSelected, selectedImages = [] }: Uplo
     >
       {hasImages ? (
         <View style={styles.uploadedImagesWrapper}>
-           <View style={styles.imageGrid}>
-             {selectedImages.map((img, idx) => (
-               <Image key={idx} source={{ uri: img.localUri }} style={styles.uploadedImage} />
-             ))}
-           </View>
+          <View style={[styles.imageGrid, isMobile && styles.mobileImageGrid]}>
+            {selectedImages.map((img, idx) => (
+              <Image key={idx} source={{ uri: img.localUri }} style={[styles.uploadedImage, isMobile && styles.mobileUploadedImage]} />
+            ))}
+          </View>
         </View>
       ) : (
         <UploadContent isDragging={isDragging} isMobile={isMobile} hasImages={false} />
@@ -193,7 +193,7 @@ const styles = StyleSheet.create({
     }) as any,
   },
   mobileUploadContainer: {
-    width: '100%',
+    width: 428,
     height: 180,
     borderRadius: 16,
     padding: 16,
@@ -285,9 +285,16 @@ const styles = StyleSheet.create({
     gap: 30,
     justifyContent: 'flex-start',
   },
+  mobileImageGrid: {
+    gap: 10,
+  },
   uploadedImage: {
     width: 100,
     height: 100,
     borderRadius: 8,
+  },
+  mobileUploadedImage: {
+    width: 70,
+    height: 70,
   },
 });
