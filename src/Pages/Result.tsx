@@ -398,7 +398,10 @@ export default function Result({ navigation }: Props) {
 
               {/* 페이지 인디케이터 (Dots) - 2개 이상일 때만 표시 */}
               {results.length > 1 && (
-                <View style={styles.paginationContainer}>
+                <View style={[
+                  styles.paginationContainer,
+                  isMobile && { marginTop: 20 }
+                ]}>
                   {results.map((_, index) => (
                     <View
                       key={index}
