@@ -161,11 +161,10 @@ export default function MyEstimate({ navigation }: Props) {
 
 const styles = StyleSheet.create({
   mainWrapper: {
-    marginTop: 50,
+    marginTop: 80,
     width: '100%',
     alignItems: 'center',
     marginBottom: 100,
-    paddingTop: 80,
   },
   mobileMainWrapper: {
     marginTop: 0,

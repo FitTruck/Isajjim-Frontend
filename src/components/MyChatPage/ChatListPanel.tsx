@@ -8,9 +8,10 @@ interface ChatListPanelProps {
   chatList: ChatItemData[];
   selectedChatId: string | null;
   onSelectChat: (id: string) => void;
+  isMobile?: boolean;
 }
 
-export default function ChatListPanel({ chatList, selectedChatId, onSelectChat }: ChatListPanelProps) {
+export default function ChatListPanel({ chatList, selectedChatId, onSelectChat, isMobile = false }: ChatListPanelProps) {
   // 검색바에 검색한 값
   const [searchText, setSearchText] = useState("");
   const [isSearchHovered, setIsSearchHovered] = useState(false);
@@ -58,12 +59,13 @@ export default function ChatListPanel({ chatList, selectedChatId, onSelectChat }
   };
 
   return (
-    <View style={styles.leftPanel}>
+    <View style={[styles.leftPanel, isMobile && styles.mobileLeftPanel]}>
       {/* 검색 바 */}
       <Pressable 
-        style={[styles.searchBar, isSearchHovered && styles.searchBarHovered]}
+        style={[styles.searchBar, isMobile && { width: 'auto', marginHorizontal: 16 }, isSearchHovered && styles.searchBarHovered]}
         onHoverIn={() => setIsSearchHovered(true)}
         onHoverOut={() => setIsSearchHovered(false)}
+        pointerEvents="box-none"
       >
         <TextInput 
           style={styles.input}
@@ -89,10 +91,11 @@ export default function ChatListPanel({ chatList, selectedChatId, onSelectChat }
         renderItem={renderItem}
         keyExtractor={item => item.id}
         contentContainerStyle={{ paddingBottom: 60 }}
+        style={{ flex: 1 }}
       />
 
       {/* 휴지통 아이콘 */}
-      <Image source={require('../../../assets/trash.png')} style={styles.trashIcon} />
+      {!isMobile && <Image source={require('../../../assets/trash.png')} style={styles.trashIcon} />}
     </View>
   );
 }
@@ -105,6 +108,12 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     backgroundColor: 'white',
     position: 'relative',
+    height: '100%',
+  },
+  mobileLeftPanel: {
+    width: '100%',
+    borderWidth: 0,
+    borderRadius: 0,
     height: '100%',
   },
   searchBar: {

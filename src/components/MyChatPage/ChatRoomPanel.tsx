@@ -3,11 +3,13 @@ import { View, Text, Image, StyleSheet, TextInput, FlatList, KeyboardAvoidingVie
 import { ChatItemData } from "../../Pages/MyChat";
 import ConfirmButton from "./ConfirmButton";
 import RequestDetailModal from "../common/RequestDetailModal";
-import { FileText, MessageSquareMore, ChevronRight } from 'lucide-react-native';
+import { FileText, MessageSquareMore, ChevronRight, ChevronLeft } from 'lucide-react-native';
 import { useEstimate, RequestData } from "../../context/EstimateContext";
 
 interface ChatRoomPanelProps {
   data: ChatItemData | null;
+  isMobile?: boolean; // Mobile check
+  onBack?: () => void; // Mobile back navigation
 }
 
 interface Message {
@@ -23,7 +25,7 @@ import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../types/navigation';
 
-export default function ChatRoomPanel({ data }: ChatRoomPanelProps) {
+export default function ChatRoomPanel({ data, isMobile = false, onBack }: ChatRoomPanelProps) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputText, setInputText] = useState("");
   const [isFileHovered, setIsFileHovered] = useState(false);
@@ -250,27 +252,38 @@ export default function ChatRoomPanel({ data }: ChatRoomPanelProps) {
   };
 
   return (
-    <View style={styles.rightPanel}>
+    <View style={[styles.rightPanel, isMobile && styles.mobileRightPanel]}>
       {/* 헤더 */}
       <View style={styles.chatHeader}>
-        <View>
-          <Text style={styles.headerCompanyName}>{data.companyName}</Text>
-          <Text style={styles.headerCompanyDesc}>보통 15분 내 응답, 응답률 100%</Text>
-        </View>
-        <View style={styles.headerRightGroup}>
-          <View style={styles.headerPriceBlock}>
-            <Text style={styles.headerPriceLabel}>제안 가격:</Text>
-            <Text style={styles.headerPriceValue}>{data.price}</Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+          {isMobile && onBack && (
+            <TouchableOpacity onPress={onBack} style={{ padding: 5, marginLeft: -5, marginRight: 5 }}>
+              <ChevronLeft size={24} color="#333" />
+            </TouchableOpacity>
+          )}
+          <View>
+            <Text style={styles.headerCompanyName}>{data.companyName}</Text>
+            <Text style={styles.headerCompanyDesc}>보통 15분 내 응답, 응답률 100%</Text>
           </View>
+        </View>
 
+        <View style={styles.headerRightGroup}>
+          {!isMobile && (
+            <View style={styles.headerPriceBlock}>
+              <Text style={styles.headerPriceLabel}>제안 가격:</Text>
+              <Text style={styles.headerPriceValue}>{data.price}</Text>
+            </View>
+          )}
 
-          <TouchableOpacity 
-            style={styles.headerRequestButton}
-            onPress={() => setIsRequestModalVisible(true)}
-          >
-            <Image source={require('../../../assets/docs.png')} style={styles.headerRequestIcon} resizeMode="contain" />
-            <Text style={styles.headerRequestText}>내 요청사항</Text>
-          </TouchableOpacity>
+          {!isMobile && (
+            <TouchableOpacity 
+              style={styles.headerRequestButton}
+              onPress={() => setIsRequestModalVisible(true)}
+            >
+              <Image source={require('../../../assets/docs.png')} style={styles.headerRequestIcon} resizeMode="contain" />
+              <Text style={styles.headerRequestText}>내 요청사항</Text>
+            </TouchableOpacity>
+          )}
 
           {/* 확정하기 버튼 */}
           <ConfirmButton messages={messages} onConfirm={handleConfirmSuccess} />
@@ -358,6 +371,12 @@ const styles = StyleSheet.create({
     display: 'flex',
     flexDirection: 'column',
   },
+  mobileRightPanel: {
+    marginLeft: 0,
+    borderWidth: 0,
+    borderRadius: 0,
+    flex: 1,
+  },
   chatHeader: {
     height: 58,
     borderBottomWidth: 1,
@@ -367,6 +386,9 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     backgroundColor: '#FFF' 
+  },
+  mobileChatHeader: {
+    paddingHorizontal: 10,
   },
   headerCompanyName: {
     fontSize: 18,
