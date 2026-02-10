@@ -47,7 +47,7 @@ export default function Header() {
   const onGoHome = () => {
     navigation.reset({
       index: 0,
-      routes: [{ name: 'Main' }],
+      routes: [{ name: 'Intro' }],
     });
   };
 
