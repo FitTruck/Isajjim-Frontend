@@ -62,7 +62,7 @@ export default function Header() {
 
   return (
     <View style={[styles.header, isMobile && styles.mobileHeader]}>
-      <View style={styles.headerContent}>
+      <View style={[styles.headerContent, isMobile && styles.mobileHeaderContent]}>
         <MyTouch style={styles.logoContainer} onPress={onGoHome}>
           <Image source={require('../../../assets/Logo.png')} style={styles.logoIcon} />
           <Text style={[styles.logoText, isMobile && styles.mobileLogoText]}>이삿찜</Text>
@@ -116,8 +116,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255, 255, 255, 0.5)', 
     // @ts-ignore
     backdropFilter: 'blur(7px)',
-    paddingHorizontal: 30, // 왼쪽/오른쪽 여백 축소
-    paddingRight: 47,
+    paddingHorizontal: 50, // 왼쪽/오른쪽 여백 축소
     flexDirection: 'row', 
     alignItems: 'center',
     justifyContent: 'center', // 내부 컨텐츠 중앙 정렬
@@ -133,9 +132,13 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 0, 
   },
+  mobileHeaderContent: {
+    alignItems: 'flex-start',
+    justifyContent: 'space-between',
+  },
   mobileHeader: {
     height: 50,
-    paddingHorizontal: 16,
+    paddingHorizontal: 20,
   },
   logoContainer: {
     height: '100%',
@@ -168,7 +171,7 @@ const styles = StyleSheet.create({
     gap: 40,
   },
   mobileHeaderRight: {
-    gap: 12,
+    gap: 13,
   },
   mypageText: { 
     fontSize: 16,
