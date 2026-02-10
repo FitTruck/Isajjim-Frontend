@@ -466,7 +466,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     position: 'relative',
-    marginTop: 150,
+    marginTop: 60,
     gap: 100,
     marginLeft: 100,
     height: 600
