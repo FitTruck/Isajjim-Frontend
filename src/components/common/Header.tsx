@@ -171,7 +171,7 @@ const styles = StyleSheet.create({
     gap: 40,
   },
   mobileHeaderRight: {
-    gap: 13,
+    gap: 15,
   },
   mypageText: { 
     fontSize: 16,
