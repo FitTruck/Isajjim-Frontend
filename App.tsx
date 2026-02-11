@@ -58,33 +58,7 @@ export default function App() {
           <Stack.Screen name="Intro" component={Intro} />
           <Stack.Screen name="Main" component={Main} />
           <Stack.Screen name="UserSelect" component={UserSelect} />
-          <Stack.Screen
-            name="Result" 
-            component={Result} 
-            initialParams={{
-              data: [{
-                fileName: "test.jpg",
-                mimeType: "image/jpeg",
-                localUri: "https://via.placeholder.com/300",
-                width: 500,
-                height: 500
-              }],
-              estimateId: 999,
-              ResultOfUserSelect: {
-                data: {
-                  images: [{
-                    furnitureList: [
-                      { furnitureId: 101, label: "소파", type: "sofa", quantity: 1 },
-                      { furnitureId: 102, label: "침대", type: "bed", quantity: 1 }
-                    ]
-                  }],
-                  items: [
-                    { category: "TRUCK", itemType: "1톤", quantity: 2 }
-                  ]
-                }
-              }
-            }}
-          />
+          <Stack.Screen name="Result" component={Result} />
           <Stack.Screen name="MyEstimate" component={MyEstimate} />
           <Stack.Screen name="MyChat" component={MyChat} />
           <Stack.Screen name="SimulationTest" component={SimulationTest} />
