@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, ScrollView, Image, Platform, useWindowDimensions } from "react-native";
+import { View, Text, StyleSheet, ScrollView, Image, Platform, useWindowDimensions, TouchableOpacity } from "react-native";
 import { commonStyles } from "../styles/commonStyles";
 import Header from "../components/common/Header";
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -132,10 +132,10 @@ export default function MyEstimate({ navigation }: Props) {
 
               {/* 필터 버튼 */}
               <View style={styles.filterButtonContainer}>
-                <MyTouch style={styles.filterButton}>
+                <TouchableOpacity style={styles.filterButton}>
                   <Image source={require('../../assets/filter.png')} style={styles.filterIcon} />
                   <Text style={styles.filterText}>필터</Text>
-                </MyTouch>
+                </TouchableOpacity>
               </View>
 
               {/* 견적 리스트 (카드들) */}
