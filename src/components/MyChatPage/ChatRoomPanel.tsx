@@ -167,42 +167,42 @@ export default function ChatRoomPanel({ data, isMobile = false, onBack }: ChatRo
       return (
         // 첫 번째 메시지 : 견적서
         <View style={[styles.messageRow, styles.theirMessageRow]}>
-          <View style={styles.profileCircle}>
+          <View style={[styles.profileCircle, isMobile && styles.mobileProfileCircle]}>
             {data.logoUri ? (
               <Image source={data.logoUri} style={styles.profileImage} />
             ) : (
-              <Text style={styles.profileText}>{data.companyName[0]}</Text>
+              <Text style={[styles.profileText, isMobile && styles.mobileProfileText]}>{data.companyName[0]}</Text>
             )}
           </View>
-          <View style={styles.quoteBubble}>
+          <View style={[styles.quoteBubble, isMobile && styles.mobileQuoteBubble]}>
             <View style={styles.quoteHeader}>
-              <View style={styles.quoteIconCircle}>
-                <FileText size={16} color="white" />              </View>
-              <Text style={styles.quoteTitle}>견적서</Text>
+              <View style={[styles.quoteIconCircle, isMobile && styles.mobileQuoteIconCircle]}>
+                <FileText size={isMobile ? 14 : 16} color="white" />              </View>
+              <Text style={[styles.quoteTitle, isMobile && styles.mobileQuoteTitle]}>견적서</Text>
             </View>
 
-            <Text style={styles.quoteGreeting}>
+            <Text style={[styles.quoteGreeting, isMobile && styles.mobileQuoteGreeting]}>
               고객님 안녕하세요. 요청서에 따른 예상 금액입니다.
             </Text>
 
             <View style={styles.quoteDivider} />
 
             <View style={styles.quoteInfoRow}>
-              <Text style={styles.quoteLabel}>예상금액</Text>
-              <Text style={styles.quotePriceValue}>총 {item.price} 부터~</Text>
+              <Text style={[styles.quoteLabel, isMobile && styles.mobileQuoteLabel]}>예상금액</Text>
+              <Text style={[styles.quotePriceValue, isMobile && styles.mobileQuotePriceValue]}>총 {item.price} 부터~</Text>
             </View>
 
             <View style={styles.quoteDivider} />
 
             <View style={styles.quoteHelpRow}>
-              <MessageSquareMore size={14} color="#A0A0A0" style={{marginTop: 2}} />              <Text style={styles.quoteHelpText}>나의 상황에 대해 상의해 보세요. 확정 시, AI가 요약하여 요청사항에 반영합니다.</Text>
+              <MessageSquareMore size={isMobile ? 12 : 14} color="#A0A0A0" style={{marginTop: 2}} />              <Text style={[styles.quoteHelpText, isMobile && styles.mobileQuoteHelpText]}>나의 상황에 대해 상의해 보세요. 확정 시, AI가 요약하여 요청사항에 반영합니다.</Text>
             </View>
 
-            <TouchableOpacity style={styles.quoteButton}>
-              <Text style={styles.quoteButtonText}>업체 프로필 보기</Text>
-              <ChevronRight size={16} color="white" />            </TouchableOpacity>
+            <TouchableOpacity style={[styles.quoteButton, isMobile && styles.mobileQuoteButton]}>
+              <Text style={[styles.quoteButtonText, isMobile && styles.mobileQuoteButtonText]}>업체 프로필 보기</Text>
+              <ChevronRight size={isMobile ? 14 : 16} color="white" />            </TouchableOpacity>
           </View>
-          <Text style={styles.messageTime}>{item.time}</Text>
+          <Text style={[styles.messageTime, isMobile && styles.mobileMessageTime]}>{item.time}</Text>
         </View>
       );
     }
@@ -211,17 +211,18 @@ export default function ChatRoomPanel({ data, isMobile = false, onBack }: ChatRo
       return (
         // 두 번째 메시지 : 소개
         <View style={[styles.messageRow, styles.theirMessageRow]}>
-          <View style={[styles.profileCircle, { opacity: 0 }]} />
+          <View style={[styles.profileCircle, isMobile && styles.mobileProfileCircle, { opacity: 0 }]} />
           <View style={[
             styles.messageBubble, 
             styles.theirMessageBubble,
-            isMobile && { maxWidth: '60%' }
+            isMobile && styles.mobileMessageBubble,
+            isMobile && { maxWidth: '70%' }
           ]}>
-            <Text style={[styles.messageText, styles.theirMessageText]}>
+            <Text style={[styles.messageText, styles.theirMessageText, isMobile && styles.mobileMessageText]}>
               {item.text}
             </Text>
           </View>
-          <Text style={styles.messageTime}>{item.time}</Text>
+          <Text style={[styles.messageTime, isMobile && styles.mobileMessageTime]}>{item.time}</Text>
         </View>
       );
     }
@@ -232,26 +233,28 @@ export default function ChatRoomPanel({ data, isMobile = false, onBack }: ChatRo
         item.isMe ? styles.myMessageRow : styles.theirMessageRow
       ]}>
         {!item.isMe && (
-          <View style={styles.profileCircle}>
+          <View style={[styles.profileCircle, isMobile && styles.mobileProfileCircle]}>
             {data.logoUri ? (
               <Image source={data.logoUri} style={styles.profileImage} />
             ) : (
-              <Text style={styles.profileText}>{data.companyName[0]}</Text>
+              <Text style={[styles.profileText, isMobile && styles.mobileProfileText]}>{data.companyName[0]}</Text>
             )}
           </View>
         )}
-        {item.isMe && <Text style={styles.messageTime}>{item.time}</Text>}
+        {item.isMe && <Text style={[styles.messageTime, isMobile && styles.mobileMessageTime]}>{item.time}</Text>}
         <View style={[
           styles.messageBubble, 
           item.isMe ? styles.myMessageBubble : styles.theirMessageBubble,
-          isMobile && { maxWidth: '75%' }
+          isMobile && styles.mobileMessageBubble,
+          isMobile && { maxWidth: '70%' }
         ]}>
           <Text style={[
             styles.messageText, 
-            item.isMe ? styles.myMessageText : styles.theirMessageText
+            item.isMe ? styles.myMessageText : styles.theirMessageText,
+            isMobile && styles.mobileMessageText
           ]}>{item.text}</Text>
         </View>
-        {!item.isMe && <Text style={styles.messageTime}>{item.time}</Text>}
+        {!item.isMe && <Text style={[styles.messageTime, isMobile && styles.mobileMessageTime]}>{item.time}</Text>}
       </View>
     );
   };
@@ -306,7 +309,7 @@ export default function ChatRoomPanel({ data, isMobile = false, onBack }: ChatRo
           data={messages}
           renderItem={renderMessage}
           keyExtractor={item => item.id}
-          contentContainerStyle={styles.messageList}
+          contentContainerStyle={[styles.messageList, isMobile && styles.mobileMessageList]}
           showsVerticalScrollIndicator={false}
         />
       </View>
@@ -454,6 +457,10 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
     paddingTop: 40,
   },
+  mobileMessageList: {
+    paddingHorizontal: 12,
+    paddingTop: 20,
+  },
   messageRow: {
     marginBottom: 20,
     flexDirection: 'row',
@@ -475,6 +482,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignSelf: 'flex-start',
   },
+  mobileProfileCircle: {
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    marginRight: 8,
+  },
   profileImage: {
     width: '100%',
     height: '100%',
@@ -485,10 +498,17 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#555',
   },
+  mobileProfileText: {
+    fontSize: 12,
+  },
   messageBubble: {
     maxWidth: '39%', // 웹 기본값
     padding: 15,
     borderRadius: 12,
+  },
+  mobileMessageBubble: {
+    padding: 12,
+    borderRadius: 10,
   },
   myMessageBubble: {
     backgroundColor: '#F0893B', // 내 메시지는 주황색
@@ -506,6 +526,10 @@ const styles = StyleSheet.create({
     fontSize: 13,
     lineHeight: 19,
   },
+  mobileMessageText: {
+    fontSize: 12,
+    lineHeight: 17,
+  },
   myMessageText: {
     color: '#FFF',
   },
@@ -518,6 +542,11 @@ const styles = StyleSheet.create({
     marginLeft: 8,
     marginRight: 8,
     marginBottom: 2,
+  },
+  mobileMessageTime: {
+    fontSize: 9,
+    marginLeft: 4,
+    marginRight: 4,
   },
 
   // 푸터 스타일
@@ -562,6 +591,12 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#e0e0e0',
   },
+  mobileQuoteBubble: {
+    borderRadius: 12,
+    padding: 12,
+    maxWidth: '70%',
+    marginTop: 3,
+  },
   quoteHeader: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -576,16 +611,30 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginRight: 8,
   },
+  mobileQuoteIconCircle: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    marginRight: 6,
+  },
   quoteTitle: {
     fontSize: 14,
     fontWeight: 'bold',
     color: '#333',
+  },
+  mobileQuoteTitle: {
+    fontSize: 12,
   },
   quoteGreeting: {
     marginVertical: 4,
     fontSize: 13,
     color: '#555',
     lineHeight: 18,
+  },
+  mobileQuoteGreeting: {
+    fontSize: 11,
+    lineHeight: 16,
+    marginVertical: 3,
   },
   quoteDivider: {
     height: 1,
@@ -601,10 +650,16 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#888',
   },
+  mobileQuoteLabel: {
+    fontSize: 10,
+  },
   quotePriceValue: {
     fontSize: 15,
     color: '#333',
     fontWeight: 'bold',
+  },
+  mobileQuotePriceValue: {
+    fontSize: 13,
   },
   quoteHelpRow: {
     flexDirection: 'row',
@@ -619,6 +674,10 @@ const styles = StyleSheet.create({
     flex: 1,
     lineHeight: 16,
   },
+  mobileQuoteHelpText: {
+    fontSize: 9,
+    lineHeight: 14,
+  },
   quoteButton: {
     backgroundColor: '#F0893B',
     borderRadius: 8,
@@ -628,10 +687,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 12,
   },
+  mobileQuoteButton: {
+    height: 34,
+    borderRadius: 6,
+    paddingHorizontal: 10,
+  },
   quoteButtonText: {
     color: 'white',
     fontSize: 13,
     fontWeight: '500'
+  },
+  mobileQuoteButtonText: {
+    fontSize: 11,
   },
   iconButton: {
     padding: 8,
