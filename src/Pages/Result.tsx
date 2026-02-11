@@ -280,6 +280,18 @@ export default function Result({ navigation }: Props) {
     }
   };
 
+  // 스와이프 시 인덱스 업데이트 (모바일 슬라이더 문제 해결)
+  const handleScrollEvent = (event: any) => {
+    const offsetX = event.nativeEvent.contentOffset.x;
+    const pageWidth = isMobile ? width : 970;
+    const currentIndex = Math.round(offsetX / pageWidth);
+    
+    if (currentIndex !== scrollIndex && currentIndex >= 0 && currentIndex < results.length) {
+      setScrollIndex(currentIndex);
+    }
+  };
+
+
   // 시뮬레이션 트럭 결과 콜백
   const handleTrucksChange = useCallback((trucks: SimulationTruckResult[]) => {
     setSimulationTrucks(trucks);
@@ -358,6 +370,8 @@ export default function Result({ navigation }: Props) {
                 pagingEnabled
                 showsHorizontalScrollIndicator={false}
                 scrollEnabled={isMobile} // Enable scroll on mobile
+                onScroll={handleScrollEvent}  
+                scrollEventThrottle={16}       
               >
                 {/* 분석 카드 */}
                 {/* results -> 모든 항목 변경 : results로 바꿔야함, 바꿀 때 results 변수 자체명도 바뀌니까 주석처리 같이 해야함. */}
@@ -367,14 +381,21 @@ export default function Result({ navigation }: Props) {
                     style={{ 
                       width: isMobile ? width : 970, // Mobile width adjustment
                       alignItems: 'center',
-                      paddingHorizontal: isMobile ? 20 : 0
+                      justifyContent: 'center',
+                      // paddingHorizontal 제거 (페이징 정확도 향상)
                     }}
                   >
-                    <LeftCard
-                      image={result.image}
-                      items={result.contents}
-                      onQuantityChange={handleUpdateQuantity}
-                    />
+                    {/* 내부에 패딩 적용 (페이징 문제 해결) */}
+                    <View style={{ 
+                      width: '100%', 
+                      paddingHorizontal: isMobile ? 20 : 0 
+                    }}>
+                      <LeftCard
+                        image={result.image}
+                        items={result.contents}
+                        onQuantityChange={handleUpdateQuantity}
+                      />
+                    </View>
                   </View>
                 ))}
               </ScrollView>
