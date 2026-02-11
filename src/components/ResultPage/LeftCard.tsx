@@ -111,6 +111,8 @@ const ResultCard = ({ image, items, onQuantityChange }: ResultCardProps) => {
     item => item.centerX !== undefined && item.centerY !== undefined && item.quantity > 0
   );
 
+
+
   return (
     <View style={[styles.resultCardContainer, isMobile && styles.mobileResultCardContainer]}>
       {/* Image Container with Markers */}
@@ -135,9 +137,28 @@ const ResultCard = ({ image, items, onQuantityChange }: ResultCardProps) => {
 
         {/* 객체 위치 마커 오버레이 */}
         {itemsWithCoordinates.map((item) => {
-          // 원본 좌표를 화면 좌표로 변환
-          const screenX = imageLayout.offsetX + (item.centerX! * imageLayout.scale) - (MARKER_SIZE / 2);
-          const screenY = imageLayout.offsetY + (item.centerY! * imageLayout.scale) - (MARKER_SIZE / 2);
+          // EXIF rotation 불일치 감지 및 좌표 보정
+          // 브라우저: EXIF 자동 보정 (세로 이미지 → width < height)
+          // AI 서버: EXIF 미보정 (세로 이미지 → width > height, 좌표가 반대)
+          let cx = item.centerX!;
+          let cy = item.centerY!;
+
+          if (cx > image.width || cy > image.height) {
+            // EXIF rotation 불일치 → 좌표 swap
+            [cx, cy] = [cy, cx];
+          }
+
+          // 화면 좌표 변환
+          let screenX = imageLayout.offsetX + (cx * imageLayout.scale) - (MARKER_SIZE / 2);
+          let screenY = imageLayout.offsetY + (cy * imageLayout.scale) - (MARKER_SIZE / 2);
+
+          // 안전장치: 이미지 표시 영역 내로 clamp
+          const minX = imageLayout.offsetX;
+          const maxX = imageLayout.offsetX + imageLayout.displayWidth - MARKER_SIZE;
+          const minY = imageLayout.offsetY;
+          const maxY = imageLayout.offsetY + imageLayout.displayHeight - MARKER_SIZE;
+          screenX = Math.max(minX, Math.min(screenX, maxX));
+          screenY = Math.max(minY, Math.min(screenY, maxY));
 
           return (
             <Image
