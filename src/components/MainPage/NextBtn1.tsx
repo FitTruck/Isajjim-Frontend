@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { StyleSheet, TouchableOpacity, Text,useWindowDimensions, Platform, Alert } from 'react-native';
+import * as ImageManipulator from 'expo-image-manipulator';
 import { v4 as uuidv4 } from 'uuid';
 import { UploadedImage } from '../../types/common';
 import { BACKEND_DOMAIN } from '../../utils/Server';
@@ -54,8 +55,25 @@ export default function NextBtn1({ imageList, onShowAlert }: NextBtnProps) {
         try {
           const { presignedUrl, fileUrl } = urls[index];
 
+          let uploadUri = img.localUri;
+          let manipWidth = img.width;
+          let manipHeight = img.height;
+
+          // [모바일 환경] 이미지 정규화 및 EXIF 회전 보정
+          // ImageManipulator를 거치면 EXIF 회전값이 이미지 픽셀 데이터에 반영되어 저장됨 (Flatten)
+          if (Platform.OS !== 'web') {
+            const manipResult = await ImageManipulator.manipulateAsync(
+              img.localUri,
+              [], // 변환 없음 (단순 재저장)
+              { compress: 1, format: ImageManipulator.SaveFormat.JPEG }
+            );
+            uploadUri = manipResult.uri;
+            manipWidth = manipResult.width;
+            manipHeight = manipResult.height;
+          }
+
           // 로컬 파일을 Blob으로 변환
-          const response = await fetch(img.localUri);
+          const response = await fetch(uploadUri);
           const blob = await response.blob(); 
           
           // GCS에 직접 PUT 요청
@@ -68,8 +86,11 @@ export default function NextBtn1({ imageList, onShowAlert }: NextBtnProps) {
           });
 
           // 이전에 localUri, width, height가 이미 저장되어 있었음.
+          // 중요: manipulateAsync를 거친 후의 실제 width, height로 업데이트해야 좌표 계산이 정확함.
           return {
             ...img,
+            width: manipWidth,
+            height: manipHeight,
             firebaseUri: fileUrl // 이미지 접근 URL
           };
         } catch (err) {

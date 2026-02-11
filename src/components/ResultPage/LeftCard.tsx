@@ -137,16 +137,9 @@ const ResultCard = ({ image, items, onQuantityChange }: ResultCardProps) => {
 
         {/* 객체 위치 마커 오버레이 */}
         {itemsWithCoordinates.map((item) => {
-          // EXIF rotation 불일치 감지 및 좌표 보정
-          // 브라우저: EXIF 자동 보정 (세로 이미지 → width < height)
-          // AI 서버: EXIF 미보정 (세로 이미지 → width > height, 좌표가 반대)
-          let cx = item.centerX!;
-          let cy = item.centerY!;
-
-          if (cx > image.width || cy > image.height) {
-            // EXIF rotation 불일치 → 좌표 swap
-            [cx, cy] = [cy, cx];
-          }
+          // EXIF rotation 불일치 감지 및 좌표 보정 로직 제거됨 (NextBtn1에서 이미지 정규화 수행)
+          const cx = item.centerX!;
+          const cy = item.centerY!;
 
           // 화면 좌표 변환
           let screenX = imageLayout.offsetX + (cx * imageLayout.scale) - (MARKER_SIZE / 2);
