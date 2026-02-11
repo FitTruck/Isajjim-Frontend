@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { StyleSheet, TouchableOpacity, Text,useWindowDimensions, Platform, Alert } from 'react-native';
+import * as FileSystem from 'expo-file-system';
 import { v4 as uuidv4 } from 'uuid';
 import { UploadedImage } from '../../types/common';
 import { BACKEND_DOMAIN } from '../../utils/Server';
@@ -54,18 +55,34 @@ export default function NextBtn1({ imageList, onShowAlert }: NextBtnProps) {
         try {
           const { presignedUrl, fileUrl } = urls[index];
 
-          // 로컬 파일을 Blob으로 변환
-          const response = await fetch(img.localUri);
-          const blob = await response.blob(); 
-          
-          // GCS에 직접 PUT 요청
-          await fetch(presignedUrl, {
-            method: 'PUT',
-            headers: {
-              'Content-Type': img.mimeType,
-            },
-            body: blob
-          });
+          // 플랫폼별 업로드 방식 분기 (모바일 최적화)
+          if (Platform.OS === 'web') {
+            // [웹 환경] 기존 방식 유지 (웹에서는 fetch가 효율적임)
+            const response = await fetch(img.localUri);
+            const blob = await response.blob(); 
+            
+            await fetch(presignedUrl, {
+              method: 'PUT',
+              headers: {
+                'Content-Type': img.mimeType,
+              },
+              body: blob
+            });
+          } else {
+            // [모바일 환경] FileSystem.uploadAsync 사용 (성능 최적화: Zero JS Overhead)
+            // JS Bridge를 거치지 않고 네이티브에서 직접 파일 전송
+            const uploadResult = await FileSystem.uploadAsync(presignedUrl, img.localUri, {
+              httpMethod: 'PUT',
+              headers: { 
+                'Content-Type': img.mimeType 
+              },
+              // uploadType: FileSystem.FileSystemUploadType.BINARY_CONTENT (PUT은 기본값이 BINARY)
+            });
+
+            if (uploadResult.status !== 200) {
+              throw new Error(`Upload failed with status ${uploadResult.status}`);
+            }
+          }
 
           // 이전에 localUri, width, height가 이미 저장되어 있었음.
           return {
