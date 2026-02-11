@@ -15,6 +15,7 @@ import { useEstimate } from '../context/EstimateContext';
 // app.tsx로부터 전달받을 함수의 자료형 정의
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types/navigation';
+import { useIsFocused } from '@react-navigation/native';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Result'>;
 
@@ -22,6 +23,7 @@ export default function Result({ navigation }: Props) {
   const { requestData, setRequestData, setChatStartTime } = useEstimate();
   const { width } = useWindowDimensions();
   const isMobile = width < 768;
+  const isFocused = useIsFocused();
 
   // Context에서 데이터 추출
   const data = requestData?.images || [];
@@ -423,24 +425,27 @@ export default function Result({ navigation }: Props) {
               isSpaceModalVisible && { position: 'relative', zIndex: 10000 }
             ]}>
               {/* 3D 시뮬레이션 - 전체화면 스타일 분리 적용 */}
-              <View style={isSpaceModalVisible ? styles.expandedContainer : styles.space3DContainer}>
-                <Space3D
-                  furniture={simulationFurniture}
-                  autoPlay={true}
-                  onAnimationComplete={handleSimulationComplete}
-                  onTrucksChange={handleTrucksChange}
-                />
-                <MyTouch
-                  style={isSpaceModalVisible ? styles.closeButtonFixed : styles.expandButton}
-                  onPress={() => setIsSpaceModalVisible(!isSpaceModalVisible)}
-                >
-                  {isSpaceModalVisible ? (
-                      <X size={30} color="#333333" />
-                  ) : (
-                      <Maximize size={20} color="#555" />
-                  )}
-                </MyTouch>
-              </View>
+              {/* 페이지 포커스 시에만 렌더링하여 다른 페이지 이동 시 GPU 리소스 해제 */}
+              {isFocused && (
+                <View style={isSpaceModalVisible ? styles.expandedContainer : styles.space3DContainer}>
+                  <Space3D
+                    furniture={simulationFurniture}
+                    autoPlay={true}
+                    onAnimationComplete={handleSimulationComplete}
+                    onTrucksChange={handleTrucksChange}
+                  />
+                  <MyTouch
+                    style={isSpaceModalVisible ? styles.closeButtonFixed : styles.expandButton}
+                    onPress={() => setIsSpaceModalVisible(!isSpaceModalVisible)}
+                  >
+                    {isSpaceModalVisible ? (
+                        <X size={30} color="#333333" />
+                    ) : (
+                        <Maximize size={20} color="#555" />
+                    )}
+                  </MyTouch>
+                </View>
+              )}
 
               {/* 다음 단계 버튼 */}
               <NextBtn3
