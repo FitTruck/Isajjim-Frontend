@@ -616,63 +616,42 @@ const Space3D: React.FC<Space3DProps> = ({
   // Result 페이지를 벗어날 때 (isFocused = false) 자동 실행됨
   useEffect(() => {
     return () => {
-      console.log('[Space3D] 🔥 컴포넌트 언마운트 - 3D 리소스 정리 시작');
-      
       // 1. loadedFurniture의 모든 리소스 dispose
-      let disposedCount = 0;
-      loadedFurniture.forEach((furniture, id) => {
+      loadedFurniture.forEach((furniture) => {
         try {
           if (furniture.geometry) {
             furniture.geometry.dispose();
-            disposedCount++;
           }
-          
           if (furniture.material) {
             furniture.material.dispose();
           }
-          
           if (furniture.edgesGeometry) {
             furniture.edgesGeometry.dispose();
           }
-          
-          console.log(`[Space3D] ✅ Disposed furniture: ${id}`);
         } catch (error) {
-          console.error(`[Space3D] ❌ Error disposing furniture ${id}:`, error);
+          // 에러 무시
         }
       });
       
       // 2. PLY 캐시의 모든 리소스 dispose
-      console.log(`[Space3D] PLY 캐시 크기: ${plyCache.size}`);
-      let cacheDisposedCount = 0;
-      
-      plyCache.forEach((cached, url) => {
+      plyCache.forEach((cached) => {
         try {
           if (cached.geometry) {
             cached.geometry.dispose();
           }
-          
           if (cached.material) {
             cached.material.dispose();
           }
-          
           if (cached.edgesGeometry) {
             cached.edgesGeometry.dispose();
           }
-          
-          cacheDisposedCount++;
-          console.log(`[Space3D] ✅ Disposed cached PLY: ${url.slice(-30)}`);
         } catch (error) {
-          console.error(`[Space3D] ❌ Error disposing cache ${url}:`, error);
+          // 에러 무시
         }
       });
       
       // 3. 캐시 클리어
       plyCache.clear();
-      
-      console.log(`[Space3D] 🎉 3D 리소스 정리 완료!`);
-      console.log(`[Space3D] - Disposed furniture: ${disposedCount}개`);
-      console.log(`[Space3D] - Disposed cache: ${cacheDisposedCount}개`);
-      console.log(`[Space3D] - GPU 메모리 해제됨`);
     };
   }, [loadedFurniture]); // loadedFurniture가 변경될 때마다 새로운 cleanup 함수 생성
 
