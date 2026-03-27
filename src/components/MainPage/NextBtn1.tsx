@@ -3,7 +3,7 @@ import { StyleSheet, TouchableOpacity, Text,useWindowDimensions, Platform, Alert
 import * as ImageManipulator from 'expo-image-manipulator';
 import { v4 as uuidv4 } from 'uuid';
 import { UploadedImage } from '../../types/common';
-import { BACKEND_DOMAIN } from '../../utils/Server';
+import api from '../../api/axiosInstance';
 import { useEstimate } from '../../context/EstimateContext';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -39,15 +39,11 @@ export default function NextBtn1({ imageList, onShowAlert }: NextBtnProps) {
     setIsLoading(true);
     try {
       // 이미지 업로드용 Presigned Url 발급
-      const presignedResponse = await fetch(`${BACKEND_DOMAIN}/api/v1/gcs/presigned`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          fileNames: imageList.map(img => img.fileName || `${uuidv4()}.jpg`)
-        })
+      const presignedResponse = await api.post('/api/v1/gcs/presigned', {
+        fileNames: imageList.map(img => img.fileName || `${uuidv4()}.jpg`)
       });
 
-      const { data } = await presignedResponse.json();
+      const { data } = presignedResponse.data;
       const { urls } = data; // 백엔드에서 내려준 presignedUrl, fileUrl, key 목록
 
       // GCS에 이미지 병렬 업로드 (Firebase SDK 대신 직접 PUT)
@@ -100,21 +96,13 @@ export default function NextBtn1({ imageList, onShowAlert }: NextBtnProps) {
       }));
 
       // 백엔드 서버에 값 전달
-      const BACKEND_URL = `${BACKEND_DOMAIN}/api/v1/estimates`; 
-      
-      const response = await fetch(BACKEND_URL, {
-        method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json', 
-        },
-        body: JSON.stringify({
-          // firebaseUri만 보냄
-          imageUrls: uploadedImages.map(img => img.firebaseUri),
-        })
+      const response = await api.post('/api/v1/estimates', {
+        // firebaseUri만 보냄
+        imageUrls: uploadedImages.map(img => img.firebaseUri),
       });
 
       // responseData에 data: {estimateId: 123} 이런식으로 있을거임.
-      const responseData = await response.json();
+      const responseData = response.data;
 
       // Context에 estimateId 저장
       if (responseData.data && responseData.data.estimateId) {

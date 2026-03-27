@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { View, ScrollView, StyleSheet, Alert, useWindowDimensions, Image } from 'react-native';
 import { commonStyles } from '../styles/commonStyles';
-import { BACKEND_DOMAIN } from '../utils/Server';
+import api from '../api/axiosInstance';
 import { translateLabel } from '../utils/Translator';
 import LeftCard from '../components/ResultPage/LeftCard';
 import NextBtn3 from '../components/ResultPage/NextBtn3';
@@ -200,21 +200,13 @@ export default function Result({ navigation }: Props) {
 
     // 백엔드로 바뀐 정보를 보내는 부분
     try {
-      const response = await fetch(`${BACKEND_DOMAIN}/api/v1/estimates/${estimateId}/furniture`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          furnitureId: furnitureId,
-          quantity: newQuantity
-        }),
+      const { data: resultOfUpdate } = await api.patch(`/api/v1/estimates/${estimateId}/furniture`, {
+        furnitureId: furnitureId,
+        quantity: newQuantity
       });
 
       // resultOfUpdate에는 트럭 타입과 수량에 대한 정보가 담겨있음.
-      const resultOfUpdate = await response.json();
-
-      if (response.ok && resultOfUpdate.code === 'OK') {
+      if (resultOfUpdate.code === 'OK') {
         // 트럭 정보는 시뮬레이션(Space3D)에서 자동 재계산됨
         // 업데이트 상태를 done으로 변경
         setUpdateStatus('done');

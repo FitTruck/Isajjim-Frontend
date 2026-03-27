@@ -1,6 +1,7 @@
 ﻿import React, { useState } from 'react';
 import { TouchableOpacity, Text, View, StyleSheet, Alert, Platform } from 'react-native';
 import { BACKEND_DOMAIN } from '../../utils/Server';
+import api from '../../api/axiosInstance';
 import LoadingModal from './LoadingModal';
 import { useEstimate } from '../../context/EstimateContext';
 import { translateLabel } from '../../utils/Translator';
@@ -106,8 +107,6 @@ export default function NextBtn2({ navigation, estimateId, images, onShowAlert, 
     setIsSubmitting(true);
 
     try {
-      const BACKEND_URL = `${BACKEND_DOMAIN}/api/v1/estimates/${estimateId}`;
-      
       const payload = {
         "date": targetDate,
         "startLocation": startLocation,
@@ -116,16 +115,8 @@ export default function NextBtn2({ navigation, estimateId, images, onShowAlert, 
 
       console.log("payload", payload);
 
-      const response = await fetch(BACKEND_URL, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
-      console.log("받은 응답:", response);
-      
-      if (!response.ok) {
-        throw new Error("초기 수정 요청 실패");
-      }
+      const patchResponse = await api.patch(`/api/v1/estimates/${estimateId}`, payload);
+      console.log("받은 응답:", patchResponse);
 
       const SSE_URL = `${BACKEND_DOMAIN}/api/v1/estimates/${estimateId}/sse`;
       const eventSource = new EventSource(SSE_URL);
@@ -134,12 +125,8 @@ export default function NextBtn2({ navigation, estimateId, images, onShowAlert, 
       eventSource.addEventListener("sse", async (event) => {
         console.log("받은 SSE 데이터:", event.data);
         if (event.data === "COMPLETED") {
-          const response = await fetch(BACKEND_URL, {
-            method: 'GET',
-            headers: { 'Content-Type': 'application/json' },
-          });
-
-          const furnitureInfo = await response.json();
+          const furnitureInfoRes = await api.get(`/api/v1/estimates/${estimateId}`);
+          const furnitureInfo = furnitureInfoRes.data;
           console.log("가구 정보: ", furnitureInfo);
 
           // 가구 목록 추출 및 매핑
