@@ -12,9 +12,9 @@ import AlertBox from '../components/common/AlertBox';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types/navigation';
 
-type Props = NativeStackScreenProps<RootStackParamList, 'Main'>;
+type Props = NativeStackScreenProps<RootStackParamList, 'Upload'>;
 
-export default function Main({ navigation }: Props) {
+export default function Main() {
 
   const [imageList, setImageList] = useState<UploadedImage[]>([]);
   const [isAlertVisible, setIsAlertVisible] = useState(false);

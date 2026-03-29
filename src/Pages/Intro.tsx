@@ -18,7 +18,7 @@ export default function Intro({ navigation }: Props) {
 
   const handleStart = () => {
     if (isAuthenticated) {
-      navigation.navigate('Main');
+      navigation.navigate('Upload');
     } else {
       navigation.navigate('Login');
     }
