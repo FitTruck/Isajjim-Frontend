@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, ScrollView, StyleSheet, Image, useWindowDimensions } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, useWindowDimensions } from 'react-native';
 
 import { commonStyles } from '../styles/commonStyles';
 import { UploadedImage } from '../types/common';
@@ -18,7 +18,6 @@ export default function Main({ navigation }: Props) {
 
   const [imageList, setImageList] = useState<UploadedImage[]>([]);
   const [isAlertVisible, setIsAlertVisible] = useState(false);
-  const [msg, setAlertMsg] = useState(''); // 이 부분 해결.
   const { width } = useWindowDimensions();
   const isMobile = width < 768; // Mobile breakpoint
 
