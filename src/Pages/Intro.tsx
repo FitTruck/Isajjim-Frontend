@@ -26,12 +26,10 @@ export default function Intro({ navigation }: Props) {
 
   return (
     <View style={styles.container}>
+      <Header />
       <ScrollView 
         contentContainerStyle={[commonStyles.scrollContent, isMobile && {height: height}]}
-        stickyHeaderIndices={[0]} // 자식 컴포넌트들 중 첫 번째 컴포넌트를 고정시키겠다.
       >
-        <Header />
-
         <View style={[
           styles.contentWrapper, 
           isMobile && styles.mobileContentWrapper,

@@ -123,6 +123,7 @@ export default function UserSelect({ route }: Props) {
 
   return (
     <View style={commonStyles.container}>
+      <Header />
       {/* 알림 박스 */}
       {isAlertVisible && (
         <AlertBox 
@@ -133,9 +134,7 @@ export default function UserSelect({ route }: Props) {
 
       <ScrollView 
         contentContainerStyle={commonStyles.scrollContent}
-        stickyHeaderIndices={[0]} // 자식 컴포넌트들 중 첫 번째 컴포넌트를 고정시키겠다.
       >
-        <Header />
 
         <View style={[commonStyles.mainWrapper, isMobile && { paddingHorizontal: 20 }]}>
           

@@ -104,17 +104,14 @@ export default function MyEstimate({ navigation }: Props) {
 
   return (
     <View style={commonStyles.container}>
-      <ScrollView 
+      <Header />
+      <ScrollView
         contentContainerStyle={[
-          commonStyles.scrollContent, 
+          commonStyles.scrollContent,
           Platform.OS === 'web' && { width: '100vw', overflowX: 'hidden' } as any,
           isMobile && { paddingHorizontal: 0 }
         ]}
-        stickyHeaderIndices={[0]}
       >
-        {/* Header */}
-        <Header />
-
         {/* 페이지 전체 컨테이너 */}
         <View style={[styles.mainWrapper, isMobile && styles.mobileMainWrapper]}>
 
