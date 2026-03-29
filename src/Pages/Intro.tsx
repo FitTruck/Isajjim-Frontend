@@ -85,8 +85,8 @@ const styles = StyleSheet.create({
   contentWrapper: {
     flexDirection: 'row',
     flex: 1,
-    paddingTop: 80, 
-    alignItems: 'center',
+    paddingTop: 100,
+    alignItems: 'flex-start',
     justifyContent: 'center',
     width: '100%',
     maxWidth: 1600,
@@ -103,7 +103,6 @@ const styles = StyleSheet.create({
   textSection: {
     flex: 0.8,
     paddingHorizontal: 40,
-    justifyContent: 'center',
     alignItems: 'flex-start',
   },
   mobileTextSection: {
@@ -121,8 +120,7 @@ const styles = StyleSheet.create({
   // Right Section
   visualSection: {
     flex: 1.2,
-    height: '100%',
-    justifyContent: 'center',
+    justifyContent: 'flex-start',
     alignItems: 'center',
     paddingRight: 40,
   },
@@ -136,8 +134,7 @@ const styles = StyleSheet.create({
   
   imageContainer: {
     width: 888,
-    height: '80%', 
-    maxHeight: 700,
+    height: 700,
     backgroundColor: '#ffffffff',
     borderRadius: 30,
     overflow: 'hidden', 
