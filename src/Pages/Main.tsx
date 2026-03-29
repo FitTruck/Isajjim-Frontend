@@ -11,7 +11,7 @@ import { useAuth } from '../context/AuthContext';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Intro'>;
 
-export default function Intro({ navigation }: Props) {
+export default function Main({ navigation }: Props) {
   const { width, height } = useWindowDimensions();
   const isMobile = width < 768;
   const { isAuthenticated } = useAuth();

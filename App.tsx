@@ -5,13 +5,13 @@ import { AuthProvider } from './src/context/AuthContext';
 import { navigationRef } from './src/auth/navigationRef';
 
 // 각 화면 컴포넌트 import
-import Main from './src/Pages/MainScreen';
+import UploadScreen from './src/Pages/MainScreen';
 import UserSelect from './src/Pages/UserSelect';
 import Result from './src/Pages/Result';
 import MyEstimate from './src/Pages/MyEstimate';
 import MyChat from './src/Pages/MyChat';
 import SimulationTest from './src/Pages/SimulationTest';
-import Intro from './src/Pages/Intro';
+import Main from './src/Pages/Main';
 import LoginPage from './src/Pages/LoginPage';
 import AuthCallbackPage from './src/Pages/AuthCallbackPage';
 import AuthFailedPage from './src/Pages/AuthFailedPage';
@@ -65,8 +65,8 @@ export default function App() {
           >
             {/* Stack.Screen: 각 화면을 정의. 각각의 component에는 컴포넌트 명을 써야함 */}
             {/* name은 MainScreen이나 UserSelect에서 부를 때 파라미터와 일치해야함 */}
-            <Stack.Screen name="Intro" component={Intro} />
-            <Stack.Screen name="Upload" component={Main} />
+            <Stack.Screen name="Intro" component={Main} />
+            <Stack.Screen name="Upload" component={UploadScreen} />
             <Stack.Screen name="UserSelect" component={UserSelect} />
             <Stack.Screen name="Result" component={Result} />
             <Stack.Screen name="MyEstimate" component={MyEstimate} />
