@@ -32,7 +32,7 @@ export default function AuthCallbackPage() {
 
     if (accessToken && refreshToken) {
       login(accessToken, refreshToken);
-      navigation.reset({ index: 0, routes: [{ name: 'Intro' }] });
+      navigation.reset({ index: 0, routes: [{ name: 'Main' }] });
     } else {
       // 토큰이 없으면 로그인 페이지로
       navigation.reset({ index: 0, routes: [{ name: 'Login' }] });

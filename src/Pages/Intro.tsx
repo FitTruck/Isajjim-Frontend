@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, Image, useWindowDimensions, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, useWindowDimensions, ScrollView } from 'react-native';
 import { commonStyles } from '../styles/commonStyles';
 import Header from '../components/common/Header';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -7,15 +7,21 @@ import { RootStackParamList } from '../types/navigation';
 import MyTouch from '../components/common/MyTouch';
 import { ArrowUpRight } from 'lucide-react-native';
 import ImageComparisonSlider from '../components/IntroPage/ImageComparisonSlider';
+import { useAuth } from '../context/AuthContext';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Intro'>;
 
 export default function Intro({ navigation }: Props) {
   const { width, height } = useWindowDimensions();
   const isMobile = width < 768;
+  const { isAuthenticated } = useAuth();
 
   const handleStart = () => {
-    navigation.navigate('Main'); 
+    if (isAuthenticated) {
+      navigation.navigate('Main');
+    } else {
+      navigation.navigate('Login');
+    }
   };
 
   return (
