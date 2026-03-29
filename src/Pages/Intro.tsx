@@ -31,9 +31,8 @@ export default function Intro({ navigation }: Props) {
         contentContainerStyle={[commonStyles.scrollContent, isMobile && {height: height}]}
       >
         <View style={[
-          styles.contentWrapper, 
+          styles.contentWrapper,
           isMobile && styles.mobileContentWrapper,
-          { minHeight: height } // Ensure full height
         ]}>
           
           {/* Left Side: Text Content */}
