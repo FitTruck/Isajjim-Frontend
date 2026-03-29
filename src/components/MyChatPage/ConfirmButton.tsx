@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { TouchableOpacity, Text, StyleSheet, Alert, Platform } from 'react-native';
-import { BACKEND_DOMAIN } from '../../utils/Server';
+import api from '../../api/axiosInstance';
 
 interface Message {
   id: string;
@@ -38,12 +38,10 @@ export default function ConfirmButton({ messages, onConfirm }: ConfirmButtonProp
       console.log('--- 전송될 채팅 ---');
       console.log(chatHistoryString);
 
-      const response = await fetch(`${BACKEND_DOMAIN}/api/v1/estimates/chat-summary`, {
-        method: 'POST',
+      const response = await api.post('/api/v1/estimates/chat-summary', JSON.stringify(chatHistoryString), {
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(chatHistoryString) // 문자열을 JSON 형식으로 전송
       });
-      const responseData = await response.json();
+      const responseData = response.data;
 
       // AI 요약 콘솔에 찍기
       console.log('AI 요약본:', responseData.data.summary);
