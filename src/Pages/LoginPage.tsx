@@ -56,6 +56,7 @@ const openOAuth = (provider: Provider) => {
 
 export default function LoginPage() {
   const lastProvider = getLastProvider();
+  const hasHistory = !!lastProvider;
 
   return (
     <View style={styles.container}>
@@ -67,6 +68,9 @@ export default function LoginPage() {
       <View style={styles.buttons}>
         {PROVIDERS.map(({ id, label, color, textColor, Icon }) => {
           const isRecent = lastProvider === id;
+          // 이전 로그인 기록(hasHistory)이 있으면 네이버 문구를 '네이버 로그인'으로 변경
+          const displayLabel = (id === 'naver' && hasHistory) ? '네이버 로그인' : label;
+          
           return (
             <TouchableOpacity
               key={id}
@@ -81,7 +85,7 @@ export default function LoginPage() {
               <View style={styles.iconContainer}>
                 <Icon />
               </View>
-              <Text style={[styles.buttonText, { color: textColor }]}>{label}</Text>
+              <Text style={[styles.buttonText, { color: textColor }]}>{displayLabel}</Text>
               {isRecent && (
                 <View style={styles.recentBadge}>
                   <Text style={styles.recentBadgeText}>최근 로그인</Text>
