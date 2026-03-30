@@ -38,8 +38,8 @@ const GoogleIcon = () => (
 
 const PROVIDERS: { id: Provider; label: string; color: string; textColor: string; Icon: React.FC }[] = [
   { id: 'naver',  label: '네이버로 3초만에 시작하기', color: '#03A94D', textColor: '#FFFFFF', Icon: NaverIcon },
-  { id: 'kakao',  label: '카카오 로그인',     color: '#FEE500', textColor: 'rgba(0, 0, 0, 0.85)', Icon: KakaoIcon },
-  { id: 'google', label: 'Google 로그인', color: '#fff',    textColor: '#757575', Icon: GoogleIcon },
+  { id: 'kakao',  label: '카카오 로그인',     color: '#FEE500', textColor: '#000000', Icon: KakaoIcon },
+  { id: 'google', label: 'Google 로그인', color: '#fff',    textColor: '#1F1F1F', Icon: GoogleIcon },
 ];
 
 const openOAuth = (provider: Provider) => {
