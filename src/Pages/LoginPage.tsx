@@ -23,7 +23,7 @@ const NaverIcon = () => (
 
 const KakaoIcon = () => (
   <Svg width="18" height="18" viewBox="0 0 18 18">
-    <Path fill="#191919" d="M9 2C4.03 2 0 5.06 0 8.84c0 2.45 1.69 4.6 4.23 5.86l-1.07 3.93c-.06.23.2.43.39.31l4.63-3.07c.27.02.55.04.82.04 4.97 0 9-3.06 9-6.84S13.97 2 9 2z" />
+    <Path fill="#000000" d="M9 2C4.03 2 0 5.06 0 8.84c0 2.45 1.69 4.6 4.23 5.86l-1.07 3.93c-.06.23.2.43.39.31l4.63-3.07c.27.02.55.04.82.04 4.97 0 9-3.06 9-6.84S13.97 2 9 2z" />
   </Svg>
 );
 
@@ -37,9 +37,9 @@ const GoogleIcon = () => (
 );
 
 const PROVIDERS: { id: Provider; label: string; color: string; textColor: string; Icon: React.FC }[] = [
-  { id: 'naver',  label: '네이버로 로그인',   color: '#03C75A', textColor: '#fff',    Icon: NaverIcon },
-  { id: 'kakao',  label: '카카오 로그인',     color: '#FEE500', textColor: '#191919', Icon: KakaoIcon },
-  { id: 'google', label: 'Google 계정으로 로그인', color: '#fff',    textColor: '#757575', Icon: GoogleIcon },
+  { id: 'naver',  label: '네이버로 3초만에 시작하기', color: '#03A94D', textColor: '#FFFFFF', Icon: NaverIcon },
+  { id: 'kakao',  label: '카카오 로그인',     color: '#FEE500', textColor: 'rgba(0, 0, 0, 0.85)', Icon: KakaoIcon },
+  { id: 'google', label: 'Google 로그인', color: '#fff',    textColor: '#757575', Icon: GoogleIcon },
 ];
 
 const openOAuth = (provider: Provider) => {
@@ -126,7 +126,7 @@ const styles = StyleSheet.create({
   button: {
     width: '100%',
     height: 52,
-    borderRadius: 6,
+    borderRadius: 12,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
