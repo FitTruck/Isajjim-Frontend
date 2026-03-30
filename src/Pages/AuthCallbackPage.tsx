@@ -4,6 +4,7 @@ import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types/navigation';
 import { useAuth } from '../context/AuthContext';
+import { getRedirectPath, clearRedirectPath } from '../auth/tokenStorage';
 
 type AuthCallbackRouteProp = RouteProp<RootStackParamList, 'AuthCallback'>;
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
@@ -32,7 +33,15 @@ export default function AuthCallbackPage() {
 
     if (accessToken && refreshToken) {
       login(accessToken, refreshToken);
-      navigation.reset({ index: 0, routes: [{ name: 'Main' }] });
+      
+      const redirectPath = getRedirectPath();
+      clearRedirectPath();
+      
+      const targetRoute = (redirectPath && redirectPath !== 'Login' && redirectPath !== 'AuthCallback') 
+        ? redirectPath 
+        : 'Main';
+        
+      navigation.reset({ index: 0, routes: [{ name: targetRoute as any }] });
     } else {
       // 토큰이 없으면 로그인 페이지로
       navigation.reset({ index: 0, routes: [{ name: 'Login' }] });

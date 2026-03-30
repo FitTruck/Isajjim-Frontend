@@ -6,8 +6,11 @@ import LoadingModal from './LoadingModal';
 import { useEstimate } from '../../context/EstimateContext';
 import { translateLabel } from '../../utils/Translator';
 
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../../types/navigation';
+
 interface Props {
-  navigation: any;
   estimateId: number;
   images: any;
   onShowAlert: () => void;
@@ -41,7 +44,8 @@ interface Props {
 }
 
 // 나중에 onShowAlert 쓸거임
-export default function NextBtn2({ navigation, estimateId, images, onShowAlert, movingDate, data1, data2 }: Props) {
+export default function NextBtn2({ estimateId, images, onShowAlert, movingDate, data1, data2 }: Props) {
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { setRequestData } = useEstimate();
 

@@ -7,7 +7,7 @@ import { RootStackParamList } from '../../types/navigation';
 import MyTouch from "./MyTouch";
 import { useEstimate } from '../../context/EstimateContext';
 import { useAuth } from '../../context/AuthContext';
-import { getAccessToken, getRefreshToken } from '../../auth/tokenStorage';
+import { getAccessToken, getRefreshToken, setRedirectPath } from '../../auth/tokenStorage';
 import { BACKEND_DOMAIN } from '../../utils/Server';
 
 // 호버 효과가 적용된 메뉴 아이템 컴포넌트
@@ -70,7 +70,7 @@ export default function Header() {
   const onGoHome = () => {
     navigation.reset({
       index: 0,
-      routes: [{ name: 'Intro' }],
+      routes: [{ name: 'Main' }],
     });
   };
 
@@ -106,7 +106,7 @@ export default function Header() {
       logout();
       navigation.reset({
         index: 0,
-        routes: [{ name: 'Intro' }],
+        routes: [{ name: 'Main' }],
       });
     }
   };
@@ -120,26 +120,24 @@ export default function Header() {
         </MyTouch>
 
         <View style={[styles.headerRight, isMobile && styles.mobileHeaderRight]}>
-          <HoverableMenuItem
-            label="내 견적"
-            onPress={onGoMyEstimate}
-            isActive={route.name === 'MyEstimate'}
-            isMobile={isMobile}
-          />
+          {isAuthenticated && (
+            <>
+              <HoverableMenuItem
+                label="내 견적"
+                onPress={onGoMyEstimate}
+                isActive={route.name === 'MyEstimate'}
+                isMobile={isMobile}
+              />
 
-          <HoverableMenuItem
-            label="채팅"
-            onPress={onGoMyChat}
-            isActive={route.name === 'MyChat'}
-            isMobile={isMobile}
-            showBadge={estimateStatus === 'active' || hasUnreadChats}
-          />
-
-          <HoverableMenuItem
-            label="문의하기"
-            onPress={() => {}}
-            isMobile={isMobile}
-          />
+              <HoverableMenuItem
+                label="채팅"
+                onPress={onGoMyChat}
+                isActive={route.name === 'MyChat'}
+                isMobile={isMobile}
+                showBadge={estimateStatus === 'active' || hasUnreadChats}
+              />
+            </>
+          )}
 
           {isAuthenticated ? (
             <View ref={profileWrapperRef} style={styles.profileWrapper}>
@@ -163,7 +161,13 @@ export default function Header() {
               )}
             </View>
           ) : (
-            <MyTouch style={styles.loginButton} onPress={() => navigation.navigate('Login')}>
+            <MyTouch
+              style={styles.loginButton}
+              onPress={() => {
+                setRedirectPath(route.name);
+                navigation.navigate('Login');
+              }}
+            >
               <Text style={styles.loginButtonText}>로그인</Text>
             </MyTouch>
           )}

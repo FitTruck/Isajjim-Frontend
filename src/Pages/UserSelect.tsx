@@ -13,7 +13,7 @@ import { RootStackParamList } from '../types/navigation';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'UserSelect'>;
 
-export default function UserSelect({ navigation, route }: Props) {
+export default function UserSelect({ route }: Props) {
   // 이미지 정보를 계속 들고 있어야 result에서 보여줄 수가 있다. 따로 다른 곳에 저장하고 있지 않음
   const { images, estimateId } = route.params;
   const { width } = useWindowDimensions();
@@ -123,6 +123,7 @@ export default function UserSelect({ navigation, route }: Props) {
 
   return (
     <View style={commonStyles.container}>
+      <Header />
       {/* 알림 박스 */}
       {isAlertVisible && (
         <AlertBox 
@@ -133,9 +134,7 @@ export default function UserSelect({ navigation, route }: Props) {
 
       <ScrollView 
         contentContainerStyle={commonStyles.scrollContent}
-        stickyHeaderIndices={[0]} // 자식 컴포넌트들 중 첫 번째 컴포넌트를 고정시키겠다.
       >
-        <Header />
 
         <View style={[commonStyles.mainWrapper, isMobile && { paddingHorizontal: 20 }]}>
           
@@ -367,7 +366,6 @@ export default function UserSelect({ navigation, route }: Props) {
           
           {/* 다음단계 버튼 */}
           <NextBtn 
-            navigation={navigation}
             estimateId={estimateId}
             images={images}
             onShowAlert={() => setIsAlertVisible(true)}

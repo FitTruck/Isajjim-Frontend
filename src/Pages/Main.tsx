@@ -8,34 +8,33 @@ import MyTouch from '../components/common/MyTouch';
 import { ArrowUpRight } from 'lucide-react-native';
 import ImageComparisonSlider from '../components/IntroPage/ImageComparisonSlider';
 import { useAuth } from '../context/AuthContext';
+import { setRedirectPath } from '../auth/tokenStorage';
 
-type Props = NativeStackScreenProps<RootStackParamList, 'Intro'>;
+type Props = NativeStackScreenProps<RootStackParamList, 'Main'>;
 
-export default function Intro({ navigation }: Props) {
+export default function Main({ navigation }: Props) {
   const { width, height } = useWindowDimensions();
   const isMobile = width < 768;
   const { isAuthenticated } = useAuth();
 
   const handleStart = () => {
     if (isAuthenticated) {
-      navigation.navigate('Main');
+      navigation.navigate('Upload');
     } else {
+      setRedirectPath('Upload');
       navigation.navigate('Login');
     }
   };
 
   return (
     <View style={styles.container}>
+      <Header />
       <ScrollView 
         contentContainerStyle={[commonStyles.scrollContent, isMobile && {height: height}]}
-        stickyHeaderIndices={[0]} // 자식 컴포넌트들 중 첫 번째 컴포넌트를 고정시키겠다.
       >
-        <Header />
-
         <View style={[
-          styles.contentWrapper, 
+          styles.contentWrapper,
           isMobile && styles.mobileContentWrapper,
-          { minHeight: height } // Ensure full height
         ]}>
           
           {/* Left Side: Text Content */}
@@ -87,8 +86,8 @@ const styles = StyleSheet.create({
   contentWrapper: {
     flexDirection: 'row',
     flex: 1,
-    paddingTop: 80, 
-    alignItems: 'center',
+    paddingTop: 100,
+    alignItems: 'flex-start',
     justifyContent: 'center',
     width: '100%',
     maxWidth: 1600,
@@ -105,7 +104,6 @@ const styles = StyleSheet.create({
   textSection: {
     flex: 0.8,
     paddingHorizontal: 40,
-    justifyContent: 'center',
     alignItems: 'flex-start',
   },
   mobileTextSection: {
@@ -123,8 +121,7 @@ const styles = StyleSheet.create({
   // Right Section
   visualSection: {
     flex: 1.2,
-    height: '100%',
-    justifyContent: 'center',
+    justifyContent: 'flex-start',
     alignItems: 'center',
     paddingRight: 40,
   },
@@ -138,8 +135,7 @@ const styles = StyleSheet.create({
   
   imageContainer: {
     width: 888,
-    height: '80%', 
-    maxHeight: 700,
+    height: 700,
     backgroundColor: '#ffffffff',
     borderRadius: 30,
     overflow: 'hidden', 

@@ -26,7 +26,7 @@ python3 cors_server.py             # 로컬 PLY 서버 실행 (테스트용)
 ### Navigation Flow
 `App.tsx`에서 React Navigation의 Native Stack Navigator를 사용하여 화면 전환을 관리:
 
-- **Intro** → **Main** → **UserSelect** → **Result**: 메인 견적 요청 플로우
+- **Main** → **UserSelect** → **Result**: 메인 견적 요청 플로우
   - Main (MainScreen.tsx): 이미지 업로드
   - UserSelect: 출발지/도착지, 이사 날짜 입력
   - Result: 3D 시뮬레이션 + 견적 결과

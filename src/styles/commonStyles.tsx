@@ -10,7 +10,7 @@ export const commonStyles = StyleSheet.create({
   },
   scrollContent: {
     flexGrow: 1,
-    paddingTop: 0,
+    paddingTop: 65, // 헤더 높이만큼 여백 추가
     alignItems: 'center',
   },
   mainWrapper: {

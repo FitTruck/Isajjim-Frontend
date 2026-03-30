@@ -2,7 +2,7 @@ import { UploadedImage } from './common';
 
 // 각 화면으로 변동할 때의 매개변수들을 정의
 export type RootStackParamList = {
-  Main: undefined; // 메인으로 이동할 때는 매개변수 없음
+  Upload: undefined; // 업로드 페이지
   UserSelect: { // UserSelect로 이동할 때는 images와 estimateId가 필요함
     images: UploadedImage[];
     estimateId: number;
@@ -15,7 +15,7 @@ export type RootStackParamList = {
   MyEstimate: undefined; // MyEstimate로 이동할 때는 매개변수 없음
   MyChat: undefined; // MyChat으로 이동할 때는 매개변수 없음
   SimulationTest: undefined; // 시뮬레이션 테스트 페이지
-  Intro: undefined; // 인트로 페이지
+  Main: undefined; // 메인 페이지
   // 인증 관련 화면
   Login: undefined;
   AuthCallback: { accessToken?: string; refreshToken?: string };

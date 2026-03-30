@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, ScrollView, StyleSheet, Image, useWindowDimensions } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, useWindowDimensions } from 'react-native';
 
 import { commonStyles } from '../styles/commonStyles';
 import { UploadedImage } from '../types/common';
@@ -12,13 +12,12 @@ import AlertBox from '../components/common/AlertBox';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types/navigation';
 
-type Props = NativeStackScreenProps<RootStackParamList, 'Main'>;
+type Props = NativeStackScreenProps<RootStackParamList, 'Upload'>;
 
-export default function Main({ navigation }: Props) {
+export default function Main() {
 
   const [imageList, setImageList] = useState<UploadedImage[]>([]);
   const [isAlertVisible, setIsAlertVisible] = useState(false);
-  const [msg, setAlertMsg] = useState(''); // 이 부분 해결.
   const { width } = useWindowDimensions();
   const isMobile = width < 768; // Mobile breakpoint
 
@@ -29,9 +28,11 @@ export default function Main({ navigation }: Props) {
 
   return (
     <View style={commonStyles.container}>
+      {/* Header */}
+      <Header />
+
       {/* 알림 박스 */}
       {isAlertVisible && (
-        // 이런 식으로 쓰면 경고 메세지를 하나 밖에 못 띄움. 차리리 함수화 하던가, value를 변수로 해서 useState로 관리해줘도 됨. 아니면 함수로 만들어서 쓰면 될듯.
         <AlertBox 
           value="이미지를 최소 1장 이상 업로드해주세요." 
           onClose={() => setIsAlertVisible(false)}
@@ -42,10 +43,7 @@ export default function Main({ navigation }: Props) {
         contentContainerStyle={
           commonStyles.scrollContent
         }
-        stickyHeaderIndices={[0]} // 자식 컴포넌트들 중 첫 번째 컴포넌트를 고정시키겠다.
       >
-        {/* Header */}
-        <Header />
 
         {/* Main Wrapper */}
         <View style={commonStyles.mainWrapper}>

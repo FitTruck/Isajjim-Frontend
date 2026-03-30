@@ -93,13 +93,11 @@ export default function MyChat({ navigation }: Props) {
 
   return (
     <View style={commonStyles.container}>
-      <ScrollView 
+      <Header />
+      <ScrollView
         contentContainerStyle={[commonStyles.scrollContent, isMobile && { flex: 1, paddingBottom: 0 }]}
-        stickyHeaderIndices={[0]} 
         scrollEnabled={!isMobile} // 모바일에서는 내부 스크롤 사용
       >
-        <Header />
-
         <View style={[styles.mainWrapper, isMobile && styles.mobileMainWrapper]}>
           
           {/* Page Content: 기준점 */}
