@@ -99,7 +99,7 @@ export default function LoginPage() {
     <View style={styles.container}>
       <View style={styles.hero}>
         <Text style={styles.title}>이삿찜</Text>
-        <Text style={styles.subtitle}>AI가 견적을 찾아드립니다</Text>
+        <Text style={styles.subtitle}>더 똑똑하게, 더 가볍게.</Text>
       </View>
 
       <View style={styles.buttons}>
