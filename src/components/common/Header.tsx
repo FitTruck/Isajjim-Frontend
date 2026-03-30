@@ -7,7 +7,7 @@ import { RootStackParamList } from '../../types/navigation';
 import MyTouch from "./MyTouch";
 import { useEstimate } from '../../context/EstimateContext';
 import { useAuth } from '../../context/AuthContext';
-import { getAccessToken, getRefreshToken } from '../../auth/tokenStorage';
+import { getAccessToken, getRefreshToken, setRedirectPath } from '../../auth/tokenStorage';
 import { BACKEND_DOMAIN } from '../../utils/Server';
 
 // 호버 효과가 적용된 메뉴 아이템 컴포넌트
@@ -163,7 +163,13 @@ export default function Header() {
               )}
             </View>
           ) : (
-            <MyTouch style={styles.loginButton} onPress={() => navigation.navigate('Login')}>
+            <MyTouch
+              style={styles.loginButton}
+              onPress={() => {
+                setRedirectPath(route.name);
+                navigation.navigate('Login');
+              }}
+            >
               <Text style={styles.loginButtonText}>로그인</Text>
             </MyTouch>
           )}

@@ -2,6 +2,7 @@ import { Platform } from 'react-native';
 
 const ACCESS_TOKEN_KEY = 'accessToken';
 const REFRESH_TOKEN_KEY = 'refreshToken';
+const REDIRECT_PATH_KEY = 'redirectPath';
 
 // React Native(비웹) 환경용 메모리 폴백
 const memoryStore: Record<string, string> = {};
@@ -41,3 +42,7 @@ export const clearTokens = (): void => {
   store.remove(ACCESS_TOKEN_KEY);
   store.remove(REFRESH_TOKEN_KEY);
 };
+
+export const setRedirectPath = (path: string): void => store.set(REDIRECT_PATH_KEY, path);
+export const getRedirectPath = (): string | null => store.get(REDIRECT_PATH_KEY);
+export const clearRedirectPath = (): void => store.remove(REDIRECT_PATH_KEY);

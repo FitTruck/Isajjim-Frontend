@@ -8,6 +8,7 @@ import MyTouch from '../components/common/MyTouch';
 import { ArrowUpRight } from 'lucide-react-native';
 import ImageComparisonSlider from '../components/IntroPage/ImageComparisonSlider';
 import { useAuth } from '../context/AuthContext';
+import { setRedirectPath } from '../auth/tokenStorage';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Intro'>;
 
@@ -20,6 +21,7 @@ export default function Main({ navigation }: Props) {
     if (isAuthenticated) {
       navigation.navigate('Upload');
     } else {
+      setRedirectPath('Upload');
       navigation.navigate('Login');
     }
   };
