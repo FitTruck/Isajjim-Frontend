@@ -9,6 +9,7 @@ import {
   Image,
 } from 'react-native';
 import { BACKEND_DOMAIN } from '../utils/Server';
+import { setLastProvider, getLastProvider } from '../auth/tokenStorage';
 
 type Provider = 'naver' | 'kakao' | 'google';
 
@@ -19,6 +20,7 @@ const PROVIDERS: { id: Provider; label: string; color: string; textColor: string
 ];
 
 const openOAuth = (provider: Provider) => {
+  setLastProvider(provider);
   const url = `${BACKEND_DOMAIN}/oauth2/authorization/${provider}`;
   if (Platform.OS === 'web') {
     // 웹: 현재 탭에서 OAuth 리다이렉트
@@ -30,6 +32,8 @@ const openOAuth = (provider: Provider) => {
 };
 
 export default function LoginPage() {
+  const lastProvider = getLastProvider();
+
   return (
     <View style={styles.container}>
       <View style={styles.hero}>
@@ -38,16 +42,29 @@ export default function LoginPage() {
       </View>
 
       <View style={styles.buttons}>
-        {PROVIDERS.map(({ id, label, color, textColor }) => (
-          <TouchableOpacity
-            key={id}
-            style={[styles.button, { backgroundColor: color }, id === 'google' && styles.buttonBorder]}
-            onPress={() => openOAuth(id)}
-            activeOpacity={0.85}
-          >
-            <Text style={[styles.buttonText, { color: textColor }]}>{label}</Text>
-          </TouchableOpacity>
-        ))}
+        {PROVIDERS.map(({ id, label, color, textColor }) => {
+          const isRecent = lastProvider === id;
+          return (
+            <TouchableOpacity
+              key={id}
+              style={[
+                styles.button, 
+                { backgroundColor: color }, 
+                id === 'google' && styles.buttonBorder,
+                isRecent && styles.recentButton
+              ]}
+              onPress={() => openOAuth(id)}
+              activeOpacity={0.85}
+            >
+              <Text style={[styles.buttonText, { color: textColor }]}>{label}</Text>
+              {isRecent && (
+                <View style={styles.recentBadge}>
+                  <Text style={styles.recentBadgeText}>최근 로그인</Text>
+                </View>
+              )}
+            </TouchableOpacity>
+          );
+        })}
       </View>
     </View>
   );
@@ -85,13 +102,32 @@ const styles = StyleSheet.create({
     paddingVertical: 15,
     borderRadius: 12,
     alignItems: 'center',
+    position: 'relative',
   },
   buttonBorder: {
     borderWidth: 1,
     borderColor: '#ddd',
   },
+  recentButton: {
+    // 최근 로그인 버튼에 약간의 효과를 줄 수 있음
+  },
   buttonText: {
     fontSize: 15,
     fontWeight: '600',
+  },
+  recentBadge: {
+    position: 'absolute',
+    right: 12,
+    top: -10,
+    backgroundColor: '#F0893B',
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 10,
+    zIndex: 10,
+  },
+  recentBadgeText: {
+    color: '#fff',
+    fontSize: 10,
+    fontWeight: '700',
   },
 });
