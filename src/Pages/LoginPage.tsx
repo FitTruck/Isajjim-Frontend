@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   View,
   Text,
@@ -6,11 +6,13 @@ import {
   StyleSheet,
   Platform,
   Linking,
-  Image,
 } from 'react-native';
-import Svg, { Path, G, Circle } from 'react-native-svg';
+import Svg, { Path } from 'react-native-svg';
 import { BACKEND_DOMAIN } from '../utils/Server';
 import { setLastProvider, getLastProvider } from '../auth/tokenStorage';
+import { useAuth } from '../context/AuthContext';
+import { useNavigation, NavigationProp } from '@react-navigation/native';
+import { RootStackParamList } from '../types/navigation';
 
 type Provider = 'naver' | 'kakao' | 'google';
 
@@ -55,8 +57,43 @@ const openOAuth = (provider: Provider) => {
 };
 
 export default function LoginPage() {
+  const { isAuthenticated, isLoading } = useAuth();
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const lastProvider = getLastProvider();
   const hasHistory = !!lastProvider;
+
+  useEffect(() => {
+    if (!isLoading && isAuthenticated) {
+      if (Platform.OS === 'web') {
+        const referrer = document.referrer;
+        const currentHost = window.location.host;
+
+        // 내부 사이트에서 온 경우 (referrer가 존재하고 현재 호스트를 포함할 때)
+        if (referrer && referrer.includes(currentHost)) {
+          // login 페이지 자체가 referrer인 경우(새로고침 등)를 대비해 체크
+          if (new URL(referrer).pathname !== '/login') {
+            window.history.back();
+          } else {
+            navigation.navigate('Intro');
+          }
+        } else {
+          // 외부 사이트에서 왔거나 직접 접근한 경우
+          navigation.navigate('Intro');
+        }
+      } else {
+        // 모바일 환경
+        if (navigation.canGoBack()) {
+          navigation.goBack();
+        } else {
+          navigation.navigate('Intro');
+        }
+      }
+    }
+  }, [isAuthenticated, isLoading, navigation]);
+
+  if (isLoading || isAuthenticated) {
+    return null;
+  }
 
   return (
     <View style={styles.container}>
