@@ -120,26 +120,24 @@ export default function Header() {
         </MyTouch>
 
         <View style={[styles.headerRight, isMobile && styles.mobileHeaderRight]}>
-          <HoverableMenuItem
-            label="내 견적"
-            onPress={onGoMyEstimate}
-            isActive={route.name === 'MyEstimate'}
-            isMobile={isMobile}
-          />
+          {isAuthenticated && (
+            <>
+              <HoverableMenuItem
+                label="내 견적"
+                onPress={onGoMyEstimate}
+                isActive={route.name === 'MyEstimate'}
+                isMobile={isMobile}
+              />
 
-          <HoverableMenuItem
-            label="채팅"
-            onPress={onGoMyChat}
-            isActive={route.name === 'MyChat'}
-            isMobile={isMobile}
-            showBadge={estimateStatus === 'active' || hasUnreadChats}
-          />
-
-          <HoverableMenuItem
-            label="문의하기"
-            onPress={() => {}}
-            isMobile={isMobile}
-          />
+              <HoverableMenuItem
+                label="채팅"
+                onPress={onGoMyChat}
+                isActive={route.name === 'MyChat'}
+                isMobile={isMobile}
+                showBadge={estimateStatus === 'active' || hasUnreadChats}
+              />
+            </>
+          )}
 
           {isAuthenticated ? (
             <View ref={profileWrapperRef} style={styles.profileWrapper}>
