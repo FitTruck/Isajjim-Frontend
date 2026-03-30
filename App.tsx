@@ -34,7 +34,7 @@ export default function App() {
     config: {
       // 주소에 뜨는 경로
       screens: {
-        Intro: '',
+        Main: '',
         Upload: 'upload',
         UserSelect: 'user-select',
         Result: 'result',
@@ -56,7 +56,7 @@ export default function App() {
         <NavigationContainer linking={linking} ref={navigationRef}>
           {/* Stack.Navigator: 각 화면을 스택처럼 쌓아 관리 */}
           <Stack.Navigator
-            initialRouteName="Intro" // 첫 화면의 name
+            initialRouteName="Main" // 첫 화면의 name
             screenOptions={{
               headerShown: false, // 헤더 숨김
               contentStyle: { backgroundColor: 'white' },
@@ -65,7 +65,7 @@ export default function App() {
           >
             {/* Stack.Screen: 각 화면을 정의. 각각의 component에는 컴포넌트 명을 써야함 */}
             {/* name은 MainScreen이나 UserSelect에서 부를 때 파라미터와 일치해야함 */}
-            <Stack.Screen name="Intro" component={Main} />
+            <Stack.Screen name="Main" component={Main} />
             <Stack.Screen name="Upload" component={UploadScreen} />
             <Stack.Screen name="UserSelect" component={UserSelect} />
             <Stack.Screen name="Result" component={Result} />

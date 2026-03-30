@@ -15,7 +15,7 @@ export type RootStackParamList = {
   MyEstimate: undefined; // MyEstimate로 이동할 때는 매개변수 없음
   MyChat: undefined; // MyChat으로 이동할 때는 매개변수 없음
   SimulationTest: undefined; // 시뮬레이션 테스트 페이지
-  Intro: undefined; // 인트로 페이지
+  Main: undefined; // 메인 페이지
   // 인증 관련 화면
   Login: undefined;
   AuthCallback: { accessToken?: string; refreshToken?: string };

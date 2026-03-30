@@ -39,7 +39,7 @@ export default function AuthCallbackPage() {
       
       const targetRoute = (redirectPath && redirectPath !== 'Login' && redirectPath !== 'AuthCallback') 
         ? redirectPath 
-        : 'Intro';
+        : 'Main';
         
       navigation.reset({ index: 0, routes: [{ name: targetRoute as any }] });
     } else {

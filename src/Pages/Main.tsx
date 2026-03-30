@@ -10,7 +10,7 @@ import ImageComparisonSlider from '../components/IntroPage/ImageComparisonSlider
 import { useAuth } from '../context/AuthContext';
 import { setRedirectPath } from '../auth/tokenStorage';
 
-type Props = NativeStackScreenProps<RootStackParamList, 'Intro'>;
+type Props = NativeStackScreenProps<RootStackParamList, 'Main'>;
 
 export default function Main({ navigation }: Props) {
   const { width, height } = useWindowDimensions();

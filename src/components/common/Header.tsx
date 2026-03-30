@@ -70,7 +70,7 @@ export default function Header() {
   const onGoHome = () => {
     navigation.reset({
       index: 0,
-      routes: [{ name: 'Intro' }],
+      routes: [{ name: 'Main' }],
     });
   };
 
@@ -106,7 +106,7 @@ export default function Header() {
       logout();
       navigation.reset({
         index: 0,
-        routes: [{ name: 'Intro' }],
+        routes: [{ name: 'Main' }],
       });
     }
   };

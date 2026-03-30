@@ -74,18 +74,18 @@ export default function LoginPage() {
           if (new URL(referrer).pathname !== '/login') {
             window.history.back();
           } else {
-            navigation.navigate('Intro');
+            navigation.navigate('Main');
           }
         } else {
           // 외부 사이트에서 왔거나 직접 접근한 경우
-          navigation.navigate('Intro');
+          navigation.navigate('Main');
         }
       } else {
         // 모바일 환경
         if (navigation.canGoBack()) {
           navigation.goBack();
         } else {
-          navigation.navigate('Intro');
+          navigation.navigate('Main');
         }
       }
     }
