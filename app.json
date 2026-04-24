@@ -16,6 +16,9 @@
     },
     "plugins": [
       "expo-asset"
-    ]
+    ],
+    "android": {
+      "package": "com.isajjim"
+    }
   }
 }
