@@ -55,7 +55,7 @@ export default function Main({ navigation }: Props) {
     <View style={[styles.imageContainer, isMobile && styles.mobileImageContainer]}>
       <ImageComparisonSlider
         beforeImage={require('../../assets/intro.jpg')}
-        afterImage={require('../../assets/intro.gif')}
+        afterImage={require('../../assets/intro_3d.gif')}
         initialSlide={0.8}
         width={sliderWidth}
         height={sliderHeight}
