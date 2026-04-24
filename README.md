@@ -37,6 +37,9 @@ npm run web
 
 # 또는
 npx expo start --web --port 8081
+
+# 안드로이드 앱
+npx expo run:android
 ```
 
 ### 환경 변수
