@@ -311,14 +311,14 @@ const styles = StyleSheet.create({
   },
   itemTitle: {
     fontSize: 17,
-    fontFamily : 'inter', 
+    fontFamily: 'Pretendard',
     fontWeight: '700',
     color: '#222',
     marginBottom: 4,
   },
   itemSubtitle: {
     fontSize: 13,
-    fontFamily : 'inter', 
+    fontFamily: 'Pretendard',
     fontWeight: '500',
     color: '#9E9E9E',
   },

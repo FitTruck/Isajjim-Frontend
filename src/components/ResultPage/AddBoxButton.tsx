@@ -80,7 +80,7 @@ const styles = StyleSheet.create({
   },
   itemTitle: {
     fontSize: 15,
-    fontFamily: 'inter', 
+    fontFamily: 'Pretendard',
     fontWeight: '500',
     color: '#535353',
     // marginBottom 제거 (수직 중앙 정렬 위해)

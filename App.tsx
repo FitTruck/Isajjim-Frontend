@@ -3,6 +3,9 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { EstimateProvider } from './src/context/EstimateContext';
 import { AuthProvider } from './src/context/AuthContext';
 import { navigationRef } from './src/auth/navigationRef';
+import { useFonts } from 'expo-font';
+import { Text, Platform } from 'react-native';
+import { useEffect } from 'react';
 
 // 각 화면 컴포넌트 import
 import UploadScreen from './src/Pages/MainScreen';
@@ -19,6 +22,51 @@ import AuthFailedPage from './src/Pages/AuthFailedPage';
 // 각 화면의 매개변수 타입들을 정의하고 있는 타입 import
 import { RootStackParamList } from './src/types/navigation';
 
+const PRETENDARD_FONTS = {
+  'Pretendard-Thin':       require('./assets/fonts/Pretendard-Thin.otf'),
+  'Pretendard-ExtraLight': require('./assets/fonts/Pretendard-ExtraLight.otf'),
+  'Pretendard-Light':      require('./assets/fonts/Pretendard-Light.otf'),
+  'Pretendard-Regular':    require('./assets/fonts/Pretendard-Regular.otf'),
+  'Pretendard-Medium':     require('./assets/fonts/Pretendard-Medium.otf'),
+  'Pretendard-SemiBold':   require('./assets/fonts/Pretendard-SemiBold.otf'),
+  'Pretendard-Bold':       require('./assets/fonts/Pretendard-Bold.otf'),
+  'Pretendard-ExtraBold':  require('./assets/fonts/Pretendard-ExtraBold.otf'),
+  'Pretendard-Black':      require('./assets/fonts/Pretendard-Black.otf'),
+};
+
+const PRETENDARD_WEIGHT_MAP = [
+  { weight: 100, src: require('./assets/fonts/Pretendard-Thin.otf') },
+  { weight: 200, src: require('./assets/fonts/Pretendard-ExtraLight.otf') },
+  { weight: 300, src: require('./assets/fonts/Pretendard-Light.otf') },
+  { weight: 400, src: require('./assets/fonts/Pretendard-Regular.otf') },
+  { weight: 500, src: require('./assets/fonts/Pretendard-Medium.otf') },
+  { weight: 600, src: require('./assets/fonts/Pretendard-SemiBold.otf') },
+  { weight: 700, src: require('./assets/fonts/Pretendard-Bold.otf') },
+  { weight: 800, src: require('./assets/fonts/Pretendard-ExtraBold.otf') },
+  { weight: 900, src: require('./assets/fonts/Pretendard-Black.otf') },
+];
+
+function injectPretendardCSS() {
+  if (typeof document === 'undefined') return;
+  if (document.getElementById('pretendard-css')) return;
+  let css = '';
+  for (const { weight, src } of PRETENDARD_WEIGHT_MAP) {
+    if (typeof src === 'string') {
+      css += `@font-face{font-family:'Pretendard';font-weight:${weight};src:url('${src}') format('opentype');}\n`;
+    }
+  }
+  if (!css) return;
+  const el = document.createElement('style');
+  el.id = 'pretendard-css';
+  el.textContent = css;
+  document.head.appendChild(el);
+}
+
+if (!(Text as any).defaultProps) (Text as any).defaultProps = {};
+(Text as any).defaultProps.style = {
+  fontFamily: Platform.OS === 'web' ? 'Pretendard' : 'Pretendard-Regular',
+};
+
 // createNativeStackNavigator: 네비게이션 엔진을 생성하는 함수임.
 // 두 가지 컴포넌트를 갖고 있다.
 // 1. Stack.Navigator: 네비게이션의 전체적인 설정을 담당하는 부분
@@ -27,6 +75,13 @@ import { RootStackParamList } from './src/types/navigation';
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export default function App() {
+  const [fontsLoaded] = useFonts(PRETENDARD_FONTS);
+
+  useEffect(() => {
+    if (fontsLoaded && Platform.OS === 'web') injectPretendardCSS();
+  }, [fontsLoaded]);
+
+  if (!fontsLoaded) return null;
 
   // 얘가 있어야 뒤로가기가 됨.
   const linking = {
