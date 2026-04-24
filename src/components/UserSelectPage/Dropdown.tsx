@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, FlatList, StyleSheet, Platform, ScrollView, Image } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
+import { ChevronUp, ChevronDown } from 'lucide-react-native';
 
 interface Option {
   label: string;
@@ -53,8 +54,8 @@ export default function Dropdown({ label, placeholder = '선택해주세요', va
           {selectedOption ? selectedOption.label : placeholder}
         </Text>
         {isOpen ? 
-          <Image style={styles.arrowIcon} source={require('../../../assets/up.png')} /> : 
-          <Image style={styles.arrowIcon} source={require('../../../assets/bottom.png')} />
+          <ChevronUp color="#999" size={14} /> : 
+          <ChevronDown color="#999" size={14} />
         }
       </TouchableOpacity>
 

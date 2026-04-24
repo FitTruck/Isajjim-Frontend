@@ -1,5 +1,6 @@
 ﻿import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, useWindowDimensions } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, useWindowDimensions } from 'react-native';
+import { MapPin, ChevronRight, FileText, CircleStop, Star, MessageCircle } from 'lucide-react-native';
 import RequestDetailModal from "../common/RequestDetailModal";
 
 interface EstimateCardProps {
@@ -177,9 +178,9 @@ export default function EstimateCard({ status, date, locations, quoteInfo, timel
 
         {/* 위치 정보 */}
         <View style={styles.locationRow}>
-          <Image source={require('../../../assets/mapsflag.png')} style={styles.mapIcon} resizeMode="contain" />
+          <MapPin color="#333" size={14} style={{ marginRight: 6, opacity: 0.5 }} />
           <Text style={styles.locationText}>{displayStart}</Text>
-          <Image source={require('../../../assets/right.png')} style={styles.arrowIcon} resizeMode="contain" />
+          <ChevronRight color="#333" size={10} style={{ marginHorizontal: 10, opacity: 0.5 }} />
           <Text style={styles.locationText}>{displayEnd}</Text>
         </View>
 
@@ -192,7 +193,7 @@ export default function EstimateCard({ status, date, locations, quoteInfo, timel
         <View style={styles.buttonRow}>
           <TouchableOpacity style={styles.requestButton}
           onPress={() => setIsRequestModalVisible(true)}>
-            <Image source={require('../../../assets/docs.png')} style={styles.btnIcon} resizeMode="contain" />
+            <FileText color="#555" size={14} style={{ marginRight: 6 }} />
             <Text style={styles.requestButtonText}>내 요청사항</Text>
           </TouchableOpacity>
 
@@ -204,7 +205,7 @@ export default function EstimateCard({ status, date, locations, quoteInfo, timel
 
           {(status === 'active' || status === 'pending') && (
             <TouchableOpacity style={styles.stopButton}>
-              <Image source={require('../../../assets/stop.png')} style={styles.btnIcon} resizeMode="contain" />
+              <CircleStop color="#FF6B6B" size={14} style={{ marginRight: 6 }} />
               <Text style={styles.stopButtonText}>견적 그만 받기</Text>
             </TouchableOpacity>
           )}
@@ -242,7 +243,7 @@ export default function EstimateCard({ status, date, locations, quoteInfo, timel
             <View style={[styles.movingInfoContainer, isMobile && { alignItems: 'flex-start', paddingVertical: 0, flex: 1 }]}>
               <Text style={[styles.movingText, isMobile && { fontSize: 18 }]}>{confirmedCompany?.name ?? ''}</Text>
               <View style={styles.movingDetailRow}>
-                 <Image source={require('../../../assets/star.png')} style={{ width: 14, height: 14, marginTop: 1 }} resizeMode="contain" />
+                 <Star color="#F0893B" size={14} fill="#F0893B" style={{ marginTop: 1 }} />
                  <Text style={styles.movingRating}>{confirmedCompany?.rating ?? '-'}</Text>
                  <View style={styles.verticalDivider} />
                  <Text style={styles.movingPrice}>{confirmedCompany?.price ?? ''}</Text>
@@ -255,7 +256,7 @@ export default function EstimateCard({ status, date, locations, quoteInfo, timel
             // Step2 : 견적 대기 중
             <View style={[styles.receivedInfo, { marginRight: 12 }]}>
               <View style={[styles.receivedIcon, isMobile && { width: 40, height: 40 }]}>
-                <Image source={require('../../../assets/chat.png')} style={isMobile ? { width: 20, height: 20 } : { width: 30, height: 30 }} resizeMode="contain" />
+                <MessageCircle color="#333" size={isMobile ? 20 : 30} />
               </View>
               <View style={{marginLeft: 14}}>
                 <Text style={styles.receivedLabel}>받은 견적서</Text>
@@ -268,7 +269,7 @@ export default function EstimateCard({ status, date, locations, quoteInfo, timel
               {/* 받은 견적서 개수 헤더 */}
               <View style={[styles.receivedInfo, !isMobile && { marginBottom: 12 }]}>
                 <View style={[styles.receivedIcon, isMobile && { width: 46, height: 46 }]}>
-                  <Image source={require('../../../assets/chat.png')} style={isMobile ? { width: 22, height: 22 } : { width: 30, height: 30 }} resizeMode="contain" />
+                  <MessageCircle color="#333" size={isMobile ? 22 : 30} />
                 </View>
                 <View style={{marginLeft: 14}}>
                   <Text style={styles.receivedLabel}>받은 견적서</Text>
@@ -292,7 +293,7 @@ export default function EstimateCard({ status, date, locations, quoteInfo, timel
                 <View style={[styles.quoteBoxHeader, isMobile && { justifyContent: 'flex-end', flexDirection: 'column-reverse', alignItems: 'flex-end', gap: 2 }]}>
 
                   <View style={styles.ratingRow}>
-                    <Image source={require('../../../assets/star.png')} style={{ width: 14, height: 14 }} resizeMode="contain" />
+                    <Star color="#F0893B" size={14} fill="#F0893B" />
                     <Text style={styles.ratingText}>{quoteInfo.rating}</Text>
                   </View>
 
