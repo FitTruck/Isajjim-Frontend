@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, Image, ImageSourcePropType, Text, Platform, ViewStyle } from 'react-native';
+import { View, StyleSheet, Image, ImageSourcePropType, Text, ViewStyle } from 'react-native';
 import { Gesture, GestureDetector, GestureHandlerRootView } from 'react-native-gesture-handler';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
   withSpring,
-  withTiming,
   runOnJS,
   interpolate,
   Extrapolate,
@@ -134,7 +133,7 @@ export default function ImageComparisonSlider({
                 <Video
                   source={afterVideo}
                   ref={videoRef}
-                  style={[styles.image, { position: 'absolute', left: 0, top: -1, bottom: 0, right: 0 }]}
+                  style={[styles.image, { position: 'absolute', left: 0, top: 0, bottom: 0, right: 0 }]}
                   resizeMode={ResizeMode.COVER}
                   isLooping={false}
                   isMuted
@@ -252,14 +251,14 @@ const styles = StyleSheet.create({
   // Labels
   beforeLabelContainer: {
     position: 'absolute',
-    bottom: 20,
+    bottom: 36,
     left: 20,
   },
   afterLabelContainer: {
     position: 'absolute',
-    bottom: 20,
+    bottom: 36,
     right: 20,
-    zIndex: 5, 
+    zIndex: 5,
   },
   labelBadge: {
     paddingHorizontal: 12,

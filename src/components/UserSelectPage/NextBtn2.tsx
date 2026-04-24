@@ -1,5 +1,5 @@
 ﻿import React, { useState } from 'react';
-import { TouchableOpacity, Text, View, StyleSheet, Alert, Platform } from 'react-native';
+import { TouchableOpacity, Text, View, StyleSheet, Alert, useWindowDimensions } from 'react-native';
 import { BACKEND_DOMAIN } from '../../utils/Server';
 import api from '../../api/axiosInstance';
 import LoadingModal from './LoadingModal';
@@ -48,6 +48,8 @@ export default function NextBtn2({ estimateId, images, onShowAlert, movingDate, 
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { setRequestData } = useEstimate();
+  const { width } = useWindowDimensions();
+  const isMobile = width < 768;
 
   const mapToBackendValue = (data: any) => {
     return {
@@ -175,17 +177,18 @@ export default function NextBtn2({ estimateId, images, onShowAlert, movingDate, 
   };
 
   return (
-    <View style={styles.nextBtnContainer}>
+    <View style={[styles.nextBtnContainer, isMobile && styles.mobileNextBtnContainer]}>
       <LoadingModal visible={isSubmitting} />
-      <TouchableOpacity 
+      <TouchableOpacity
         style={[
-          styles.nextBtn, 
+          styles.nextBtn,
+          isMobile && styles.mobileNextBtn,
           isSubmitting && styles.nextBtnDisabled
         ]}
         onPress={handlePressNext}
         disabled={isSubmitting}
       >
-          <Text style={styles.nextBtnText}>다음 단계</Text>
+          <Text style={[styles.nextBtnText, isMobile && styles.mobileNextBtnText]}>다음 단계</Text>
       </TouchableOpacity>
     </View>
   );
@@ -193,28 +196,41 @@ export default function NextBtn2({ estimateId, images, onShowAlert, movingDate, 
 
 const styles = StyleSheet.create({
   nextBtnContainer: {
-    width: '100%', 
-    maxWidth: 1240, // 600 * 2 + 40 (gap)
+    width: '100%',
+    maxWidth: 1240,
     alignSelf: 'center',
     flexDirection: 'row',
     justifyContent: 'flex-end',
     marginBottom: 250,
+  },
+  mobileNextBtnContainer: {
+    paddingHorizontal: 20,
+    marginBottom: 60,
   },
   nextBtn: {
     paddingHorizontal: 15,
     paddingVertical: 8,
     backgroundColor: '#F0893B',
     borderRadius: 4,
-    justifyContent: 'center', 
+    justifyContent: 'center',
     alignItems: 'center',
+  },
+  mobileNextBtn: {
+    flex: 1,
+    paddingVertical: 14,
+    borderRadius: 8,
   },
   nextBtnDisabled: {
     backgroundColor: '#666',
-    opacity: 0.7
+    opacity: 0.7,
   },
   nextBtnText: {
-    color: 'white', 
-    fontSize: 17, 
-    fontWeight: 400
-  }
+    color: 'white',
+    fontSize: 17,
+    fontWeight: '400',
+  },
+  mobileNextBtnText: {
+    fontSize: 16,
+    textAlign: 'center',
+  },
 });

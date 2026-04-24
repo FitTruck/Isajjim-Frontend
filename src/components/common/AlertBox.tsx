@@ -1,4 +1,4 @@
-import { Text, View, Platform, StyleSheet } from "react-native";
+import { Text, View, StyleSheet, useWindowDimensions } from "react-native";
 import { useEffect } from "react";
 
 interface AlertBoxProps {
@@ -7,6 +7,9 @@ interface AlertBoxProps {
 }
 
 export default function AlertBox({ value, onClose }: AlertBoxProps) {
+  const { width } = useWindowDimensions();
+  const isMobile = width < 768;
+
   useEffect(() => {
     const timer = setTimeout(() => { onClose() }, 2000);
     return () => clearTimeout(timer);
@@ -14,13 +17,13 @@ export default function AlertBox({ value, onClose }: AlertBoxProps) {
 
 
   return(
-    <View style={styles.container}>
+    <View style={[styles.container, isMobile && styles.mobileContainer]}>
       <View style={styles.iconContent}>
         <Text style={styles.iconText}>!</Text>
       </View>
       <Text style={styles.text}>{value}</Text>
     </View>
-  )    
+  )
 }
 
 const styles = StyleSheet.create({
@@ -35,7 +38,6 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     borderWidth: 1,
     borderColor: '#f3f0e7ff',
-    // 그림자 설정
     elevation: 10,
     shadowColor: "#000",
     shadowOffset: {
@@ -44,12 +46,15 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.12,
     shadowRadius: 8,
-    
-    // 위치 고정 설정
     position: 'absolute',
     zIndex: 9999,
     bottom: 30,
     right: 30,
+  },
+  mobileContainer: {
+    bottom: 20,
+    left: 16,
+    right: 16,
   },
   iconContent: {
     width: 20,

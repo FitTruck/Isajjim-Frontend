@@ -22,9 +22,10 @@ export const commonStyles = StyleSheet.create({
 
   // --- 타이틀 ---
   mainSection: {
-    marginTop: 150, // Reduced further to 50
+    marginTop: 150,
     marginBottom: 80,
-    width: 837,
+    width: '100%',
+    maxWidth: 837,
     alignItems: 'center',
     alignSelf: 'center',
     gap: 10,

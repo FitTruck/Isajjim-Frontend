@@ -13,7 +13,7 @@ import { setRedirectPath } from '../auth/tokenStorage';
 type Props = NativeStackScreenProps<RootStackParamList, 'Main'>;
 
 export default function Main({ navigation }: Props) {
-  const { width, height } = useWindowDimensions();
+  const { width } = useWindowDimensions();
   const isMobile = width < 768;
   const { isAuthenticated } = useAuth();
 
@@ -26,52 +26,71 @@ export default function Main({ navigation }: Props) {
     }
   };
 
+  const textContent = (
+    <View style={[styles.textContent, isMobile && styles.mobileTextContent]}>
+      <Text style={[styles.title, isMobile && styles.mobileTitle]}>
+        AI 견적 산출 서비스{'\n'}
+        <Text style={{ color: '#F0893B' }}>이삿찜</Text>
+      </Text>
+      <Text style={[styles.subtitle, isMobile && styles.mobileSubtitle]}>
+        이삿짐 사진을 업로드하면{'\n'}
+        AI가 가구를 자동으로 분석하여{'\n'}
+        최적의 이사 견적을 알려드립니다.
+      </Text>
+      <MyTouch
+        style={[styles.startButton, isMobile && styles.mobileStartButton]}
+        onPress={handleStart}
+      >
+        <Text style={[styles.startButtonText, isMobile && styles.mobileStartButtonText]}>시작하기</Text>
+        <ArrowUpRight size={20} color="white" strokeWidth={3} />
+      </MyTouch>
+    </View>
+  );
+
+  // 모바일: paddingHorizontal 20 양쪽 = 40 제외한 정확한 픽셀값 전달
+  const sliderWidth = isMobile ? width - 40 : undefined;
+  const sliderHeight = isMobile ? 240 : undefined;
+
+  const imageContent = (
+    <View style={[styles.imageContainer, isMobile && styles.mobileImageContainer]}>
+      <ImageComparisonSlider
+        beforeImage={require('../../assets/intro.jpg')}
+        afterImage={require('../../assets/intro.gif')}
+        initialSlide={0.8}
+        width={sliderWidth}
+        height={sliderHeight}
+      />
+    </View>
+  );
+
+  if (isMobile) {
+    return (
+      <View style={styles.container}>
+        <Header />
+        <ScrollView contentContainerStyle={styles.mobileScrollContent}>
+          {/* 이미지 → 텍스트+버튼 순서 */}
+          <View style={styles.mobileVisualSection}>
+            {imageContent}
+          </View>
+          <View style={styles.mobileTextSection}>
+            {textContent}
+          </View>
+        </ScrollView>
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
       <Header />
-      <ScrollView 
-        contentContainerStyle={[commonStyles.scrollContent, isMobile && {height: height}]}
-      >
-        <View style={[
-          styles.contentWrapper,
-          isMobile && styles.mobileContentWrapper,
-        ]}>
-          
-          {/* Left Side: Text Content */}
-          <View style={[styles.textSection, isMobile && styles.mobileTextSection]}>
-            <View style={styles.textContent}>
-              <Text style={[styles.title, isMobile && styles.mobileTitle]}>
-                AI 견적 산출 서비스{'\n'}
-                <Text style={{ color: '#F0893B', textAlign: 'right'}}>이삿찜</Text>
-              </Text>
-              <Text style={[styles.subtitle, isMobile && styles.mobileSubtitle]}>
-                이삿짐 사진을 업로드하면{'\n'}
-                AI가 가구를 자동으로 분석하여{'\n'}
-                최적의 이사 견적을 알려드립니다.
-              </Text>
-              
-              <MyTouch 
-                style={[styles.startButton, isMobile && styles.mobileStartButton]} 
-                onPress={handleStart}
-              >
-                <Text style={[styles.startButtonText, isMobile && styles.mobileStartButtonText]}>시작하기</Text>
-                <ArrowUpRight size={20} color="white" strokeWidth={3} />
-              </MyTouch>
-            </View>
+      <ScrollView contentContainerStyle={commonStyles.scrollContent}>
+        <View style={styles.contentWrapper}>
+          <View style={styles.textSection}>
+            {textContent}
           </View>
-
-          {/* 기술 표현 영역 */}
-          <View style={[styles.visualSection, isMobile && styles.mobileVisualSection]}>
-            <View style={styles.imageContainer}>
-              <ImageComparisonSlider 
-                beforeImage={require('../../assets/intro.jpg')} 
-                afterVideo={require('../../assets/intro.mov')} 
-                width={888}
-                initialSlide={0.8}
-              />
-            </View>
+          <View style={styles.visualSection}>
+            {imageContent}
           </View>
-
         </View>
       </ScrollView>
     </View>
@@ -83,6 +102,8 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: 'white',
   },
+
+  // ── Desktop ──────────────────────────────────────────
   contentWrapper: {
     flexDirection: 'row',
     flex: 1,
@@ -93,76 +114,57 @@ const styles = StyleSheet.create({
     maxWidth: 1600,
     alignSelf: 'center',
   },
-  mobileContentWrapper: {
-    flexDirection: 'column-reverse', 
-    justifyContent: 'flex-end',
-    paddingTop: 200,
-    paddingBottom: 40,
-  },
-  
-  // Left Section
   textSection: {
     flex: 0.8,
     paddingHorizontal: 40,
     alignItems: 'flex-start',
-  },
-  mobileTextSection: {
-    flex: 0,
-    width: '100%',
-    paddingHorizontal: 24,
-    marginTop: 40,
-    alignItems: 'center',
+    justifyContent: 'center',
+    paddingTop: 40,
   },
   textContent: {
     maxWidth: 600,
-    textAlign: 'left',
   },
-
-  // Right Section
   visualSection: {
     flex: 1.2,
     justifyContent: 'flex-start',
-    alignItems: 'center',
+    alignItems: 'stretch',
     paddingRight: 40,
   },
-  mobileVisualSection: {
-    flex: 0,
-    width: '100%',
-    height: 400, 
-    paddingRight: 24,
-    paddingLeft: 24,
-  },
-  
   imageContainer: {
-    width: 888,
-    height: 700,
-    backgroundColor: '#ffffffff',
-    borderRadius: 30,
-    overflow: 'hidden', 
-    position: 'relative',
-  },
-  techImage: {
     width: '100%',
-    height: '100%',
-  },
-  techBadge: {
-    position: 'absolute',
-    bottom: 20,
-    right: 20,
-    backgroundColor: 'rgba(0,0,0,0.7)',
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
-    // @ts-ignore
-    backdropFilter: 'blur(10px)',
-  },
-  techBadgeText: {
-    color: 'white',
-    fontSize: 14,
-    fontWeight: '600',
+    borderRadius: 30,
+    overflow: 'hidden',
   },
 
-  // Typography
+  // ── Mobile ───────────────────────────────────────────
+  mobileScrollContent: {
+    flexGrow: 1,
+    paddingTop: 50,   // 모바일 헤더 높이
+    paddingBottom: 40,
+  },
+  mobileVisualSection: {
+    width: '100%',
+    height: 240,
+    paddingHorizontal: 20,
+    marginBottom: 28,
+  },
+  mobileImageContainer: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 20,
+    overflow: 'hidden',
+  },
+  mobileTextSection: {
+    width: '100%',
+    paddingHorizontal: 24,
+    alignItems: 'center',
+  },
+  mobileTextContent: {
+    width: '100%',
+    alignItems: 'center',
+  },
+
+  // ── Typography ───────────────────────────────────────
   title: {
     fontSize: 64,
     fontWeight: '600',
@@ -172,9 +174,10 @@ const styles = StyleSheet.create({
     textAlign: 'left',
   },
   mobileTitle: {
-    fontSize: 36,
-    lineHeight: 46,
+    fontSize: 34,
+    lineHeight: 44,
     textAlign: 'center',
+    marginBottom: 16,
   },
   subtitle: {
     fontSize: 20,
@@ -185,12 +188,13 @@ const styles = StyleSheet.create({
     textAlign: 'left',
   },
   mobileSubtitle: {
-    fontSize: 16,
-    lineHeight: 26,
+    fontSize: 15,
+    lineHeight: 24,
     textAlign: 'center',
+    marginBottom: 28,
   },
 
-  // Button
+  // ── Button ───────────────────────────────────────────
   startButton: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -207,9 +211,9 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-start',
   },
   mobileStartButton: {
-    alignSelf: 'center', // Center btn on mobile
-    paddingHorizontal: 24,
-    paddingVertical: 12,
+    alignSelf: 'center',
+    paddingHorizontal: 36,
+    paddingVertical: 14,
   },
   startButtonText: {
     fontSize: 18,

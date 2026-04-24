@@ -6,6 +6,7 @@ import {
   StyleSheet,
   Platform,
   Linking,
+  useWindowDimensions,
 } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 import { BACKEND_DOMAIN } from '../utils/Server';
@@ -61,6 +62,8 @@ export default function LoginPage() {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const lastProvider = getLastProvider();
   const hasHistory = !!lastProvider;
+  const { width } = useWindowDimensions();
+  const isMobile = width < 768;
 
   useEffect(() => {
     if (!isLoading && isAuthenticated) {
@@ -97,9 +100,9 @@ export default function LoginPage() {
 
   return (
     <View style={styles.container}>
-      <View style={styles.hero}>
-        <Text style={styles.title}>이삿찜</Text>
-        <Text style={styles.subtitle}>더 똑똑하게, 더 가볍게.</Text>
+      <View style={[styles.hero, isMobile && styles.mobileHero]}>
+        <Text style={[styles.title, isMobile && styles.mobileTitle]}>이삿찜</Text>
+        <Text style={[styles.subtitle, isMobile && styles.mobileSubtitle]}>더 똑똑하게, 더 가볍게.</Text>
       </View>
 
       <View style={styles.buttons}>
@@ -148,16 +151,25 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 60,
   },
+  mobileHero: {
+    marginBottom: 40,
+  },
   title: {
     fontSize: 40,
     fontWeight: '800',
     color: '#1a1a1a',
     letterSpacing: -1,
   },
+  mobileTitle: {
+    fontSize: 32,
+  },
   subtitle: {
     marginTop: 10,
     fontSize: 16,
     color: '#666',
+  },
+  mobileSubtitle: {
+    fontSize: 14,
   },
   buttons: {
     width: '100%',
