@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types/navigation';
@@ -10,7 +11,7 @@ export default function AuthFailedPage() {
   const navigation = useNavigation<NavigationProp>();
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <Text style={styles.icon}>⚠️</Text>
       <Text style={styles.title}>로그인 실패</Text>
       <Text style={styles.message}>소셜 로그인 중 문제가 발생했습니다.{'\n'}다시 시도해주세요.</Text>
@@ -21,7 +22,7 @@ export default function AuthFailedPage() {
       >
         <Text style={styles.buttonText}>로그인 화면으로</Text>
       </TouchableOpacity>
-    </View>
+    </SafeAreaView>
   );
 }
 

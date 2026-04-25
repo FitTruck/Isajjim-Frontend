@@ -8,6 +8,7 @@ import {
   Linking,
   useWindowDimensions,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
 import { BACKEND_DOMAIN } from '../utils/Server';
 import { setLastProvider, getLastProvider } from '../auth/tokenStorage';
@@ -99,7 +100,7 @@ export default function LoginPage() {
   }
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <View style={[styles.hero, isMobile && styles.mobileHero]}>
         <Text style={[styles.title, isMobile && styles.mobileTitle]}>이삿찜</Text>
         <Text style={[styles.subtitle, isMobile && styles.mobileSubtitle]}>더 똑똑하게, 더 가볍게.</Text>
@@ -135,7 +136,7 @@ export default function LoginPage() {
           );
         })}
       </View>
-    </View>
+    </SafeAreaView>
   );
 }
 

@@ -6,6 +6,7 @@ import { navigationRef } from './src/auth/navigationRef';
 import { useFonts } from 'expo-font';
 import { Text, Platform } from 'react-native';
 import { useEffect } from 'react';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 // 각 화면 컴포넌트 import
 import UploadScreen from './src/Pages/MainScreen';
@@ -106,6 +107,7 @@ export default function App() {
 
   return (
     // NavigationContainer: 앱의 네비게이션 트리를 관리하는 최상위 컴포넌트
+    <SafeAreaProvider>
     <AuthProvider>
       <EstimateProvider>
         <NavigationContainer linking={linking} ref={navigationRef}>
@@ -135,5 +137,6 @@ export default function App() {
         </NavigationContainer>
       </EstimateProvider>
     </AuthProvider>
+    </SafeAreaProvider>
   );
 }

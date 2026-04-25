@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { View, Text, Image, StyleSheet, useWindowDimensions, Pressable, Platform } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -45,6 +46,7 @@ const HoverableMenuItem = ({ label, onPress, isActive, isMobile, showBadge = fal
 export default function Header() {
   const { width } = useWindowDimensions();
   const isMobile = width < 768;
+  const insets = useSafeAreaInsets();
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const route = useRoute();
   const { estimateStatus, chatList } = useEstimate();
@@ -111,8 +113,14 @@ export default function Header() {
     }
   };
 
+  const baseHeight = isMobile ? 50 : 65;
+
   return (
-    <View style={[styles.header, isMobile && styles.mobileHeader]}>
+    <View style={[
+      styles.header,
+      isMobile && styles.mobileHeader,
+      { paddingTop: insets.top, height: baseHeight + insets.top },
+    ]}>
       <View style={[styles.headerContent, isMobile && styles.mobileHeaderContent]}>
         <MyTouch style={styles.logoContainer} onPress={onGoHome}>
           <Image source={require('../../../assets/Logo.png')} style={styles.logoIcon} />

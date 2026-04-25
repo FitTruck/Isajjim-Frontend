@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { View, Text, ActivityIndicator, StyleSheet, Platform } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types/navigation';
@@ -49,10 +50,10 @@ export default function AuthCallbackPage() {
   }, []);
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <ActivityIndicator size="large" color="#555" />
       <Text style={styles.text}>로그인 처리 중...</Text>
-    </View>
+    </SafeAreaView>
   );
 }
 
