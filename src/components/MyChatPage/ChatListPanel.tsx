@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { View, Text, Image, StyleSheet, TextInput, FlatList, Platform, Pressable, TouchableOpacity } from "react-native";
-import { Search } from 'lucide-react-native';
+import { Search, Trash2 } from 'lucide-react-native';
 import { ChatItemData } from "../../Pages/MyChat";
 import MyTouch from "../common/MyTouch";
 
@@ -96,7 +96,7 @@ export default function ChatListPanel({ chatList, selectedChatId, onSelectChat, 
       />
 
       {/* 휴지통 아이콘 */}
-      {!isMobile && <Image source={require('../../../assets/trash.png')} style={styles.trashIcon} />}
+      {!isMobile && <Trash2 color="#4e4e4e" size={18} style={{ position: 'absolute', bottom: 15, left: 17 }} />}
     </View>
   );
 }

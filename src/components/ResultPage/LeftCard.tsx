@@ -1,10 +1,7 @@
-import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView, Pressable, useWindowDimensions } from 'react-native';
+import { View, Text, StyleSheet, Image, ScrollView, Pressable, useWindowDimensions } from 'react-native';
 import React, { useMemo, useState } from 'react';
 import { translateLabel, translateType } from '../../utils/Translator';
-import { Minus, Plus } from 'lucide-react-native';
-
-// 체크 마커 이미지
-const checkObjectImage = require('../../../assets/check_object.png');
+import { Minus, Plus, CircleCheck } from 'lucide-react-native';
 
 // 이미지 컨테이너 크기 (스타일과 동일하게 유지)
 const IMAGE_CONTAINER_WIDTH = 670;
@@ -154,17 +151,20 @@ const ResultCard = ({ image, items, onQuantityChange }: ResultCardProps) => {
           screenY = Math.max(minY, Math.min(screenY, maxY));
 
           return (
-            <Image
+            <View
               key={`marker-${item.furnitureId}`}
-              source={checkObjectImage}
               style={[
                 styles.checkMarker,
                 {
                   left: screenX,
                   top: screenY,
+                  justifyContent: 'center',
+                  alignItems: 'center',
                 }
               ]}
-            />
+            >
+              <CircleCheck color="#F0893B" size={MARKER_SIZE} fill="white" />
+            </View>
           );
         })}
       </View>
@@ -311,14 +311,14 @@ const styles = StyleSheet.create({
   },
   itemTitle: {
     fontSize: 17,
-    fontFamily : 'inter', 
+    fontFamily: 'Pretendard',
     fontWeight: '700',
     color: '#222',
     marginBottom: 4,
   },
   itemSubtitle: {
     fontSize: 13,
-    fontFamily : 'inter', 
+    fontFamily: 'Pretendard',
     fontWeight: '500',
     color: '#9E9E9E',
   },

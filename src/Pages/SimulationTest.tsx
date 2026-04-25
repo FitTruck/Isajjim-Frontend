@@ -6,6 +6,7 @@
 
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Space3D from '../components/Space/Space3D';
 import { SimulationFurniture, TruckType } from '../types/simulation';
 
@@ -238,13 +239,14 @@ export default function SimulationTest() {
   // 'auto'면 멀티트럭 자동 최적화, 그 외는 고정 트럭
   const [truckMode, setTruckMode] = useState<'auto' | TruckType>('auto');
   const [furnitureCount, setFurnitureCount] = useState(ALL_FURNITURE.length);
+  const insets = useSafeAreaInsets();
 
   const activeFurniture = ALL_FURNITURE.slice(0, furnitureCount);
 
   return (
     <View style={styles.container}>
       {/* 헤더 */}
-      <View style={styles.header}>
+      <View style={[styles.header, { paddingTop: 15 + insets.top }]}>
         <Text style={styles.title}>3D 적재 시뮬레이션 테스트</Text>
         <Text style={styles.subtitle}>총 {ALL_FURNITURE.length}개 가구</Text>
       </View>

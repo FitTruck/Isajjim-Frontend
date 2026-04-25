@@ -3,7 +3,7 @@ import { View, Text, Image, StyleSheet, TextInput, FlatList, KeyboardAvoidingVie
 import { ChatItemData } from "../../Pages/MyChat";
 import ConfirmButton from "./ConfirmButton";
 import RequestDetailModal from "../common/RequestDetailModal";
-import { FileText, MessageSquareMore, ChevronRight, ChevronLeft } from 'lucide-react-native';
+import { FileText, MessageSquareMore, ChevronRight, ChevronLeft, Paperclip, Send } from 'lucide-react-native';
 import { useEstimate, RequestData } from "../../context/EstimateContext";
 
 interface ChatRoomPanelProps {
@@ -287,7 +287,7 @@ export default function ChatRoomPanel({ data, isMobile = false, onBack }: ChatRo
             style={[styles.headerRequestButton, isMobile && { paddingHorizontal: 8 }]}
             onPress={() => setIsRequestModalVisible(true)}
           >
-            <Image source={require('../../../assets/docs.png')} style={[styles.headerRequestIcon, isMobile && { marginRight: 0 }]} resizeMode="contain" />
+            <FileText color="#555" size={14} style={[isMobile && { marginRight: 0 }, !isMobile && { marginRight: 6 }]} />
             {!isMobile && <Text style={styles.headerRequestText}>내 요청사항</Text>}
           </TouchableOpacity>
 
@@ -344,7 +344,7 @@ export default function ChatRoomPanel({ data, isMobile = false, onBack }: ChatRo
                 isFileHovered && styles.iconButtonHovered
               ]}
             >
-              <Image source={require('../../../assets/file.png')} style={styles.clipIcon} />
+              <Paperclip color="#999" size={20} />
             </Pressable>
 
             <Pressable 
@@ -356,7 +356,7 @@ export default function ChatRoomPanel({ data, isMobile = false, onBack }: ChatRo
                 isSendHovered && styles.iconButtonHoveredOrange
               ]}
             >
-              <Image source={require('../../../assets/plane.png')} style={styles.sendIcon} />
+              <Send color="#F0893B" size={24} />
             </Pressable>
           </View>
         </View>
