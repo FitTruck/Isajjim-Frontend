@@ -2,6 +2,8 @@
 import { TouchableOpacity, Text, View, StyleSheet, Alert, useWindowDimensions } from 'react-native';
 import { BACKEND_DOMAIN } from '../../utils/Server';
 import api from '../../api/axiosInstance';
+import { getAccessToken } from '../../auth/tokenStorage';
+import { fetchEventSource } from '@microsoft/fetch-event-source';
 import LoadingModal from './LoadingModal';
 import { useEstimate } from '../../context/EstimateContext';
 import { translateLabel } from '../../utils/Translator';
@@ -124,51 +126,55 @@ export default function NextBtn2({ estimateId, images, onShowAlert, movingDate, 
       const patchResponse = await api.patch(`/api/v1/estimates/${estimateId}`, payload);
       console.log("받은 응답:", patchResponse);
 
+      const token = getAccessToken();
       const SSE_URL = `${BACKEND_DOMAIN}/api/v1/estimates/${estimateId}/sse`;
-      const eventSource = new EventSource(SSE_URL);
+      const controller = new AbortController();
 
-      // SSE이벤트 받게 되면 실행됨
-      eventSource.addEventListener("sse", async (event) => {
-        console.log("받은 SSE 데이터:", event.data);
-        if (event.data === "COMPLETED") {
-          const furnitureInfoRes = await api.get(`/api/v1/estimates/${estimateId}`);
-          const furnitureInfo = furnitureInfoRes.data;
-          console.log("가구 정보: ", furnitureInfo);
+      fetchEventSource(SSE_URL, {
+        method: 'GET',
+        headers: {
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        signal: controller.signal,
+        onmessage: async (event) => {
+          if (event.event !== 'sse') return;
+          console.log("받은 SSE 데이터:", event.data);
+          if (event.data === "COMPLETED") {
+            const furnitureInfoRes = await api.get(`/api/v1/estimates/${estimateId}`);
+            const furnitureInfo = furnitureInfoRes.data;
+            console.log("가구 정보: ", furnitureInfo);
 
-          // 가구 목록 추출 및 매핑
-          const initialItems = furnitureInfo.data.images?.flatMap((img: any) => 
-            img.furnitureList?.map((f: any) => ({
-              name: translateLabel(f.label),
-              quantity: f.quantity
-            })) || []
-          ) || [];
+            const initialItems = furnitureInfo.data.images?.flatMap((img: any) =>
+              img.furnitureList?.map((f: any) => ({
+                name: translateLabel(f.label),
+                quantity: f.quantity
+              })) || []
+            ) || [];
 
-          // 저장소로 보낼 값
-          setRequestData({
-            estimateId: estimateId,
-            movingDate: targetDate,
-            startLocation: startLocation,
-            endLocation: endLocation,
-            items: initialItems, // 가구 목록 저장
-            truckInfo: { type: '', quantity: 0 }, // 트럭 정보는 Result 페이지에서 계산됨
-            images: images,
-            analysisResult: furnitureInfo
-          });
+            setRequestData({
+              estimateId: estimateId,
+              movingDate: targetDate,
+              startLocation: startLocation,
+              endLocation: endLocation,
+              items: initialItems,
+              truckInfo: { type: '', quantity: 0 },
+              images: images,
+              analysisResult: furnitureInfo
+            });
 
-          // Result 페이지로 이동 함수
-          navigation.navigate('Result');
-          
-          eventSource.close();
+            navigation.navigate('Result');
+            controller.abort();
+            setIsSubmitting(false);
+          }
+        },
+        onerror: (error) => {
+          console.error("SSE Error:", error);
+          controller.abort();
+          Alert.alert("오류", "실시간 연결 중 문제가 발생했습니다.");
           setIsSubmitting(false);
-        }
+          throw error; // fetchEventSource 재시도 방지
+        },
       });
-
-      eventSource.onerror = (error) => {
-        console.error("SSE Error:", error);
-        eventSource.close();
-        Alert.alert("오류", "실시간 연결 중 문제가 발생했습니다.");
-        setIsSubmitting(false);
-      };
     } catch (error) {
       console.error("Process Error:", error);
       Alert.alert("오류", "업로드 중 문제가 발생했습니다.");
