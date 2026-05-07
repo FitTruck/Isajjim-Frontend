@@ -1,20 +1,12 @@
-import React, { useEffect } from 'react';
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  Platform,
-  Linking,
-  useWindowDimensions,
-} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import Svg, { Path } from 'react-native-svg';
-import { BACKEND_DOMAIN } from '../utils/Server';
-import { setLastProvider, getLastProvider } from '../auth/tokenStorage';
-import { useAuth } from '../context/AuthContext';
-import { useNavigation, NavigationProp } from '@react-navigation/native';
-import { RootStackParamList } from '../types/navigation';
+import React, {useEffect} from 'react';
+import {Linking, Platform, StyleSheet, Text, TouchableOpacity, useWindowDimensions, View,} from 'react-native';
+import {SafeAreaView} from 'react-native-safe-area-context';
+import Svg, {Path} from 'react-native-svg';
+import {BACKEND_DOMAIN} from '../utils/Server';
+import {getLastProvider, setLastProvider} from '../auth/tokenStorage';
+import {useAuth} from '../context/AuthContext';
+import {NavigationProp, useNavigation} from '@react-navigation/native';
+import {RootStackParamList} from '../types/navigation';
 
 type Provider = 'naver' | 'kakao' | 'google';
 
@@ -48,12 +40,12 @@ const PROVIDERS: { id: Provider; label: string; color: string; textColor: string
 
 const openOAuth = (provider: Provider) => {
   setLastProvider(provider);
-  const url = `${BACKEND_DOMAIN}/oauth2/authorization/${provider}`;
   if (Platform.OS === 'web') {
-    // 웹: 현재 탭에서 OAuth 리다이렉트
-    window.location.href = url;
+    const protocol = window.location.hostname === 'localhost' ? 'http' : 'https';
+    const redirectUri = `${protocol}://${window.location.host}/auth/register`;
+    window.location.href = `${BACKEND_DOMAIN}/oauth2/authorization/${provider}?redirect_uri=${redirectUri}`;
   } else {
-    // 모바일: 외부 브라우저 열기
+    const url = `${BACKEND_DOMAIN}/oauth2/authorization/${provider}`;
     Linking.openURL(url);
   }
 };
