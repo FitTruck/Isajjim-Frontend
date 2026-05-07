@@ -17,7 +17,7 @@ export interface LoadedPLY {
 
 /**
  * PLY 파일을 URL에서 로드
- * @param url PLY 파일 URL (GCS)
+ * @param url PLY 파일 URL
  * @param pointSize 포인트 크기 (기본 0.01)
  * @returns Promise<LoadedPLY>
  */

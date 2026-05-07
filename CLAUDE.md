@@ -92,7 +92,7 @@ EXPO_PUBLIC_BACKEND_DOMAIN=https://api.isajjim.kro.kr
 
 1. **Upload (`NextBtn1.tsx`)**:
    - Presigned URL 발급: `POST /api/v1/presigned-url`
-   - GCS에 이미지 직접 PUT 업로드
+   - 이미지 PUT 업로드
    - 견적 요청: `POST /api/v1/estimates` (이미지 URL 포함)
    - estimateId 받아서 UserSelect로 이동
 

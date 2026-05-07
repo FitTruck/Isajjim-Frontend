@@ -11,7 +11,7 @@ export interface SimulationFurniture {
   depth: number;      // mm
   height: number;     // mm
   volume: number;     // m³
-  ply_url?: string;   // GCS PLY URL
+  ply_url?: string;   // PLY URL
 }
 
 export type TruckType = '1ton' | '2.5ton' | '5ton';

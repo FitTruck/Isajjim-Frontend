@@ -46,7 +46,7 @@ export default function NextBtn1({ imageList, onShowAlert }: NextBtnProps) {
       const { data } = presignedResponse.data;
       const { urls } = data; // 백엔드에서 내려준 presignedUrl, fileUrl, key 목록
 
-      // GCS에 이미지 병렬 업로드 (Firebase SDK 대신 직접 PUT)
+      // 이미지 병렬 업로드
       const uploadedImages = await Promise.all(imageList.map(async (img, index) => {
         try {
           const { presignedUrl, fileUrl } = urls[index];
@@ -72,7 +72,7 @@ export default function NextBtn1({ imageList, onShowAlert }: NextBtnProps) {
           const response = await fetch(uploadUri);
           const blob = await response.blob(); 
           
-          // GCS에 직접 PUT 요청
+          // PUT 요청
           await fetch(presignedUrl, {
             method: 'PUT',
             headers: {
