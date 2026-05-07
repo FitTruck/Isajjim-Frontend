@@ -39,7 +39,7 @@ export default function NextBtn1({ imageList, onShowAlert }: NextBtnProps) {
     setIsLoading(true);
     try {
       // 이미지 업로드용 Presigned Url 발급
-      const presignedResponse = await api.post('/api/v1/gcs/presigned', {
+      const presignedResponse = await api.post('/api/v1/presigned-url', {
         fileNames: imageList.map(img => img.fileName || `${uuidv4()}.jpg`)
       });
 

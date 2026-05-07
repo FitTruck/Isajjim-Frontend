@@ -81,7 +81,7 @@ EXPO_PUBLIC_BACKEND_DOMAIN=https://api.isajjim.kro.kr
 - **Backend API**: `EXPO_PUBLIC_BACKEND_DOMAIN` (기본값: `https://isajjim-backend-1079420824591.asia-northeast3.run.app`)
   - 견적 요청: `POST /api/v1/estimates`
   - 견적 조회: `GET /api/v1/estimates/{id}`
-  - Presigned URL 발급: `POST /api/v1/gcs/presigned`
+  - Presigned URL 발급: `POST /api/v1/presigned-url`
   - SSE 연결로 AI 분석 실시간 수신 (`NextBtn2.tsx`)
 - **Google Cloud Storage**: 이미지 직접 업로드 (Presigned URL 방식, `NextBtn1.tsx`)
 - **3D Visualization**: `@react-three/fiber` + `drei` + `three`
@@ -91,7 +91,7 @@ EXPO_PUBLIC_BACKEND_DOMAIN=https://api.isajjim.kro.kr
 ### Data Flow: Image Upload to Simulation
 
 1. **Upload (`NextBtn1.tsx`)**:
-   - Presigned URL 발급: `POST /api/v1/gcs/presigned`
+   - Presigned URL 발급: `POST /api/v1/presigned-url`
    - GCS에 이미지 직접 PUT 업로드
    - 견적 요청: `POST /api/v1/estimates` (이미지 URL 포함)
    - estimateId 받아서 UserSelect로 이동
