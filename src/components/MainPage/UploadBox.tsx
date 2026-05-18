@@ -44,7 +44,7 @@ export default function UploadBox({ onFilesSelected, selectedImages = [] }: Uplo
 
   const handleWebUpload = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      mediaTypes: 'images',
       allowsMultipleSelection: true,
       quality: 1,
     });
@@ -73,7 +73,7 @@ export default function UploadBox({ onFilesSelected, selectedImages = [] }: Uplo
             return;
           }
           const result = await ImagePicker.launchCameraAsync({
-            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            mediaTypes: 'images',
             quality: 1,
           });
           if (!result.canceled) {
@@ -91,7 +91,7 @@ export default function UploadBox({ onFilesSelected, selectedImages = [] }: Uplo
         text: '앨범에서 선택',
         onPress: async () => {
           const result = await ImagePicker.launchImageLibraryAsync({
-            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            mediaTypes: 'images',
             allowsMultipleSelection: true,
             quality: 1,
           });
