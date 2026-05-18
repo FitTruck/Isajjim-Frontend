@@ -17,6 +17,7 @@
     "plugins": [
       "expo-asset"
     ],
+    "scheme": "isajjim",
     "android": {
       "package": "com.isajjim"
     }

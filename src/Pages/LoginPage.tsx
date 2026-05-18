@@ -45,8 +45,8 @@ const openOAuth = (provider: Provider) => {
     const redirectUri = `${protocol}://${window.location.host}/auth/register`;
     window.location.href = `${BACKEND_DOMAIN}/oauth2/authorization/${provider}?redirect_uri=${redirectUri}`;
   } else {
-    const url = `${BACKEND_DOMAIN}/oauth2/authorization/${provider}`;
-    Linking.openURL(url);
+    const redirectUri = 'isajjim://auth/register';
+    Linking.openURL(`${BACKEND_DOMAIN}/oauth2/authorization/${provider}?redirect_uri=${encodeURIComponent(redirectUri)}`);
   }
 };
 
