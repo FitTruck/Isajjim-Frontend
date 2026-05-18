@@ -99,7 +99,7 @@ export default function App() {
         SimulationTest: 'simulation-test',
         // 인증 관련 경로
         Login: 'login',
-        AuthCallback: 'auth/register',
+        AuthCallback: 'oauth2/callback',
         AuthFailed: 'auth/failed',
       },
     },
