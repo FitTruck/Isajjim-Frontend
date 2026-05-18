@@ -40,14 +40,14 @@ const PROVIDERS: { id: Provider; label: string; color: string; textColor: string
 ];
 
 export default function LoginPage() {
-  const { isAuthenticated, isLoading, login } = useAuth();
+  const { isAuthenticated, isLoading } = useAuth();
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const lastProvider = getLastProvider();
   const hasHistory = !!lastProvider;
   const { width } = useWindowDimensions();
   const isMobile = width < 768;
 
-  const openOAuth = async (provider: Provider) => {
+  const openOAuth = (provider: Provider) => {
     setLastProvider(provider);
     if (Platform.OS === 'web') {
       const protocol = window.location.hostname === 'localhost' ? 'http' : 'https';
@@ -56,18 +56,7 @@ export default function LoginPage() {
     } else {
       const redirectUri = 'isajjim://oauth2/callback';
       const url = `${BACKEND_DOMAIN}/oauth2/authorization/${provider}?redirect_uri=${encodeURIComponent(redirectUri)}`;
-      const result = await WebBrowser.openAuthSessionAsync(url, redirectUri);
-      if (result.type === 'success') {
-        const params = new URLSearchParams(result.url.split('?')[1]);
-        const accessToken = params.get('accessToken');
-        const refreshToken = params.get('refreshToken');
-        if (accessToken && refreshToken) {
-          navigation.reset({ index: 0, routes: [{ name: 'Main' }] });
-          login(accessToken, refreshToken);
-        } else {
-          navigation.navigate('AuthFailed');
-        }
-      }
+      WebBrowser.openBrowserAsync(url);
     }
   };
 

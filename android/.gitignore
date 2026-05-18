@@ -14,9 +14,3 @@ local.properties
 
 # Bundle artifacts
 *.jsbundle
-
-# Signing files
-*.keystore
-*.jks
-*.p12
-

@@ -82,6 +82,7 @@ export default function App() {
     if (fontsLoaded && Platform.OS === 'web') injectPretendardCSS();
   }, [fontsLoaded]);
 
+
   if (!fontsLoaded) return <View style={{ flex: 1, backgroundColor: '#fff' }} />;
 
   // 얘가 있어야 뒤로가기가 됨.
