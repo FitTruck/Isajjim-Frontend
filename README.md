@@ -47,7 +47,6 @@ npx expo run:android
 | 항목 | 값 | 위치 |
 |------|-----|------|
 | Backend API | `https://api.isajjim.kro.kr` | `src/utils/Server.ts` |
-| Firebase Project | `knu-team-05` | `src/utils/Server.ts` |
 
 ---
 
