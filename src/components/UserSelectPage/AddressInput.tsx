@@ -65,7 +65,7 @@ export default function AddressInput({
   useEffect(() => {
     if (Platform.OS === 'web') {
       const script = document.createElement('script');
-      script.src = 'https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js';
+      script.src = 'https://t1.kakaocdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js';
       script.async = true;
       document.body.appendChild(script);
       return () => {};
@@ -77,7 +77,7 @@ export default function AddressInput({
       // @ts-ignore
       if (window.daum && window.daum.Postcode) {
         // @ts-ignore
-        new window.daum.Postcode({
+        new window.kakao.Postcode({
           oncomplete: function(data: any) {
             handleComplete(data);
           }
@@ -96,14 +96,14 @@ export default function AddressInput({
     <html>
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+        <script src="https://t1.kakaocdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
         <style>html,body{margin:0;padding:0;height:100%;} #wrap{border:1px solid;width:100%;height:100%;}</style>
       </head>
       <body>
         <div id="wrap"></div>
         <script>
           const element_wrap = document.getElementById('wrap');
-          new daum.Postcode({
+          new kakao.Postcode({
             oncomplete: function(data) {
               window.ReactNativeWebView.postMessage(JSON.stringify(data));
             },
@@ -166,9 +166,10 @@ export default function AddressInput({
             </View>
             <WebView
               originWhitelist={['*']}
-              source={{ html: kakaoAddressSource }}
+              source={{ html: kakaoAddressSource, baseUrl: 'https://isajjim.kro.kr' }}
               onMessage={(event: any) => handleAddressSelectNative(event)}
               style={{ flex: 1 }}
+              domStorageEnabled={true}
             />
           </SafeAreaView>
         </Modal>
