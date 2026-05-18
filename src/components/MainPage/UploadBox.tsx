@@ -206,7 +206,6 @@ export default function UploadBox({ onFilesSelected, selectedImages = [] }: Uplo
                 <Text style={styles.addMorePlus}>+</Text>
               </View>
             </View>
-            <Text style={styles.addMoreHint}>탭하여 추가 촬영</Text>
           </View>
         ) : (
           <UploadContent isDragging={false} isMobile={true} hasImages={false} />
@@ -385,11 +384,5 @@ const styles = StyleSheet.create({
     fontSize: 28,
     color: '#F0893B',
     lineHeight: 32,
-  },
-  addMoreHint: {
-    marginTop: 8,
-    fontSize: 12,
-    color: '#9CA3AF',
-    textAlign: 'center',
   },
 });
