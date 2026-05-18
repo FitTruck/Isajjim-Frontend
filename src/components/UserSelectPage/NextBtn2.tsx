@@ -1,9 +1,11 @@
 ﻿import React, { useState } from 'react';
 import { TouchableOpacity, Text, View, StyleSheet, Alert, useWindowDimensions } from 'react-native';
+import { Platform } from 'react-native';
 import { BACKEND_DOMAIN } from '../../utils/Server';
 import api from '../../api/axiosInstance';
 import { getAccessToken } from '../../auth/tokenStorage';
 import { fetchEventSource } from '@microsoft/fetch-event-source';
+import EventSource from 'react-native-sse';
 import LoadingModal from './LoadingModal';
 import { useEstimate } from '../../context/EstimateContext';
 import { translateLabel } from '../../utils/Translator';
@@ -128,53 +130,74 @@ export default function NextBtn2({ estimateId, images, onShowAlert, movingDate, 
 
       const token = getAccessToken();
       const SSE_URL = `${BACKEND_DOMAIN}/api/v1/estimates/${estimateId}/sse`;
-      const controller = new AbortController();
 
-      fetchEventSource(SSE_URL, {
-        method: 'GET',
-        headers: {
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        },
-        signal: controller.signal,
-        onmessage: async (event) => {
-          if (event.event !== 'sse') return;
+      const handleCompleted = async () => {
+        const furnitureInfoRes = await api.get(`/api/v1/estimates/${estimateId}`);
+        const furnitureInfo = furnitureInfoRes.data;
+        console.log("가구 정보: ", furnitureInfo);
+
+        const initialItems = furnitureInfo.data.images?.flatMap((img: any) =>
+          img.furnitureList?.map((f: any) => ({
+            name: translateLabel(f.label),
+            quantity: f.quantity
+          })) || []
+        ) || [];
+
+        setRequestData({
+          estimateId: estimateId,
+          movingDate: targetDate,
+          startLocation: startLocation,
+          endLocation: endLocation,
+          items: initialItems,
+          truckInfo: { type: '', quantity: 0 },
+          images: images,
+          analysisResult: furnitureInfo
+        });
+
+        navigation.navigate('Result');
+        setIsSubmitting(false);
+      };
+
+      if (Platform.OS === 'web') {
+        const controller = new AbortController();
+        fetchEventSource(SSE_URL, {
+          method: 'GET',
+          headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+          signal: controller.signal,
+          onmessage: async (event) => {
+            if (event.event !== 'sse') return;
+            console.log("받은 SSE 데이터:", event.data);
+            if (event.data === "COMPLETED") {
+              controller.abort();
+              await handleCompleted();
+            }
+          },
+          onerror: (error) => {
+            console.error("SSE Error:", error);
+            controller.abort();
+            Alert.alert("오류", "실시간 연결 중 문제가 발생했습니다.");
+            setIsSubmitting(false);
+            throw error;
+          },
+        });
+      } else {
+        const es = new EventSource(SSE_URL, {
+          headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+        });
+        es.addEventListener('sse', async (event: any) => {
           console.log("받은 SSE 데이터:", event.data);
           if (event.data === "COMPLETED") {
-            const furnitureInfoRes = await api.get(`/api/v1/estimates/${estimateId}`);
-            const furnitureInfo = furnitureInfoRes.data;
-            console.log("가구 정보: ", furnitureInfo);
-
-            const initialItems = furnitureInfo.data.images?.flatMap((img: any) =>
-              img.furnitureList?.map((f: any) => ({
-                name: translateLabel(f.label),
-                quantity: f.quantity
-              })) || []
-            ) || [];
-
-            setRequestData({
-              estimateId: estimateId,
-              movingDate: targetDate,
-              startLocation: startLocation,
-              endLocation: endLocation,
-              items: initialItems,
-              truckInfo: { type: '', quantity: 0 },
-              images: images,
-              analysisResult: furnitureInfo
-            });
-
-            navigation.navigate('Result');
-            controller.abort();
-            setIsSubmitting(false);
+            es.close();
+            await handleCompleted();
           }
-        },
-        onerror: (error) => {
+        });
+        es.addEventListener('error', (error: any) => {
           console.error("SSE Error:", error);
-          controller.abort();
+          es.close();
           Alert.alert("오류", "실시간 연결 중 문제가 발생했습니다.");
           setIsSubmitting(false);
-          throw error; // fetchEventSource 재시도 방지
-        },
-      });
+        });
+      }
     } catch (error) {
       console.error("Process Error:", error);
       Alert.alert("오류", "업로드 중 문제가 발생했습니다.");
