@@ -1,7 +1,8 @@
 import React, {useEffect} from 'react';
-import {Linking, Platform, StyleSheet, Text, TouchableOpacity, useWindowDimensions, View,} from 'react-native';
+import {Platform, StyleSheet, Text, TouchableOpacity, useWindowDimensions, View,} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import Svg, {Path} from 'react-native-svg';
+import * as WebBrowser from 'expo-web-browser';
 import {BACKEND_DOMAIN} from '../utils/Server';
 import {getLastProvider, setLastProvider} from '../auth/tokenStorage';
 import {useAuth} from '../context/AuthContext';
@@ -38,25 +39,37 @@ const PROVIDERS: { id: Provider; label: string; color: string; textColor: string
   { id: 'google', label: 'Google 로그인', color: '#fff',    textColor: '#1F1F1F', Icon: GoogleIcon },
 ];
 
-const openOAuth = (provider: Provider) => {
-  setLastProvider(provider);
-  if (Platform.OS === 'web') {
-    const protocol = window.location.hostname === 'localhost' ? 'http' : 'https';
-    const redirectUri = `${protocol}://${window.location.host}/auth/register`;
-    window.location.href = `${BACKEND_DOMAIN}/oauth2/authorization/${provider}?redirect_uri=${redirectUri}`;
-  } else {
-    const redirectUri = 'isajjim://oauth2/callback';
-    Linking.openURL(`${BACKEND_DOMAIN}/oauth2/authorization/${provider}?redirect_uri=${encodeURIComponent(redirectUri)}`);
-  }
-};
-
 export default function LoginPage() {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading, login } = useAuth();
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const lastProvider = getLastProvider();
   const hasHistory = !!lastProvider;
   const { width } = useWindowDimensions();
   const isMobile = width < 768;
+
+  const openOAuth = async (provider: Provider) => {
+    setLastProvider(provider);
+    if (Platform.OS === 'web') {
+      const protocol = window.location.hostname === 'localhost' ? 'http' : 'https';
+      const redirectUri = `${protocol}://${window.location.host}/auth/register`;
+      window.location.href = `${BACKEND_DOMAIN}/oauth2/authorization/${provider}?redirect_uri=${redirectUri}`;
+    } else {
+      const redirectUri = 'isajjim://oauth2/callback';
+      const url = `${BACKEND_DOMAIN}/oauth2/authorization/${provider}?redirect_uri=${encodeURIComponent(redirectUri)}`;
+      const result = await WebBrowser.openAuthSessionAsync(url, redirectUri);
+      if (result.type === 'success') {
+        const params = new URLSearchParams(result.url.split('?')[1]);
+        const accessToken = params.get('accessToken');
+        const refreshToken = params.get('refreshToken');
+        if (accessToken && refreshToken) {
+          login(accessToken, refreshToken);
+          navigation.reset({ index: 0, routes: [{ name: 'Main' }] });
+        } else {
+          navigation.navigate('AuthFailed');
+        }
+      }
+    }
+  };
 
   useEffect(() => {
     if (!isLoading && isAuthenticated) {
@@ -112,7 +125,7 @@ export default function LoginPage() {
                 { backgroundColor: color }, 
                 id === 'google' && styles.buttonBorder,
               ]}
-              onPress={() => openOAuth(id)}
+              onPress={() => { openOAuth(id); }}
               activeOpacity={0.85}
             >
               <View style={styles.iconContainer}>
