@@ -51,7 +51,7 @@ export default function LoginPage() {
     setLastProvider(provider);
     if (Platform.OS === 'web') {
       const protocol = window.location.hostname === 'localhost' ? 'http' : 'https';
-      const redirectUri = `${protocol}://${window.location.host}/auth/register`;
+      const redirectUri = `${protocol}://${window.location.host}/oauth2/callback`;
       window.location.href = `${BACKEND_DOMAIN}/oauth2/authorization/${provider}?redirect_uri=${redirectUri}`;
     } else {
       const redirectUri = 'isajjim://oauth2/callback';
