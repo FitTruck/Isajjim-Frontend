@@ -98,19 +98,22 @@ export default function DateSelector({ date, onSelect, isOpen: controlledOpen, o
         <Text style={[styles.dateText, !isSelected && styles.placeholderText]}>
           {formattedDate}
         </Text>
-        <Calendar size={20} color={isOpen ? "#F0893B" : "#666"} />      </TouchableOpacity>
+        <Calendar size={20} color={isOpen ? "#F0893B" : "#666"} />
+      </TouchableOpacity>
 
       {isOpen && (
         <View style={[styles.calendarContainer, isMobile && styles.mobileCalendarContainer]}>
             {/* Header */}
             <View style={styles.header}>
               <TouchableOpacity onPress={handlePrevMonth} style={styles.arrowButton}>
-                <ChevronLeft size={24} color="#333" />              </TouchableOpacity>
+                <ChevronLeft size={24} color="#333" />
+              </TouchableOpacity>
               <Text style={styles.headerTitle}>
                 {currentYear}년 {currentMonth + 1}월
               </Text>
               <TouchableOpacity onPress={handleNextMonth} style={styles.arrowButton}>
-                <ChevronRight size={24} color="#333" />              </TouchableOpacity>
+                <ChevronRight size={24} color="#333" />
+              </TouchableOpacity>
             </View>
 
             {/* Week Days */}
