@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, TouchableOpacity, Modal, StyleSheet, SafeAreaView, Platform, TextInput } from 'react-native';
+import { View, Text, TouchableOpacity, Modal, StyleSheet, Platform, TextInput } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Search, X } from 'lucide-react-native';
 
 let WebView: any;
