@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { StyleSheet, View, Text, Platform, Image, useWindowDimensions } from 'react-native';
+import { StyleSheet, View, Text, Platform, Image, useWindowDimensions, TouchableOpacity, Alert } from 'react-native';
 import { Upload } from 'lucide-react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { UploadedImage } from '../../types/common';
@@ -18,7 +18,7 @@ const UploadContent = ({ isDragging, isMobile, hasImages }: { isDragging: boolea
           <Upload size={isMobile ? 32 : 48} color="#F0893B" />
         </View>
         <Text style={[styles.uploadTitle, isMobile && styles.mobileUploadTitle]}>
-          {hasImages ? "이미지 추가 업로드" : "클릭 또는 드롭하여 이미지 업로드"}
+          {hasImages ? "이미지 추가 업로드" : Platform.OS !== 'web' ? "이미지 촬영 또는 업로드" : "클릭 또는 드롭하여 이미지 업로드"}
         </Text>
         <Text style={[styles.uploadSubTitle, isMobile && styles.mobileUploadSubTitle]}>JPG, PNG, HEIC 형식 지원</Text>
       </View>
@@ -60,6 +60,54 @@ export default function UploadBox({ onFilesSelected, selectedImages = [] }: Uplo
 
       onFilesSelected(newImages);
     }
+  };
+
+  const handleNativeUpload = () => {
+    Alert.alert('이미지 선택', '', [
+      {
+        text: '카메라로 촬영',
+        onPress: async () => {
+          const { status } = await ImagePicker.requestCameraPermissionsAsync();
+          if (status !== 'granted') {
+            Alert.alert('카메라 권한이 필요합니다.');
+            return;
+          }
+          const result = await ImagePicker.launchCameraAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            quality: 1,
+          });
+          if (!result.canceled) {
+            onFilesSelected(result.assets.map(asset => ({
+              fileName: asset.fileName ?? `photo_${Date.now()}.jpg`,
+              mimeType: asset.mimeType ?? 'image/jpeg',
+              localUri: asset.uri,
+              width: asset.width,
+              height: asset.height,
+            } as UploadedImage)));
+          }
+        },
+      },
+      {
+        text: '앨범에서 선택',
+        onPress: async () => {
+          const result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            allowsMultipleSelection: true,
+            quality: 1,
+          });
+          if (!result.canceled) {
+            onFilesSelected(result.assets.map(asset => ({
+              fileName: asset.fileName,
+              mimeType: asset.mimeType,
+              localUri: asset.uri,
+              width: asset.width,
+              height: asset.height,
+            } as UploadedImage)));
+          }
+        },
+      },
+      { text: '취소', style: 'cancel' },
+    ]);
   };
 
   // 드래그 앤 드롭(웹 브라우저의 고유 기능. 앱으로는 불가능. -> 웹 고유 기능을 가져와야 함)
@@ -140,6 +188,28 @@ export default function UploadBox({ onFilesSelected, selectedImages = [] }: Uplo
       };
     }
   }, [onFilesSelected]);
+
+  if (Platform.OS !== 'web') {
+    return (
+      <TouchableOpacity
+        style={[styles.uploadContainer, styles.mobileUploadContainer]}
+        onPress={handleNativeUpload}
+        activeOpacity={0.7}
+      >
+        {hasImages ? (
+          <View style={styles.uploadedImagesWrapper}>
+            <View style={[styles.imageGrid, styles.mobileImageGrid]}>
+              {selectedImages.map((img, idx) => (
+                <Image key={idx} source={{ uri: img.localUri }} style={[styles.uploadedImage, styles.mobileUploadedImage]} />
+              ))}
+            </View>
+          </View>
+        ) : (
+          <UploadContent isDragging={false} isMobile={true} hasImages={false} />
+        )}
+      </TouchableOpacity>
+    );
+  }
 
   return (
     <View
