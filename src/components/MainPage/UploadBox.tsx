@@ -202,7 +202,11 @@ export default function UploadBox({ onFilesSelected, selectedImages = [] }: Uplo
               {selectedImages.map((img, idx) => (
                 <Image key={idx} source={{ uri: img.localUri }} style={[styles.uploadedImage, styles.mobileUploadedImage]} />
               ))}
+              <View style={styles.addMoreBox}>
+                <Text style={styles.addMorePlus}>+</Text>
+              </View>
             </View>
+            <Text style={styles.addMoreHint}>탭하여 추가 촬영</Text>
           </View>
         ) : (
           <UploadContent isDragging={false} isMobile={true} hasImages={false} />
@@ -366,5 +370,26 @@ const styles = StyleSheet.create({
   mobileUploadedImage: {
     width: 70,
     height: 70,
+  },
+  addMoreBox: {
+    width: 70,
+    height: 70,
+    borderRadius: 8,
+    borderWidth: 2,
+    borderStyle: 'dashed',
+    borderColor: '#F0893B',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  addMorePlus: {
+    fontSize: 28,
+    color: '#F0893B',
+    lineHeight: 32,
+  },
+  addMoreHint: {
+    marginTop: 8,
+    fontSize: 12,
+    color: '#9CA3AF',
+    textAlign: 'center',
   },
 });
