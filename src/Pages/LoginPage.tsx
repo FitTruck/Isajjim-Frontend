@@ -62,8 +62,8 @@ export default function LoginPage() {
         const accessToken = params.get('accessToken');
         const refreshToken = params.get('refreshToken');
         if (accessToken && refreshToken) {
-          login(accessToken, refreshToken);
           navigation.reset({ index: 0, routes: [{ name: 'Main' }] });
+          login(accessToken, refreshToken);
         } else {
           navigation.navigate('AuthFailed');
         }
@@ -72,36 +72,23 @@ export default function LoginPage() {
   };
 
   useEffect(() => {
-    if (!isLoading && isAuthenticated) {
-      if (Platform.OS === 'web') {
-        const referrer = document.referrer;
-        const currentHost = window.location.host;
-
-        // 내부 사이트에서 온 경우 (referrer가 존재하고 현재 호스트를 포함할 때)
-        if (referrer && referrer.includes(currentHost)) {
-          // login 페이지 자체가 referrer인 경우(새로고침 등)를 대비해 체크
-          if (new URL(referrer).pathname !== '/login') {
-            window.history.back();
-          } else {
-            navigation.navigate('Main');
-          }
+    if (!isLoading && isAuthenticated && Platform.OS === 'web') {
+      const referrer = document.referrer;
+      const currentHost = window.location.host;
+      if (referrer && referrer.includes(currentHost)) {
+        if (new URL(referrer).pathname !== '/login') {
+          window.history.back();
         } else {
-          // 외부 사이트에서 왔거나 직접 접근한 경우
           navigation.navigate('Main');
         }
       } else {
-        // 모바일 환경
-        if (navigation.canGoBack()) {
-          navigation.goBack();
-        } else {
-          navigation.navigate('Main');
-        }
+        navigation.navigate('Main');
       }
     }
   }, [isAuthenticated, isLoading, navigation]);
 
-  if (isLoading || isAuthenticated) {
-    return null;
+  if (isLoading) {
+    return <SafeAreaView style={styles.container} />;
   }
 
   return (

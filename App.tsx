@@ -4,7 +4,7 @@ import { EstimateProvider } from './src/context/EstimateContext';
 import { AuthProvider } from './src/context/AuthContext';
 import { navigationRef } from './src/auth/navigationRef';
 import { useFonts } from 'expo-font';
-import { Text, Platform } from 'react-native';
+import { Text, Platform, View } from 'react-native';
 import { useEffect } from 'react';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
@@ -82,7 +82,7 @@ export default function App() {
     if (fontsLoaded && Platform.OS === 'web') injectPretendardCSS();
   }, [fontsLoaded]);
 
-  if (!fontsLoaded) return null;
+  if (!fontsLoaded) return <View style={{ flex: 1, backgroundColor: '#fff' }} />;
 
   // 얘가 있어야 뒤로가기가 됨.
   const linking = {
