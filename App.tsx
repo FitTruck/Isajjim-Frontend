@@ -20,6 +20,9 @@ import LoginPage from './src/Pages/LoginPage';
 import AuthCallbackPage from './src/Pages/AuthCallbackPage';
 import AuthFailedPage from './src/Pages/AuthFailedPage';
 import SplashPage from './src/Pages/SplashPage';
+import SettingsPage from './src/Pages/SettingsPage';
+import PersonalInfoPage from './src/Pages/PersonalInfoPage';
+import NotificationSettingsPage from './src/Pages/NotificationSettingsPage';
 
 // 각 화면의 매개변수 타입들을 정의하고 있는 타입 import
 import { RootStackParamList } from './src/types/navigation';
@@ -132,6 +135,9 @@ export default function App() {
             <Stack.Screen name="MyEstimate" component={MyEstimate} />
             <Stack.Screen name="MyChat" component={MyChat} />
             <Stack.Screen name="SimulationTest" component={SimulationTest} />
+            <Stack.Screen name="Settings" component={SettingsPage} />
+            <Stack.Screen name="PersonalInfo" component={PersonalInfoPage} />
+            <Stack.Screen name="NotificationSettings" component={NotificationSettingsPage} />
             {/* 인증 화면 */}
             <Stack.Screen name="Login" component={LoginPage} />
             <Stack.Screen name="AuthCallback" component={AuthCallbackPage} />

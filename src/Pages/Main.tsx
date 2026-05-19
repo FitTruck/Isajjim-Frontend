@@ -67,6 +67,7 @@ export default function Main({ navigation }: Props) {
   const handleTabPress = (tab: TabKey) => {
     if (tab === 'estimate') navigation.navigate('MyEstimate');
     else if (tab === 'chat') navigation.navigate('MyChat');
+    else if (tab === 'settings') navigation.navigate('Settings');
   };
 
   if (isMobile) {
