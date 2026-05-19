@@ -62,11 +62,17 @@ export default function SettingsPage() {
     else if (tab === 'chat') navigation.navigate('MyChat');
   };
 
+  const handleLogout = () => {
+    logout();
+    navigation.reset({ index: 0, routes: [{ name: 'Login' }] });
+  };
+
   const ITEMS = [
     { label: '개인정보 수정', onPress: () => navigation.navigate('PersonalInfo') },
     { label: '알림 설정', onPress: () => navigation.navigate('NotificationSettings') },
     { label: '이용약관', onPress: () => openUrl(TERMS_URL) },
     { label: '개인정보 처리방침', onPress: () => openUrl(PRIVACY_URL) },
+    { label: '로그아웃', onPress: handleLogout },
     { label: '회원탈퇴', onPress: () => setShowWithdrawConfirm(true) },
   ];
 
@@ -93,7 +99,7 @@ export default function SettingsPage() {
           {ITEMS.map((item, index) => (
             <React.Fragment key={item.label}>
               <TouchableOpacity style={styles.listItem} onPress={item.onPress} activeOpacity={0.7}>
-                <Text style={[styles.listLabel, item.label === '회원탈퇴' && styles.withdrawLabel]}>
+                <Text style={[styles.listLabel, item.label === '로그아웃' && styles.logoutLabel, item.label === '회원탈퇴' && styles.withdrawLabel]}>
                   {item.label}
                 </Text>
                 <ChevronRight size={12} color="#8F9098" />
@@ -221,6 +227,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 0,
   },
   listLabel: { fontSize: 14, fontWeight: '500', color: '#1F2024' },
+  logoutLabel: { color: '#71727A' },
   withdrawLabel: { color: '#FF4444' },
   divider: { height: StyleSheet.hairlineWidth, backgroundColor: '#E5E5EA' },
   overlay: {
