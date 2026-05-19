@@ -34,8 +34,8 @@ const GoogleIcon = () => (
 );
 
 const PROVIDERS: { id: Provider; label: string; color: string; textColor: string; Icon: React.FC }[] = [
-  { id: 'naver',  label: '네이버로 3초만에 시작하기', color: '#03A94D', textColor: '#FFFFFF', Icon: NaverIcon },
-  { id: 'kakao',  label: '카카오 로그인',     color: '#FEE500', textColor: '#000000', Icon: KakaoIcon },
+  { id: 'kakao',  label: '카카오 로그인',  color: '#FEE500', textColor: '#000000', Icon: KakaoIcon },
+  { id: 'naver',  label: '네이버 로그인',  color: '#03A94D', textColor: '#FFFFFF', Icon: NaverIcon },
   { id: 'google', label: 'Google 로그인', color: '#fff',    textColor: '#1F1F1F', Icon: GoogleIcon },
 ];
 
@@ -43,7 +43,6 @@ export default function LoginPage() {
   const { isAuthenticated, isLoading } = useAuth();
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const lastProvider = getLastProvider();
-  const hasHistory = !!lastProvider;
   const { width } = useWindowDimensions();
   const isMobile = width < 768;
 
@@ -90,9 +89,7 @@ export default function LoginPage() {
       <View style={styles.buttons}>
         {PROVIDERS.map(({ id, label, color, textColor, Icon }) => {
           const isRecent = lastProvider === id;
-          // 이전 로그인 기록(hasHistory)이 있으면 네이버 문구를 '네이버 로그인'으로 변경
-          const displayLabel = (id === 'naver' && hasHistory) ? '네이버 로그인' : label;
-          
+
           return (
             <TouchableOpacity
               key={id}
@@ -107,7 +104,7 @@ export default function LoginPage() {
               <View style={styles.iconContainer}>
                 <Icon />
               </View>
-              <Text style={[styles.buttonText, { color: textColor }]}>{displayLabel}</Text>
+              <Text style={[styles.buttonText, { color: textColor }]}>{label}</Text>
               {isRecent && (
                 <View style={styles.recentBadge}>
                   <Text style={styles.recentBadgeText}>최근 로그인</Text>
