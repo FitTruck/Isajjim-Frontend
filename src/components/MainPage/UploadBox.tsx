@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { StyleSheet, View, Text, Platform, Image, useWindowDimensions, TouchableOpacity, Alert } from 'react-native';
-import { Upload } from 'lucide-react-native';
+import { Upload, ImageIcon, Plus } from 'lucide-react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { UploadedImage } from '../../types/common';
 
@@ -192,23 +192,31 @@ export default function UploadBox({ onFilesSelected, selectedImages = [] }: Uplo
   if (Platform.OS !== 'web') {
     return (
       <TouchableOpacity
-        style={[styles.uploadContainer, styles.mobileUploadContainer]}
+        style={styles.mobileBox}
         onPress={handleNativeUpload}
-        activeOpacity={0.7}
+        activeOpacity={0.85}
       >
         {hasImages ? (
           <View style={styles.uploadedImagesWrapper}>
             <View style={[styles.imageGrid, styles.mobileImageGrid]}>
               {selectedImages.map((img, idx) => (
-                <Image key={idx} source={{ uri: img.localUri }} style={[styles.uploadedImage, styles.mobileUploadedImage]} />
+                <Image key={idx} source={{ uri: img.localUri }} style={styles.mobileUploadedImage} />
               ))}
               <View style={styles.addMoreBox}>
-                <Text style={styles.addMorePlus}>+</Text>
+                <Plus size={20} color="#006FFD" />
               </View>
             </View>
           </View>
         ) : (
-          <UploadContent isDragging={false} isMobile={true} hasImages={false} />
+          <View style={styles.mobileEmptyContent}>
+            <View style={styles.mobileIconBox}>
+              <ImageIcon size={32} color="#006FFD" />
+            </View>
+            <TouchableOpacity style={styles.mobileAddButton} onPress={handleNativeUpload} activeOpacity={0.7}>
+              <Plus size={12} color="#006FFD" />
+              <Text style={styles.mobileAddButtonText}>사진 추가하기</Text>
+            </TouchableOpacity>
+          </View>
         )}
       </TouchableOpacity>
     );
@@ -374,15 +382,46 @@ const styles = StyleSheet.create({
     width: 70,
     height: 70,
     borderRadius: 8,
-    borderWidth: 2,
+    borderWidth: 1,
     borderStyle: 'dashed',
-    borderColor: '#F0893B',
+    borderColor: '#006FFD',
     justifyContent: 'center',
     alignItems: 'center',
   },
-  addMorePlus: {
-    fontSize: 28,
-    color: '#F0893B',
-    lineHeight: 32,
+  // ── Native mobile (Figma design) ─────────────────────
+  mobileBox: {
+    flex: 1,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: '#D4D6DD',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 16,
+    gap: 24,
+  },
+  mobileEmptyContent: {
+    alignItems: 'center',
+    gap: 24,
+  },
+  mobileIconBox: {
+    width: 80,
+    height: 69,
+    backgroundColor: '#EAF2FF',
+    borderRadius: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  mobileAddButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderRadius: 8,
+  },
+  mobileAddButtonText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#006FFD',
   },
 });

@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
-import { View, Text, ScrollView, StyleSheet, useWindowDimensions } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, useWindowDimensions, Pressable } from 'react-native';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { ChevronLeft } from 'lucide-react-native';
+import { useNavigation } from '@react-navigation/native';
 
 import { commonStyles } from '../styles/commonStyles';
 import { UploadedImage } from '../types/common';
@@ -15,64 +18,75 @@ import { RootStackParamList } from '../types/navigation';
 type Props = NativeStackScreenProps<RootStackParamList, 'Upload'>;
 
 export default function Main() {
-
   const [imageList, setImageList] = useState<UploadedImage[]>([]);
   const [isAlertVisible, setIsAlertVisible] = useState(false);
   const { width } = useWindowDimensions();
-  const isMobile = width < 768; // Mobile breakpoint
+  const isMobile = width < 768;
+  const navigation = useNavigation();
+  const insets = useSafeAreaInsets();
 
-  // UploadBox에서 이미지 정보 가져오면 imageList업데이트 하라는거임.
-  const onFilesSelected = (newImages : UploadedImage[]) => {
-    setImageList((prev) => [...prev, ...newImages]); // 이전꺼에다가 받아온 이미지의 딕셔너리 배열을 더함.
+  const onFilesSelected = (newImages: UploadedImage[]) => {
+    setImageList((prev) => [...prev, ...newImages]);
+  };
+
+  if (isMobile) {
+    return (
+      <View style={[styles.mobileContainer, { paddingTop: insets.top }]}>
+        {/* 헤더: 뒤로가기 + 진행 바 */}
+        <View style={styles.mobileHeader}>
+          <Pressable onPress={() => navigation.goBack()} style={styles.backButton} hitSlop={8}>
+            <ChevronLeft size={20} color="#1F2024" />
+          </Pressable>
+          <View style={styles.progressTrack}>
+            <View style={styles.progressFill} />
+          </View>
+        </View>
+
+        {/* 제목 */}
+        <View style={styles.titleSection}>
+          <Text style={styles.pageTitle}>집 사진을 촬영 또는 업로드</Text>
+          <Text style={styles.pageSubtitle}>
+            각 방마다 가구와 짐들이 잘 보이도록 촬영해주세요.{'\n'}
+            서랍 속 잔짐이 보이도록 찍어주면 더 좋아요.
+          </Text>
+        </View>
+
+        {/* 업로드 영역 */}
+        <View style={styles.uploadSection}>
+          <UploadBox onFilesSelected={onFilesSelected} selectedImages={imageList} />
+        </View>
+
+        {/* 하단 버튼 */}
+        <View style={[styles.bottomBar, { paddingBottom: Math.max(insets.bottom, 24) }]}>
+          <NextBtn1 imageList={imageList} onShowAlert={() => setIsAlertVisible(true)} />
+        </View>
+
+        {isAlertVisible && (
+          <AlertBox
+            value="이미지를 최소 1장 이상 업로드해주세요."
+            onClose={() => setIsAlertVisible(false)}
+          />
+        )}
+      </View>
+    );
   }
 
   return (
     <View style={commonStyles.container}>
-      {/* Header */}
       <Header />
-
-      {/* 알림 박스 */}
       {isAlertVisible && (
-        <AlertBox 
-          value="이미지를 최소 1장 이상 업로드해주세요." 
+        <AlertBox
+          value="이미지를 최소 1장 이상 업로드해주세요."
           onClose={() => setIsAlertVisible(false)}
         />
       )}
-
-      <ScrollView 
-        contentContainerStyle={
-          commonStyles.scrollContent
-        }
-      >
-
-        {/* Main Wrapper */}
+      <ScrollView contentContainerStyle={commonStyles.scrollContent}>
         <View style={commonStyles.mainWrapper}>
-
-          {/* 메인 섹션 */}
-          <View style={[
-              commonStyles.mainSection, 
-              isMobile && styles.mobileMainSection
-            ]}>
-            <Text style={[
-              commonStyles.mainTitle,
-              isMobile && styles.mobileMainTitle
-            ]}>사진을 찍어서 이사 견적내기</Text>
-            <Text style={[
-              commonStyles.mainSubtitle,
-              isMobile && styles.mobileMainSubtitle
-            ]}>간단한 견적내기 시작</Text>
-
-            <UploadBox
-            // onFileSelected라는 함수는 newImages라는 매개변수가 있다는 점~
-              onFilesSelected={onFilesSelected}
-              selectedImages={imageList}
-            />
-            
-            {/* 다음 단계 버튼 */}
-            <NextBtn1
-              imageList={imageList}
-              onShowAlert={() => setIsAlertVisible(true)}
-            />
+          <View style={commonStyles.mainSection}>
+            <Text style={commonStyles.mainTitle}>사진을 찍어서 이사 견적내기</Text>
+            <Text style={commonStyles.mainSubtitle}>간단한 견적내기 시작</Text>
+            <UploadBox onFilesSelected={onFilesSelected} selectedImages={imageList} />
+            <NextBtn1 imageList={imageList} onShowAlert={() => setIsAlertVisible(true)} />
           </View>
         </View>
       </ScrollView>
@@ -81,6 +95,66 @@ export default function Main() {
 }
 
 const styles = StyleSheet.create({
+  // ── Mobile layout ────────────────────────────────────
+  mobileContainer: {
+    flex: 1,
+    backgroundColor: '#fff',
+  },
+  mobileHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 24,
+    paddingVertical: 14,
+    gap: 10,
+  },
+  backButton: {
+    width: 20,
+    height: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  progressTrack: {
+    flex: 1,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: '#E8E9F1',
+    overflow: 'hidden',
+  },
+  progressFill: {
+    width: '25%',
+    height: '100%',
+    backgroundColor: '#006FFD',
+    borderRadius: 8,
+  },
+  titleSection: {
+    paddingHorizontal: 24,
+    paddingTop: 32,
+    paddingBottom: 24,
+    gap: 10,
+  },
+  pageTitle: {
+    fontSize: 24,
+    fontWeight: '800',
+    color: '#1F2024',
+    letterSpacing: 0.2,
+  },
+  pageSubtitle: {
+    fontSize: 12,
+    fontWeight: '500',
+    color: '#71727A',
+    lineHeight: 16,
+    letterSpacing: 0.1,
+  },
+  uploadSection: {
+    flex: 1,
+    paddingHorizontal: 16,
+  },
+  bottomBar: {
+    paddingHorizontal: 24,
+    paddingTop: 24,
+    backgroundColor: '#fff',
+  },
+
   imageGrid: {
     marginTop: 30,
     flexDirection: 'row',

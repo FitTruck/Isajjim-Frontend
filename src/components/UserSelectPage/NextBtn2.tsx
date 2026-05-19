@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+﻿import React, { useState, forwardRef, useImperativeHandle } from 'react';
 import { TouchableOpacity, Text, View, StyleSheet, Alert, useWindowDimensions } from 'react-native';
 import { Platform } from 'react-native';
 import { BACKEND_DOMAIN } from '../../utils/Server';
@@ -47,13 +47,18 @@ interface Props {
   };
 }
 
-// 나중에 onShowAlert 쓸거임
-export default function NextBtn2({ estimateId, images, onShowAlert, movingDate, data1, data2 }: Props) {
+export interface NextBtn2Handle {
+  submit: () => void;
+}
+
+const NextBtn2 = forwardRef<NextBtn2Handle, Props>(function NextBtn2({ estimateId, images, onShowAlert, movingDate, data1, data2 }, ref) {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { setRequestData } = useEstimate();
   const { width } = useWindowDimensions();
   const isMobile = width < 768;
+
+  useImperativeHandle(ref, () => ({ submit: handlePressNext }));
 
   const mapToBackendValue = (data: any) => {
     return {
@@ -209,19 +214,17 @@ export default function NextBtn2({ estimateId, images, onShowAlert, movingDate, 
     <View style={[styles.nextBtnContainer, isMobile && styles.mobileNextBtnContainer]}>
       <LoadingModal visible={isSubmitting} />
       <TouchableOpacity
-        style={[
-          styles.nextBtn,
-          isMobile && styles.mobileNextBtn,
-          isSubmitting && styles.nextBtnDisabled
-        ]}
+        style={[styles.nextBtn, isSubmitting && styles.nextBtnDisabled]}
         onPress={handlePressNext}
         disabled={isSubmitting}
       >
-          <Text style={[styles.nextBtnText, isMobile && styles.mobileNextBtnText]}>다음 단계</Text>
+        <Text style={styles.nextBtnText}>다음 단계</Text>
       </TouchableOpacity>
     </View>
   );
-}
+});
+
+export default NextBtn2;
 
 const styles = StyleSheet.create({
   nextBtnContainer: {

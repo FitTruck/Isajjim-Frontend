@@ -132,11 +132,13 @@ export default function NextBtn1({ imageList, onShowAlert }: NextBtnProps) {
   };
 
   return (
-    <TouchableOpacity 
-      style={[styles.nextBtn, isMobile && styles.mobileNextBtn, isLoading && styles.nextBtnDisabled]} 
+    <TouchableOpacity
+      style={[styles.nextBtn, isMobile && styles.mobileNextBtn, isLoading && styles.nextBtnDisabled]}
       onPress={handleNextStep}
     >
-      <Text style={[styles.nextBtnText, isMobile && styles.mobileNextBtnText]}>다음 단계</Text>
+      <Text style={[styles.nextBtnText, isMobile && styles.mobileNextBtnText]}>
+        {isMobile ? '다음으로' : '다음 단계'}
+      </Text>
     </TouchableOpacity>
   );
 }
@@ -152,11 +154,12 @@ const styles = StyleSheet.create({
     marginTop: 0,
   },
   mobileNextBtn: {
-    backgroundColor: '#F0893B',
+    backgroundColor: '#006FFD',
+    height: 48,
+    borderRadius: 12,
+    width: '100%',
     paddingHorizontal: 16,
-    paddingVertical: 10,
-    borderRadius: 8,
-    alignItems: 'center',
+    paddingVertical: 0,
     marginTop: 0,
   },
   nextBtnText: {
@@ -165,7 +168,8 @@ const styles = StyleSheet.create({
     fontWeight: '400',
   },
   mobileNextBtnText: {
-    fontSize: 15,
+    fontSize: 14,
+    fontWeight: '600',
   },
   nextBtnDisabled: {
     backgroundColor: '#666',
