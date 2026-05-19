@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "395829892592",
+    "firebase_url": "https://isajjim-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "isajjim",
+    "storage_bucket": "isajjim.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:395829892592:android:1ad8ce92988ea2da8d7935",
+        "android_client_info": {
+          "package_name": "com.isajjim"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "395829892592-o7qp8toq10ugdal312h09rinugg9lm7u.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyChJ2VXN6cUZOSef8fvin8hfzF7TA40hG8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "395829892592-o7qp8toq10ugdal312h09rinugg9lm7u.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
