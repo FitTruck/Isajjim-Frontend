@@ -1,12 +1,13 @@
 import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
-import { View, ScrollView, StyleSheet, Alert, useWindowDimensions, Image } from 'react-native';
+import { View, ScrollView, StyleSheet, Alert, useWindowDimensions, Image, TouchableOpacity, FlatList, Text, Modal } from 'react-native';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { commonStyles } from '../styles/commonStyles';
 import api from '../api/axiosInstance';
 import { translateLabel } from '../utils/Translator';
 import LeftCard from '../components/ResultPage/LeftCard';
 import NextBtn3 from '../components/ResultPage/NextBtn3';
-import Space3D from '../components/Space/Space3D';
-import { ChevronLeft, ChevronRight, X, Maximize } from 'lucide-react-native';
+import Space3D, { Space3DHandle } from '../components/Space/Space3D';
+import { ChevronLeft, ChevronRight, X, Maximize, Minus, Plus } from 'lucide-react-native';
 import { SimulationFurniture, SimulationTruckResult } from '../types/simulation';
 import MyTouch from "../components/common/MyTouch";
 import { useEstimate } from '../context/EstimateContext';
@@ -23,6 +24,9 @@ export default function Result({ navigation }: Props) {
   const { width } = useWindowDimensions();
   const isMobile = width < 768;
   const isFocused = useIsFocused();
+  const insets = useSafeAreaInsets();
+  const [mobileMode, setMobileMode] = useState<'review' | 'edit'>('review');
+  const [editImageIndex, setEditImageIndex] = useState(0);
 
   // Context에서 데이터 추출
   const data = requestData?.images || [];
@@ -44,6 +48,10 @@ export default function Result({ navigation }: Props) {
   const [updateStatus, setUpdateStatus] = useState<'prev' | 'updating' | 'done'>('prev');
   const [isSpaceModalVisible, setIsSpaceModalVisible] = useState(false);
   const [isSimulationPlaying, setIsSimulationPlaying] = useState(false);
+  const [isMobileSimDone, setIsMobileSimDone] = useState(false);
+  const [isMobileFullscreen, setIsMobileFullscreen] = useState(false);
+  const mobileSpace3DRef = useRef<Space3DHandle>(null);
+  const fullscreenSpace3DRef = useRef<Space3DHandle>(null);
   // 시뮬레이션에서 계산된 트럭 정보
   const [simulationTrucks, setSimulationTrucks] = useState<SimulationTruckResult[]>([]);
   // 박스 수량 상태 (가구 목록과 분리)
@@ -116,6 +124,9 @@ export default function Result({ navigation }: Props) {
     }
   }, [analysisResult, data, estimateId]); // 값이 바뀔 때마다 useEffect 실행 (requestData 전체 의존성 제거)
 
+  // simulationFurniture 변경 감지
+  const prevSimFurnitureRef = useRef<string>('');
+
   // 시뮬레이션용 가구 목록 (모든 이미지의 가구 합침)
   const simulationFurniture = useMemo((): SimulationFurniture[] => {
     if (!results || results.length === 0) {
@@ -156,8 +167,35 @@ export default function Result({ navigation }: Props) {
       }];
     }
 
+    const key = JSON.stringify(furniture.map(f => ({ id: f.furnitureId, qty: f.quantity })));
+    if (key !== prevSimFurnitureRef.current) {
+      console.log(`[Result] simulationFurniture 변경 | ${furniture.length}개`, key);
+      prevSimFurnitureRef.current = key;
+    }
     return furniture;
   }, [results, boxQuantity]);
+
+  const TRUCK_LABELS: Record<string, string> = {
+    '1ton': '1톤 트럭', '2.5ton': '2.5톤 트럭', '5ton': '5톤 트럭',
+  };
+
+  const allItems = useMemo(() =>
+    results.flatMap(r => r.contents.map((item: any) => ({
+      ...item,
+      label: translateLabel(item.label),
+    }))),
+  [results]);
+
+  // 타입별로 합산한 가구 목록 (review 모드용)
+  const groupedItems = useMemo(() => {
+    const map = new Map<string, number>();
+    allItems.forEach(item => {
+      if (item.quantity > 0) {
+        map.set(item.label, (map.get(item.label) ?? 0) + item.quantity);
+      }
+    });
+    return Array.from(map.entries()).map(([label, quantity]) => ({ label, quantity }));
+  }, [allItems]);
 
   const handleUpdateQuantity = async (furnitureId: number, newQuantity: number) => {
     if (!estimateId) return;
@@ -242,6 +280,7 @@ export default function Result({ navigation }: Props) {
 
   const handleSimulationComplete = () => {
     setIsSimulationPlaying(false);
+    setIsMobileSimDone(true);
   };
 
   // 슬라이더 로직
@@ -333,6 +372,227 @@ export default function Result({ navigation }: Props) {
       };
     });
   }, [setRequestData]);
+
+  // ── 모바일 뷰 ─────────────────────────────────────────
+  if (isMobile) {
+    const firstImage = results[0]?.image;
+
+    if (mobileMode === 'review') {
+      return (
+        <View style={mStyles.container}>
+          <SafeAreaView edges={['top']} />
+
+          {/* 타이틀 - 시뮬레이션 위 */}
+          <View style={mStyles.titleSection}>
+            <Text style={mStyles.title}>분석 결과</Text>
+            <Text style={mStyles.subtitle}>인식된 가구 목록을 확인해주세요.</Text>
+          </View>
+
+          {/* 3D 시뮬레이션 - ScrollView 밖, 터치 이벤트 차단 */}
+          {isFocused && (
+            <View style={{ position: 'relative' }}>
+              <View style={mStyles.simulation} pointerEvents="none">
+                <Space3D
+                  ref={mobileSpace3DRef}
+                  furniture={simulationFurniture}
+                  autoPlay={true}
+                  onAnimationComplete={handleSimulationComplete}
+                  onTrucksChange={handleTrucksChange}
+                />
+              </View>
+              {/* 전체화면 버튼 */}
+              <TouchableOpacity
+                style={mStyles.fullscreenBtn}
+                onPress={() => setIsMobileFullscreen(true)}
+              >
+                <Maximize size={16} color="#555" />
+              </TouchableOpacity>
+              {/* 다시 보기 버튼 */}
+              {isMobileSimDone && (
+                <TouchableOpacity
+                  style={mStyles.replayButton}
+                  onPress={() => {
+                    setIsMobileSimDone(false);
+                    mobileSpace3DRef.current?.play();
+                  }}
+                >
+                  <Text style={mStyles.replayButtonText}>다시 보기</Text>
+                </TouchableOpacity>
+              )}
+            </View>
+          )}
+
+          <ScrollView contentContainerStyle={mStyles.scrollContent}>
+            <View style={mStyles.section}>
+              <Text style={mStyles.sectionLabel}>예상 필요 차량</Text>
+              <View style={mStyles.dashedBox}>
+                {simulationTrucks.filter(t => t.type && t.quantity > 0).length > 0 ? (
+                  simulationTrucks
+                    .filter(t => t.type && t.quantity > 0)
+                    .map((t, i) => (
+                      <View key={i} style={mStyles.row}>
+                        <Text style={mStyles.rowLabel}>{TRUCK_LABELS[t.type] || t.type}</Text>
+                        <Text style={mStyles.rowValue}>{t.quantity}대</Text>
+                      </View>
+                    ))
+                ) : (
+                  <Text style={mStyles.emptyText}>시뮬레이션 계산 중...</Text>
+                )}
+              </View>
+
+              <Text style={[mStyles.sectionLabel, { marginTop: 16 }]}>가구 목록</Text>
+              <View style={mStyles.dashedBox}>
+                {groupedItems.map((item, i) => (
+                  <View key={i} style={mStyles.row}>
+                    <Text style={mStyles.rowLabel}>{item.label}</Text>
+                    <Text style={mStyles.rowValue}>{item.quantity}개</Text>
+                  </View>
+                ))}
+              </View>
+            </View>
+          </ScrollView>
+
+          <View style={[mStyles.bottomBar, { paddingBottom: Math.max(insets.bottom, 16) }]}>
+            <TouchableOpacity
+              style={mStyles.outlineBtn}
+              onPress={() => setMobileMode('edit')}
+              activeOpacity={0.8}
+            >
+              <Text style={mStyles.outlineBtnText}>수정</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={mStyles.fillBtn}
+              onPress={handleNextStep}
+              activeOpacity={0.85}
+            >
+              <Text style={mStyles.fillBtnText}>확인</Text>
+            </TouchableOpacity>
+          </View>
+
+          {/* 전체화면 모달 */}
+          <Modal
+            visible={isMobileFullscreen}
+            animationType="fade"
+            statusBarTranslucent
+            onRequestClose={() => setIsMobileFullscreen(false)}
+          >
+            <View style={mStyles.fullscreenContainer}>
+              <View style={{ flex: 1 }} pointerEvents="none">
+                <Space3D
+                  ref={fullscreenSpace3DRef}
+                  furniture={simulationFurniture}
+                  autoPlay={true}
+                  onAnimationComplete={() => setIsMobileSimDone(true)}
+                  onTrucksChange={handleTrucksChange}
+                />
+              </View>
+              {/* 닫기 버튼 */}
+              <TouchableOpacity
+                style={mStyles.fullscreenClose}
+                onPress={() => setIsMobileFullscreen(false)}
+              >
+                <X size={22} color="#fff" />
+              </TouchableOpacity>
+              {/* 전체화면 다시 보기 버튼 */}
+              {isMobileSimDone && (
+                <TouchableOpacity
+                  style={mStyles.replayButton}
+                  onPress={() => {
+                    setIsMobileSimDone(false);
+                    fullscreenSpace3DRef.current?.play();
+                  }}
+                >
+                  <Text style={mStyles.replayButtonText}>다시 보기</Text>
+                </TouchableOpacity>
+              )}
+            </View>
+          </Modal>
+        </View>
+      );
+    }
+
+    // edit mode
+    return (
+      <View style={mStyles.container}>
+        <SafeAreaView edges={['top']} />
+        <View style={mStyles.titleSection}>
+          <Text style={mStyles.title}>견적 수정</Text>
+          <Text style={mStyles.subtitle}>가구 수를 조정해주세요.</Text>
+        </View>
+
+        {/* 이미지 캐러셀 */}
+        {results.length > 0 && (
+          <View>
+            <ScrollView
+              horizontal pagingEnabled showsHorizontalScrollIndicator={false}
+              onScroll={e => {
+                const idx = Math.round(e.nativeEvent.contentOffset.x / width);
+                setEditImageIndex(idx);
+              }}
+              scrollEventThrottle={16}
+            >
+              {results.map((r, i) => r.image && (
+                <Image
+                  key={i}
+                  source={typeof r.image.localUri === 'string' ? { uri: r.image.localUri } : r.image.localUri}
+                  style={[mStyles.carouselImage, { width }]}
+                  resizeMode="cover"
+                />
+              ))}
+            </ScrollView>
+            {results.length > 1 && (
+              <View style={mStyles.dotsRow}>
+                {results.map((_, i) => (
+                  <View key={i} style={[mStyles.dot, i === editImageIndex && mStyles.dotActive]} />
+                ))}
+              </View>
+            )}
+          </View>
+        )}
+
+        {/* 현재 이미지의 가구 편집 목록 */}
+        <FlatList
+          data={(results[editImageIndex]?.contents ?? []).map((item: any) => ({
+            ...item,
+            label: translateLabel(item.label),
+          }))}
+          keyExtractor={(item, i) => String(item.furnitureId ?? i)}
+          style={mStyles.editList}
+          contentContainerStyle={mStyles.editListContent}
+          renderItem={({ item }) => (
+            <View style={mStyles.editRow}>
+              <Text style={mStyles.editLabel}>{item.label}</Text>
+              <View style={mStyles.qtyRow}>
+                <TouchableOpacity
+                  style={mStyles.qtyBtn}
+                  onPress={() => item.quantity > 0 && handleUpdateQuantity(item.furnitureId, item.quantity - 1)}
+                >
+                  <Minus size={10} color="#006FFD" />
+                </TouchableOpacity>
+                <Text style={mStyles.qtyText}>{item.quantity}</Text>
+                <TouchableOpacity
+                  style={[mStyles.qtyBtn, mStyles.qtyBtnPlus]}
+                  onPress={() => handleUpdateQuantity(item.furnitureId, item.quantity + 1)}
+                >
+                  <Plus size={10} color="#1F2024" />
+                </TouchableOpacity>
+              </View>
+            </View>
+          )}
+        />
+
+        <View style={[mStyles.bottomBar, { paddingBottom: Math.max(insets.bottom, 16) }]}>
+          <TouchableOpacity
+            style={mStyles.fillBtn}
+            onPress={() => setMobileMode('review')}
+            activeOpacity={0.85}
+          >
+            <Text style={mStyles.fillBtnText}>확인</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    );
+  }
 
   return (
     <View style={commonStyles.container}>
@@ -633,7 +893,75 @@ const styles = StyleSheet.create({
     backgroundColor: '#E0E0E0',
   },
   activeDot: {
-    backgroundColor: '#F0893B', // 브랜드 컬러
-    width: 24, // 활성화된 닷은 길게
+    backgroundColor: '#F0893B',
+    width: 24,
   },
+});
+
+const mStyles = StyleSheet.create({
+  container: { flex: 1, backgroundColor: '#fff' },
+  scrollContent: { paddingBottom: 24 },
+  titleSection: { paddingHorizontal: 24, paddingTop: 32, paddingBottom: 24, gap: 10 },
+  title: { fontSize: 24, fontWeight: '800', color: '#1F2024', letterSpacing: 0.2 },
+  subtitle: { fontSize: 12, fontWeight: '500', color: '#71727A', lineHeight: 16, letterSpacing: 0.1 },
+  simulation: { width: '100%', height: 221, backgroundColor: '#F5F5F5' },
+  replayButton: {
+    position: 'absolute', bottom: 10, alignSelf: 'center',
+    backgroundColor: '#F0893B', paddingHorizontal: 16, paddingVertical: 8, borderRadius: 8,
+    zIndex: 10,
+  },
+  replayButtonText: { color: '#fff', fontSize: 14, fontWeight: '600' },
+  fullscreenBtn: {
+    position: 'absolute', bottom: 10, right: 10,
+    backgroundColor: 'rgba(255,255,255,0.85)', padding: 7, borderRadius: 8, zIndex: 10,
+  },
+  fullscreenContainer: {
+    flex: 1, backgroundColor: '#111', position: 'relative',
+  },
+  fullscreenClose: {
+    position: 'absolute', top: 52, right: 16,
+    backgroundColor: 'rgba(0,0,0,0.5)', padding: 8, borderRadius: 8, zIndex: 20,
+  },
+  section: { paddingHorizontal: 24, paddingTop: 16 },
+  sectionLabel: { fontSize: 12, fontWeight: '700', color: '#000', marginBottom: 8 },
+  dashedBox: {
+    borderWidth: 1, borderColor: '#C5C6CC', borderStyle: 'dashed',
+    borderRadius: 16, padding: 24, gap: 5,
+  },
+  row: { flexDirection: 'row', alignItems: 'center', alignSelf: 'stretch' },
+  rowLabel: { flex: 1, fontSize: 12, fontWeight: '700', color: '#2F3036' },
+  rowValue: { fontSize: 14, color: '#1F2024' },
+  emptyText: { fontSize: 12, color: '#8F9098' },
+  bottomBar: {
+    flexDirection: 'row', gap: 24, paddingHorizontal: 24, paddingTop: 24, backgroundColor: '#fff',
+  },
+  outlineBtn: {
+    flex: 1, height: 48, borderRadius: 12, justifyContent: 'center', alignItems: 'center',
+    backgroundColor: '#B4DBFF',
+  },
+  outlineBtnText: { fontSize: 14, fontWeight: '600', color: '#006FFD' },
+  fillBtn: {
+    flex: 1, height: 48, borderRadius: 12, justifyContent: 'center', alignItems: 'center',
+    backgroundColor: '#006FFD',
+  },
+  fillBtnText: { fontSize: 14, fontWeight: '600', color: '#fff' },
+  carouselImage: { height: 212 },
+  dotsRow: { flexDirection: 'row', justifyContent: 'center', gap: 8, marginTop: 8 },
+  dot: { width: 8, height: 8, borderRadius: 4, backgroundColor: '#E5E5EA' },
+  dotActive: { backgroundColor: '#006FFD' },
+  editList: { flex: 1 },
+  editListContent: {
+    marginHorizontal: 24, marginTop: 16,
+    borderWidth: 1, borderColor: '#C5C6CC', borderStyle: 'dashed',
+    borderRadius: 16, padding: 24, gap: 5,
+  },
+  editRow: { flexDirection: 'row', alignItems: 'center', alignSelf: 'stretch' },
+  editLabel: { flex: 1, fontSize: 12, fontWeight: '700', color: '#2F3036' },
+  qtyRow: { flexDirection: 'row', alignItems: 'center', gap: 4 },
+  qtyBtn: {
+    width: 24, height: 24, borderRadius: 12, backgroundColor: '#EAF2FF',
+    justifyContent: 'center', alignItems: 'center',
+  },
+  qtyBtnPlus: { backgroundColor: '#F5F6FA' },
+  qtyText: { width: 24, textAlign: 'center', fontSize: 14, color: '#1F2024', lineHeight: 18 },
 });

@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useLayoutEffect, useMemo, useState, useCallback } from 'react';
+import React, { useRef, useEffect, useLayoutEffect, useMemo, useState, useCallback, forwardRef, useImperativeHandle } from 'react';
 import { View, TouchableOpacity, Text, StyleSheet } from 'react-native';
 import { Canvas, extend, useThree, useFrame } from '@react-three/fiber';
 import { OrbitControls as OrbitControlsStd } from 'three-stdlib';
@@ -306,13 +306,22 @@ const MultiTruckScene: React.FC<MultiTruckSceneProps> = ({
 // PLY 캐시 (ply_url → geometry/material) - 컴포넌트 외부에 선언하여 전역 캐시로 사용
 const plyCache = new Map<string, { geometry: THREE.BufferGeometry; material: THREE.PointsMaterial; edgesGeometry?: THREE.EdgesGeometry; width: number; depth: number; height: number }>();
 
-const Space3D: React.FC<Space3DProps> = ({
+const renderCountRef = { current: 0 };
+
+export interface Space3DHandle {
+  play: () => void;
+}
+
+const Space3D = forwardRef<Space3DHandle, Space3DProps>(({
   furniture,
   truckType,
   autoPlay = false,
   onAnimationComplete,
   onTrucksChange,
-}) => {
+}, ref) => {
+  renderCountRef.current += 1;
+  console.log(`[Space3D] 렌더 #${renderCountRef.current} | furniture: ${furniture?.length}개 | plyCache: ${plyCache.size}개`);
+
   const [loadedFurniture, setLoadedFurniture] = useState<Map<string, LoadedFurniture>>(new Map());
   const [trucks, setTrucks] = useState<TruckPlacement[]>([]);
   const [currentTruckIndex, setCurrentTruckIndex] = useState(0);
@@ -347,7 +356,8 @@ const Space3D: React.FC<Space3DProps> = ({
       return;
     }
     const loadAllPLY = async () => {
-      // 이미 데이터가 있다면 로딩 표시 생략 (깜빡임 방지)
+      console.log(`[PLY] 로드 시작 | 가구: ${furniture.length}개 | 캐시: ${plyCache.size}개`);
+      const t0 = performance.now();
       if (loadedFurniture.size === 0) {
         setIsLoading(true);
       }
@@ -453,6 +463,7 @@ const Space3D: React.FC<Space3DProps> = ({
         }
       });
 
+      console.log(`[PLY] 로드 완료 | ${loaded.size}개 | ${(performance.now() - t0).toFixed(0)}ms`);
       setLoadedFurniture(loaded);
       setIsLoading(false);
     };
@@ -488,15 +499,15 @@ const Space3D: React.FC<Space3DProps> = ({
       }
     });
 
-    console.log('=== binPacking 입력 (quantity 반영, cm) ===', items);
+    const packT0 = performance.now();
+    console.log(`[Packing] 시작 | 아이템: ${items.length}개`);
 
     let newTrucks: TruckPlacement[];
     let newMessage: string;
 
     if (truckType) {
-      // 트럭 타입이 지정되면 단일 트럭 모드
       const result = optimizeOBB(items, truckType);
-      console.log('=== binPacking 결과 (단일 트럭) ===', result);
+      console.log(`[Packing] 단일 트럭 완료 | ${(performance.now() - packT0).toFixed(0)}ms`);
 
       newTrucks = [{
         type: truckType,
@@ -507,7 +518,7 @@ const Space3D: React.FC<Space3DProps> = ({
     } else {
       // 트럭 타입 미지정 → 멀티트럭 자동 최적화
       const result = packMultiTruck(items);
-      console.log('=== binPacking 결과 (멀티트럭) ===', result);
+      console.log(`[Packing] 멀티트럭 완료 | ${result.trucks.length}대 | ${(performance.now() - packT0).toFixed(0)}ms`);
 
       newTrucks = result.trucks;
       newMessage = result.message;
@@ -612,11 +623,9 @@ const Space3D: React.FC<Space3DProps> = ({
     };
   }, []);
 
-  // 🔥 3D 리소스 클린업 (페이지 이탈 시 GPU 메모리 해제)
-  // Result 페이지를 벗어날 때 (isFocused = false) 자동 실행됨
   useEffect(() => {
     return () => {
-      // 1. loadedFurniture의 모든 리소스 dispose
+      console.warn(`[Space3D] 클린업 실행! loadedFurniture: ${loadedFurniture.size}개, plyCache: ${plyCache.size}개 → 캐시 삭제됨`);
       loadedFurniture.forEach((furniture) => {
         try {
           if (furniture.geometry) {
@@ -750,6 +759,8 @@ const Space3D: React.FC<Space3DProps> = ({
     }, 100);
   }, [scheduleNext, trucks]);
 
+  useImperativeHandle(ref, () => ({ play }), [play]);
+
   const reset = useCallback(() => {
     setIsPlaying(false);
     setCurrentTruckIndex(0);
@@ -868,7 +879,7 @@ const Space3D: React.FC<Space3DProps> = ({
       )}
     </View>
   );
-};
+});
 
 const styles = StyleSheet.create({
   canvasContainer: {

@@ -26,44 +26,45 @@ export async function loadPLY(
   pointSize: number = 0.01,
   convertToYUp: boolean = true
 ): Promise<LoadedPLY> {
-  return new Promise((resolve, reject) => {
-    loader.load(
-      url,
-      (geometry) => {
-        if (!geometry || !geometry.attributes || !geometry.attributes.position) {
-          reject(new Error('Invalid PLY geometry'));
-          return;
-        }
+  const shortUrl = url.split('/').pop()?.slice(0, 40) ?? url.slice(-40);
 
-        // Z-up → Y-up 좌표계 변환 (Three.js는 Y-up 사용)
-        if (convertToYUp) {
-          geometry.rotateX(-Math.PI / 2);
-        }
+  // 1. 다운로드
+  const t0 = performance.now();
+  const response = await fetch(url, { cache: 'no-store' });
+  if (!response.ok) throw new Error(`PLY fetch 실패: ${response.status}`);
+  const arrayBuffer = await response.arrayBuffer();
+  const downloadMs = (performance.now() - t0).toFixed(0);
+  console.log(`[PLY 다운로드] ${shortUrl} | ${arrayBuffer.byteLength}B | ${downloadMs}ms`);
 
-        geometry.computeBoundingSphere();
-        geometry.computeBoundingBox();
+  // 2. 파싱
+  const t1 = performance.now();
+  const geometry = loader.parse(arrayBuffer);
+  const parseMs = (performance.now() - t1).toFixed(0);
+  console.log(`[PLY 파싱]     ${shortUrl} | ${parseMs}ms`);
 
-        // PointsMaterial 생성
-        const hasColors = geometry.hasAttribute('color');
-        const material = new THREE.PointsMaterial({
-          size: pointSize,
-          vertexColors: hasColors,
-          sizeAttenuation: true,
-        });
+  if (!geometry || !geometry.attributes?.position) {
+    throw new Error('Invalid PLY geometry');
+  }
 
-        // 색상이 없으면 기본 색상 설정
-        if (!hasColors) {
-          material.color = new THREE.Color(0x888888);
-        }
+  if (convertToYUp) {
+    geometry.rotateX(-Math.PI / 2);
+  }
 
-        resolve({ geometry, material });
-      },
-      undefined,
-      (error) => {
-        reject(error);
-      }
-    );
+  geometry.computeBoundingSphere();
+  geometry.computeBoundingBox();
+
+  const hasColors = geometry.hasAttribute('color');
+  const material = new THREE.PointsMaterial({
+    size: pointSize,
+    vertexColors: hasColors,
+    sizeAttenuation: true,
   });
+
+  if (!hasColors) {
+    material.color = new THREE.Color(0x888888);
+  }
+
+  return { geometry, material };
 }
 
 /**
