@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
   View, Text, StyleSheet, FlatList, TouchableOpacity,
   TextInput, Image, ActivityIndicator, useWindowDimensions,
@@ -8,6 +8,8 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types/navigation';
 import { ChatRoom } from '../types/chat';
 import { getRooms } from '../api/chatApi';
+import { chatSocket } from '../api/chatSocket';
+import { getMyUserId } from '../auth/tokenStorage';
 import { Search } from 'lucide-react-native';
 import BottomTabBar from '../components/common/BottomTabBar';
 import { useIsFocused } from '@react-navigation/native';
@@ -100,13 +102,44 @@ export default function MyChat({ navigation }: Props) {
     }
   }, []);
 
+  const unsubRef = useRef<(() => void) | null>(null);
+
   useEffect(() => {
-    if (isFocused) load();
+    if (!isFocused) {
+      unsubRef.current?.();
+      unsubRef.current = null;
+      return;
+    }
+    load();
+
+    const myUserId = getMyUserId();
+    if (!myUserId) return;
+
+    // 유저 채널 구독 → 새 메시지 수신 시 해당 채팅방 정보 업데이트
+    unsubRef.current = chatSocket.subscribe(`/sub/user/${myUserId}`, (update) => {
+      const { roomId, lastMessageContent, lastMessageAt, unreadCount } = update;
+      setRooms(prev => {
+        const updated = prev.map(r =>
+          r.roomId === roomId
+            ? { ...r, lastMessageContent, lastMessageAt, unreadCount }
+            : r
+        );
+        // 최신 메시지 순 정렬
+        return updated.sort((a, b) =>
+          new Date(b.lastMessageAt ?? 0).getTime() - new Date(a.lastMessageAt ?? 0).getTime()
+        );
+      });
+    });
+
+    return () => {
+      unsubRef.current?.();
+      unsubRef.current = null;
+    };
   }, [isFocused, load]);
 
   useEffect(() => {
     const q = search.trim().toLowerCase();
-    setFiltered(q ? rooms.filter(r => r.target.name.toLowerCase().includes(q)) : rooms);
+    setFiltered(q ? rooms.filter(r => r.target.name.toLowerCase().includes(q)) : [...rooms]);
   }, [search, rooms]);
 
   const goToRoom = (room: ChatRoom) => {

@@ -41,9 +41,11 @@ export default function ChatRoom({ route, navigation }: Props) {
     setTimeout(() => flatListRef.current?.scrollToEnd({ animated: true }), 50);
   }, []);
 
+  const unsubRef = useRef<(() => void) | null>(null);
+
   useEffect(() => {
     initRoom();
-    return () => { chatSocket.disconnect(); };
+    return () => { unsubRef.current?.(); };
   }, []);
 
   const initRoom = async () => {
@@ -69,7 +71,7 @@ export default function ChatRoom({ route, navigation }: Props) {
 
       await markRead(id);
 
-      chatSocket.connect(id, (msg) => {
+      unsubRef.current = chatSocket.subscribe(`/sub/chat/rooms/${id}`, (msg) => {
         appendMessages(msg);
         markRead(id!);
       });
