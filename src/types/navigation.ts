@@ -16,6 +16,11 @@ export type RootStackParamList = {
   };
   MyEstimate: undefined; // MyEstimate로 이동할 때는 매개변수 없음
   MyChat: undefined; // MyChat으로 이동할 때는 매개변수 없음
+  ChatRoom: {
+    roomId?: number;   // 채팅 목록에서 진입 시
+    targetId?: number; // 다른 화면에서 새 채팅 시작 시
+    targetName: string;
+  };
   SimulationTest: undefined; // 시뮬레이션 테스트 페이지
   Main: undefined; // 메인 페이지
   PartnerSearch: undefined;

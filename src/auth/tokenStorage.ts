@@ -50,3 +50,21 @@ export const clearRedirectPath = (): void => store.remove(REDIRECT_PATH_KEY);
 
 export const setLastProvider = (provider: string): void => store.set(LAST_PROVIDER_KEY, provider);
 export const getLastProvider = (): string | null => store.get(LAST_PROVIDER_KEY);
+
+// JWT payload 파싱으로 현재 로그인 유저 ID 추출 (sub 클레임)
+export const getMyUserId = (): number | null => {
+  const token = getAccessToken();
+  if (!token) return null;
+  try {
+    const base64 = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
+    const json = decodeURIComponent(
+      Array.from(atob(base64))
+        .map(c => '%' + c.charCodeAt(0).toString(16).padStart(2, '0'))
+        .join(''),
+    );
+    const payload = JSON.parse(json);
+    return payload.sub != null ? Number(payload.sub) : null;
+  } catch {
+    return null;
+  }
+};

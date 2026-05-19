@@ -1,15 +1,23 @@
-import { View, Text, ScrollView, StyleSheet, useWindowDimensions } from "react-native";
-import { useState, useEffect } from "react";
-import { commonStyles } from "../styles/commonStyles";
+import React, { useState, useEffect, useCallback } from 'react';
+import {
+  View, Text, StyleSheet, FlatList, TouchableOpacity,
+  TextInput, Image, ActivityIndicator, useWindowDimensions,
+} from 'react-native';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types/navigation';
-import ChatListPanel from "../components/MyChatPage/ChatListPanel";
-import ChatRoomPanel from "../components/MyChatPage/ChatRoomPanel";
-import { useEstimate, ChatItemData } from "../context/EstimateContext";
+import { ChatRoom } from '../types/chat';
+import { getRooms } from '../api/chatApi';
+import { Search } from 'lucide-react-native';
+import BottomTabBar from '../components/common/BottomTabBar';
+import { useIsFocused } from '@react-navigation/native';
 
-type Props = NativeStackScreenProps<RootStackParamList, 'MyChat'>;
+// 웹/태블릿 split-view용 기존 패널 유지
+import ChatListPanel from '../components/MyChatPage/ChatListPanel';
+import ChatRoomPanel from '../components/MyChatPage/ChatRoomPanel';
+import { useEstimate, ChatItemData } from '../context/EstimateContext';
 
-// export용 - 다른 곳에서 참조할 수 있도록 (MyEstimate에서 사용)
+// 하위 호환성: 기존 컴포넌트들이 import해서 사용하는 타입과 더미 데이터
 export type { ChatItemData };
 export const dummyChatList: ChatItemData[] = [
   {
@@ -18,7 +26,7 @@ export const dummyChatList: ChatItemData[] = [
     price: '820,000원',
     time: '방금',
     isActive: true,
-    isUnread: false, // 초기값은 false, 견적 받는 중 상태가 되면 true로 변경
+    isUnread: false,
     logoUri: require('../../assets/smallisa.png'),
     rating: '4.9',
   },
@@ -28,7 +36,7 @@ export const dummyChatList: ChatItemData[] = [
     price: '860,000원',
     time: '방금',
     isActive: false,
-    isUnread: false, // 초기값은 false, 견적 받는 중 상태가 되면 true로 변경
+    isUnread: false,
     logoUri: require('../../assets/back.png'),
     rating: '4.8',
   },
@@ -38,177 +46,296 @@ export const dummyChatList: ChatItemData[] = [
     price: '900,000원',
     time: '방금',
     isActive: false,
-    isUnread: false, // 초기값은 false, 견적 받는 중 상태가 되면 true로 변경
+    isUnread: false,
     logoUri: require('../../assets/2424.png'),
     rating: '4.7',
   },
 ];
 
+type Props = NativeStackScreenProps<RootStackParamList, 'MyChat'>;
+
+function formatTime(iso?: string): string {
+  if (!iso) return '';
+  const d = new Date(iso);
+  const now = new Date();
+  const diffMs = now.getTime() - d.getTime();
+  const diffMin = Math.floor(diffMs / 60000);
+  if (diffMin < 1) return '방금';
+  if (diffMin < 60) return `${diffMin}분 전`;
+  if (diffMin < 1440) return `${Math.floor(diffMin / 60)}시간 전`;
+  return `${Math.floor(diffMin / 1440)}일 전`;
+}
+
+function previewContent(content?: string): string {
+  if (!content) return '';
+  if (content.startsWith('http') && !content.includes(' ')) return '사진';
+  return content;
+}
+
 export default function MyChat({ navigation }: Props) {
   const { width } = useWindowDimensions();
   const isMobile = width < 768;
+  const isFocused = useIsFocused();
+  const insets = useSafeAreaInsets();
 
-  // Context에서 chatList 가져오기
+  const [rooms, setRooms] = useState<ChatRoom[]>([]);
+  const [filtered, setFiltered] = useState<ChatRoom[]>([]);
+  const [search, setSearch] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
+
+  // 웹 split-view 상태
   const { chatList, setChatList } = useEstimate();
+  const [selectedChatId, setSelectedChatId] = useState<string | null>(chatList[0]?.id ?? null);
+  const selectedChat = chatList.find(c => c.id === selectedChatId) ?? null;
 
-  // 선택된 채팅 ID 상태 관리 (초기값 : 첫 번째 채팅방)
-  // 모바일에서는 초기 진입 시 리스트를 보여주어야 하므로, 모바일인 경우 선택된 채팅방이 있어도 리스트 뷰로 시작하는 로직이 필요함.
-  // 다만 '내부 로직 건들지 말라'는 요청이 있으므로 selectedChatId는 그대로 두고, 보이는 뷰만 제어함.
-  const [selectedChatId, setSelectedChatId] = useState<string | null>(chatList[0]?.id || null);
-  const [mobileView, setMobileView] = useState<'list' | 'room'>('list');
-
-  // 선택된 ID에 해당하는 채팅 데이터 찾기
-  const selectedChatData = chatList.find(item => item.id === selectedChatId) || null;
-
-  const handleSelectChat = (id: string) => {
-    setSelectedChatId(id);
-    
-    // 채팅을 선택하면 해당 채팅의 isUnread를 false로 변경
-    setChatList(prevList => 
-      prevList.map(chat => 
-        chat.id === id ? { ...chat, isUnread: false } : chat
-      )
-    );
-    
-    if (isMobile) {
-      setMobileView('room');
+  const load = useCallback(async () => {
+    try {
+      const data = await getRooms();
+      setRooms(data);
+      setFiltered(data);
+    } catch {
+      // API 실패 시 빈 목록 유지
+    } finally {
+      setIsLoading(false);
     }
-  };
+  }, []);
 
-  // 웹 환경에서 초기 진입 시 첫 번째 채팅을 자동으로 읽음 처리
   useEffect(() => {
-    if (!isMobile && selectedChatId) {
-      setChatList(prevList => 
-        prevList.map(chat => 
-          chat.id === selectedChatId ? { ...chat, isUnread: false } : chat
-        )
-      );
-    }
-  }, []); // 컴포넌트 마운트 시 한 번만 실행
+    if (isFocused) load();
+  }, [isFocused, load]);
 
-  const handleMobileBack = () => {
-    setMobileView('list');
+  useEffect(() => {
+    const q = search.trim().toLowerCase();
+    setFiltered(q ? rooms.filter(r => r.target.name.toLowerCase().includes(q)) : rooms);
+  }, [search, rooms]);
+
+  const goToRoom = (room: ChatRoom) => {
+    navigation.navigate('ChatRoom', {
+      roomId: room.roomId,
+      targetName: room.target.name,
+    });
   };
 
-  return (
-    <View style={commonStyles.container}>
+  const goTab = (tab: string) => {
+    const map: Record<string, keyof RootStackParamList> = {
+      home: 'Main',
+      partner: 'PartnerSearch',
+      estimate: 'MyEstimate',
+      settings: 'Settings',
+    };
+    if (map[tab]) navigation.navigate(map[tab] as any);
+  };
 
-      <ScrollView
-        contentContainerStyle={[commonStyles.scrollContent, isMobile && { flex: 1, paddingBottom: 0 }]}
-        scrollEnabled={!isMobile} // 모바일에서는 내부 스크롤 사용
-      >
-        <View style={[styles.mainWrapper, isMobile && styles.mobileMainWrapper]}>
-          
-          {/* Page Content: 기준점 */}
-          <View style={[styles.pageContent, isMobile && styles.mobilePageContent]}>
+  // ── 모바일 뷰 ──────────────────────────────────────────
+  if (isMobile) {
+    return (
+      <View style={styles.container}>
+        <SafeAreaView edges={['top']} />
 
-            {/* 중앙정렬 컨테이너 - 모바일에서는 숨김 or 스타일 변경 */}
-            <View style={[styles.centerContainer, isMobile && styles.mobileCenterContainer]}>
-              <Text style={styles.pageTitle}>채팅</Text>
-            </View>
-
-            {/* 채팅 UI 섹션 */}
-            <View style={[styles.chatSection, isMobile && styles.mobileChatSection]}>
-              {isMobile ? (
-                // 모바일 뷰
-                mobileView === 'list' ? (
-                  <ChatListPanel 
-                    chatList={chatList} 
-                    selectedChatId={selectedChatId}
-                    onSelectChat={handleSelectChat}
-                    isMobile={isMobile}
-                  />
-                ) : (
-                  <ChatRoomPanel 
-                    data={selectedChatData} 
-                    isMobile={isMobile}
-                    onBack={handleMobileBack}
-                  />
-                )
-              ) : (
-                // 데스크탑 뷰
-                <>
-                  <ChatListPanel 
-                    chatList={chatList} 
-                    selectedChatId={selectedChatId}
-                    onSelectChat={handleSelectChat}
-                  />
-                  <ChatRoomPanel data={selectedChatData} />
-                </>
-              )}
-            </View>
-          </View>
+        {/* 네비 바 */}
+        <View style={styles.navBar}>
+          <Text style={styles.navTitle}>채팅</Text>
+          <TouchableOpacity style={styles.editBtn}>
+            <Text style={styles.editText}>편집</Text>
+          </TouchableOpacity>
         </View>
-      </ScrollView>
+
+        {/* 검색 바 */}
+        <View style={styles.searchBar}>
+          <Search size={16} color="#8F9098" />
+          <TextInput
+            style={styles.searchInput}
+            value={search}
+            onChangeText={setSearch}
+            placeholder="검색"
+            placeholderTextColor="#8F9098"
+          />
+        </View>
+
+        {/* 채팅 목록 */}
+        {isLoading ? (
+          <ActivityIndicator style={styles.flex} color="#006FFD" />
+        ) : (
+          <FlatList
+            data={filtered}
+            keyExtractor={item => String(item.roomId)}
+            style={styles.flex}
+            contentContainerStyle={styles.listContent}
+            renderItem={({ item }) => (
+              <TouchableOpacity style={styles.listItem} onPress={() => goToRoom(item)} activeOpacity={0.7}>
+                {/* 아바타 */}
+                <View style={styles.avatar}>
+                  {item.target.profileImageUrl ? (
+                    <Image source={{ uri: item.target.profileImageUrl }} style={StyleSheet.absoluteFill} resizeMode="cover" />
+                  ) : (
+                    <View style={styles.avatarDefault} />
+                  )}
+                </View>
+
+                {/* 텍스트 */}
+                <View style={styles.listContent2}>
+                  <Text style={styles.roomName} numberOfLines={1}>{item.target.name}</Text>
+                  <Text style={styles.lastMessage} numberOfLines={1}>
+                    {previewContent(item.lastMessageContent)}
+                  </Text>
+                </View>
+
+                {/* 우측: 시간 + 뱃지 */}
+                <View style={styles.rightCol}>
+                  <Text style={styles.timeText}>{formatTime(item.lastMessageAt)}</Text>
+                  {item.unreadCount > 0 && (
+                    <View style={styles.badge}>
+                      <Text style={styles.badgeText}>
+                        {item.unreadCount > 99 ? '99+' : String(item.unreadCount)}
+                      </Text>
+                    </View>
+                  )}
+                </View>
+              </TouchableOpacity>
+            )}
+            ListEmptyComponent={
+              <Text style={styles.emptyText}>
+                {search ? '검색 결과가 없습니다.' : '채팅방이 없습니다.'}
+              </Text>
+            }
+          />
+        )}
+
+        {/* 하단 탭 바 */}
+        <BottomTabBar activeTab="chat" onTabPress={goTab} />
+      </View>
+    );
+  }
+
+  // ── 데스크톱/태블릿 split-view ─────────────────────────
+  return (
+    <View style={styles.desktopContainer}>
+      <ChatListPanel
+        chatList={chatList}
+        selectedChatId={selectedChatId}
+        onSelectChat={setSelectedChatId}
+      />
+      {selectedChatId && (
+        <ChatRoomPanel
+          data={selectedChat}
+          onBack={() => setSelectedChatId(null)}
+        />
+      )}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  mainWrapper: {
-    marginTop: 80,
-    width: '100%',
-    alignItems: 'center',
-    marginBottom: 100,
-  },
-  mobileMainWrapper: {
-    marginTop: 0,
-    marginBottom: 0,
-    flex: 1,
-  },
-  pageContent: {
-    width: '90%', 
-    maxWidth: 1600, 
-    position: 'relative', 
-    alignItems: 'center',
-    marginHorizontal: 'auto',
-  },
-  mobilePageContent: {
-    width: '100%',
-    maxWidth: '100%',
-    flex: 1,
-  },
-  
-  // 중앙 컨텐츠 컨테이너 
-  centerContainer: {
-    width: 1050, 
-    alignSelf: 'center',
-    marginHorizontal: 'auto',
-    marginBottom: 30,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'baseline',
-  },
-  mobileCenterContainer: {
-    width: '100%',
-    paddingHorizontal: 20,
-    paddingTop: 20,
-    marginBottom: 10,
-    display: 'none', // Hide title on mobile to save space
-  },
+  flex: { flex: 1 },
+  container: { flex: 1, backgroundColor: '#fff' },
+  desktopContainer: { flex: 1, flexDirection: 'row', backgroundColor: '#fff' },
 
-  pageTitle: {
-    fontSize: 30, 
+  navBar: {
+    height: 56,
+    paddingHorizontal: 24,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: '#E5E5E5',
+  },
+  navTitle: {
+    fontSize: 14,
     fontWeight: '700',
-    color: '#323232',
-    lineHeight: 34,
-    marginBottom: 5,
+    color: '#1F2024',
+  },
+  editBtn: {
+    position: 'absolute',
+    right: 24,
+  },
+  editText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#006FFD',
   },
 
-  // 채팅 레이아웃 스타일
-  chatSection: {
+  searchBar: {
+    marginHorizontal: 16,
+    marginVertical: 8,
     flexDirection: 'row',
-    width: 1050,
-    height: 700,
-    backgroundColor: 'transparent',
-    overflow: 'visible',
-    alignSelf: 'center',
-    marginHorizontal: 'auto',
-    position: 'relative',
+    alignItems: 'center',
+    gap: 8,
+    backgroundColor: '#F8F9FE',
+    borderRadius: 24,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
   },
-  mobileChatSection: {
-    width: '100%',
+  searchInput: {
     flex: 1,
-    flexDirection: 'column',
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#1F2024',
+  },
+
+  listContent: { paddingHorizontal: 8, paddingVertical: 8 },
+  listContent2: { flex: 1, gap: 4 },
+
+  listItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 16,
+    padding: 16,
+    borderRadius: 12,
+  },
+  avatar: {
+    width: 40,
+    height: 40,
+    borderRadius: 16,
+    backgroundColor: '#EAF2FF',
+    overflow: 'hidden',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  avatarDefault: {
+    width: '60%',
+    height: '100%',
+    backgroundColor: '#B4DBFF',
+    borderRadius: 8,
+  },
+  roomName: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#1F2024',
+  },
+  lastMessage: {
+    fontSize: 12,
+    fontWeight: '500',
+    color: '#71727A',
+    lineHeight: 16,
+  },
+  rightCol: {
+    alignItems: 'flex-end',
+    gap: 6,
+    minWidth: 40,
+  },
+  timeText: {
+    fontSize: 10,
+    color: '#8F9098',
+  },
+  badge: {
+    minWidth: 20,
+    height: 20,
+    borderRadius: 10,
+    backgroundColor: '#006FFD',
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 5,
+  },
+  badgeText: {
+    fontSize: 10,
+    fontWeight: '600',
+    color: '#fff',
+    letterSpacing: 0.5,
+  },
+  emptyText: {
+    textAlign: 'center',
+    marginTop: 60,
+    fontSize: 14,
+    color: '#8F9098',
   },
 });
