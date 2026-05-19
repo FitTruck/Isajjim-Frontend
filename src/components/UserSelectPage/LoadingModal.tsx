@@ -27,7 +27,7 @@ const LoadingModal = ({ visible }: LoadingModalProps) => {
 const styles = StyleSheet.create({
   loadingOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.2)', // 배경 투명도 조절
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
     justifyContent: 'center',
     alignItems: 'center',
   },

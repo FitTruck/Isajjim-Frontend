@@ -30,6 +30,7 @@
     "expo-status-bar": "~3.0.9",
     "expo-web-browser": "~15.0.11",
     "firebase": "^12.8.0",
+    "korean-lunar-calendar": "^0.3.6",
     "lucide-react-native": "^0.563.0",
     "react": "19.1.0",
     "react-dom": "19.1.0",

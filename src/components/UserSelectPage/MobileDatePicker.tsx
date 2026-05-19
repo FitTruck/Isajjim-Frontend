@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { ChevronLeft, ChevronRight } from 'lucide-react-native';
+import KoreanLunarCalendar from 'korean-lunar-calendar';
+import { getKoreanHolidays } from '../../utils/holidays';
 
 interface Props {
   value: string | null;
@@ -8,6 +10,13 @@ interface Props {
 }
 
 const WEEK_DAYS = ['일', '월', '화', '수', '목', '금', '토'];
+const SON_EOMNUN_DAYS = new Set([9, 10, 19, 20, 29, 30]);
+
+function getLunarDay(year: number, month: number, day: number): number {
+  const cal = new KoreanLunarCalendar();
+  cal.setSolarDate(year, month, day);
+  return cal.getLunarCalendar().day;
+}
 
 export default function MobileDatePicker({ value, onSelect }: Props) {
   const today = new Date();
@@ -31,11 +40,23 @@ export default function MobileDatePicker({ value, onSelect }: Props) {
     ...Array.from({ length: lastDate }, (_, i) => i + 1),
   ];
 
-  // 7개씩 행으로 분할
   const weeks: (number | null)[][] = [];
   for (let i = 0; i < days.length; i += 7) {
     weeks.push(days.slice(i, i + 7).concat(Array(7 - days.slice(i, i + 7).length).fill(null)));
   }
+
+  // 공휴일 목록 캐싱
+  const holidays = useMemo(() => getKoreanHolidays(year), [year]);
+
+  // 현재 월의 손없는날 목록 (음력 변환 결과 캐싱)
+  const sonEomnunSet = useMemo(() => {
+    const set = new Set<number>();
+    for (let d = 1; d <= lastDate; d++) {
+      const lunarDay = getLunarDay(year, month + 1, d);
+      if (SON_EOMNUN_DAYS.has(lunarDay)) set.add(d);
+    }
+    return set;
+  }, [year, month]);
 
   const isToday = (day: number) =>
     day === today.getDate() && month === today.getMonth() && year === today.getFullYear();
@@ -85,6 +106,11 @@ export default function MobileDatePicker({ value, onSelect }: Props) {
             {week.map((day, di) => {
               const selected = day !== null && isSelected(day);
               const todayCell = day !== null && isToday(day);
+              const sonEomnun = day !== null && sonEomnunSet.has(day);
+              const holidayKey = day !== null
+                ? `${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`
+                : null;
+              const isHoliday = holidayKey !== null && holidays.has(holidayKey);
               return (
                 <TouchableOpacity
                   key={di}
@@ -98,15 +124,30 @@ export default function MobileDatePicker({ value, onSelect }: Props) {
                   activeOpacity={0.7}
                 >
                   {day !== null && (
-                    <Text style={[styles.dayText, selected && styles.selectedDayText]}>
-                      {day}
-                    </Text>
+                    <>
+                      <Text style={[
+                        styles.dayText,
+                        (isHoliday || di === 0) && styles.holidayText,
+                        selected && styles.selectedDayText,
+                      ]}>
+                        {day}
+                      </Text>
+                      {sonEomnun && (
+                        <View style={[styles.sonDot, selected && styles.sonDotSelected]} />
+                      )}
+                    </>
                   )}
                 </TouchableOpacity>
               );
             })}
           </View>
         ))}
+      </View>
+
+      {/* 손없는날 범례 */}
+      <View style={styles.legend}>
+        <View style={styles.legendDot} />
+        <Text style={styles.legendText}>손없는날</Text>
       </View>
     </View>
   );
@@ -155,6 +196,24 @@ const styles = StyleSheet.create({
     color: '#8F9098',
     letterSpacing: 0.5,
   },
+  legend: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingHorizontal: 10,
+    alignSelf: 'flex-start',
+  },
+  legendDot: {
+    width: 5,
+    height: 5,
+    borderRadius: 3,
+    backgroundColor: '#006FFD',
+  },
+  legendText: {
+    fontSize: 11,
+    color: '#71727A',
+    fontWeight: '500',
+  },
   daysContainer: {
     gap: 0,
   },
@@ -182,5 +241,19 @@ const styles = StyleSheet.create({
   },
   selectedDayText: {
     color: '#fff',
+  },
+  holidayText: {
+    color: '#FF4444',
+  },
+  sonDot: {
+    position: 'absolute',
+    bottom: 3,
+    width: 5,
+    height: 5,
+    borderRadius: 3,
+    backgroundColor: '#006FFD',
+  },
+  sonDotSelected: {
+    backgroundColor: '#fff',
   },
 });
