@@ -3,6 +3,7 @@
     "name": "이삿찜",
     "slug": "isajjim",
     "version": "1.0.0",
+    "icon": "./assets/logo.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "platforms": [
@@ -11,7 +12,7 @@
       "ios"
     ],
     "web": {
-      "favicon": "./assets/Logo.png",
+      "favicon": "./assets/logo.png",
       "bundler": "metro"
     },
     "plugins": [
@@ -20,7 +21,14 @@
     ],
     "scheme": "isajjim",
     "android": {
-      "package": "com.isajjim"
+      "package": "com.isajjim",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/logo.png",
+        "backgroundColor": "#ffffff"
+      }
+    },
+    "ios": {
+      "bundleIdentifier": "com.isajjim"
     }
   }
 }

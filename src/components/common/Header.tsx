@@ -123,7 +123,7 @@ export default function Header() {
     ]}>
       <View style={[styles.headerContent, isMobile && styles.mobileHeaderContent]}>
         <MyTouch style={styles.logoContainer} onPress={onGoHome}>
-          <Image source={require('../../../assets/Logo.png')} style={styles.logoIcon} />
+          <Image source={require('../../../assets/logo.png')} style={styles.logoIcon} />
           <Text style={[styles.logoText, isMobile && styles.mobileLogoText]}>이삿찜</Text>
         </MyTouch>
 
