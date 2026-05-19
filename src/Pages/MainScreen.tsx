@@ -7,7 +7,6 @@ import { useNavigation } from '@react-navigation/native';
 import { commonStyles } from '../styles/commonStyles';
 import { UploadedImage } from '../types/common';
 
-import Header from '../components/common/Header';
 import UploadBox from '../components/MainPage/UploadBox';
 import NextBtn1 from '../components/MainPage/NextBtn1';
 import AlertBox from '../components/common/AlertBox';
@@ -34,7 +33,7 @@ export default function Main() {
       <View style={[styles.mobileContainer, { paddingTop: insets.top }]}>
         {/* 헤더: 뒤로가기 + 진행 바 */}
         <View style={styles.mobileHeader}>
-          <Pressable onPress={() => navigation.goBack()} style={styles.backButton} hitSlop={8}>
+          <Pressable onPress={() => navigation.canGoBack() ? navigation.goBack() : navigation.navigate('Main' as any)} style={styles.backButton} hitSlop={8}>
             <ChevronLeft size={20} color="#1F2024" />
           </Pressable>
           <View style={styles.progressTrack}>
@@ -73,7 +72,7 @@ export default function Main() {
 
   return (
     <View style={commonStyles.container}>
-      <Header />
+
       {isAlertVisible && (
         <AlertBox
           value="이미지를 최소 1장 이상 업로드해주세요."

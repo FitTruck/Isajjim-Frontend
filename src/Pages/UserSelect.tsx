@@ -4,7 +4,6 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ChevronLeft } from 'lucide-react-native';
 import { useNavigation } from '@react-navigation/native';
 import { commonStyles } from '../styles/commonStyles';
-import Header from '../components/common/Header';
 import NextBtn, { NextBtn2Handle } from '../components/UserSelectPage/NextBtn2';
 import AlertBox from '../components/common/AlertBox';
 import Dropdown from '../components/UserSelectPage/Dropdown';
@@ -249,7 +248,7 @@ export default function UserSelect({ route }: Props) {
 
   return (
     <View style={commonStyles.container}>
-      <Header />
+
       {/* 알림 박스 */}
       {isAlertVisible && (
         <AlertBox 

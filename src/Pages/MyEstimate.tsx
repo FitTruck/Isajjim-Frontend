@@ -1,7 +1,6 @@
 import { View, Text, StyleSheet, ScrollView, Platform, useWindowDimensions, TouchableOpacity } from "react-native";
 import { SlidersHorizontal } from 'lucide-react-native';
 import { commonStyles } from "../styles/commonStyles";
-import Header from "../components/common/Header";
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types/navigation';
 import EstimateCard from "../components/MyEstimatePage/EstimateCard";
@@ -104,7 +103,7 @@ export default function MyEstimate({ navigation }: Props) {
 
   return (
     <View style={commonStyles.container}>
-      <Header />
+
       <ScrollView
         contentContainerStyle={[
           commonStyles.scrollContent,

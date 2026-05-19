@@ -5,7 +5,6 @@ import api from '../api/axiosInstance';
 import { translateLabel } from '../utils/Translator';
 import LeftCard from '../components/ResultPage/LeftCard';
 import NextBtn3 from '../components/ResultPage/NextBtn3';
-import Header from '../components/common/Header';
 import Space3D from '../components/Space/Space3D';
 import { ChevronLeft, ChevronRight, X, Maximize } from 'lucide-react-native';
 import { SimulationFurniture, SimulationTruckResult } from '../types/simulation';
@@ -337,7 +336,7 @@ export default function Result({ navigation }: Props) {
 
   return (
     <View style={commonStyles.container}>
-      <Header />
+
       <ScrollView
         contentContainerStyle=
         {commonStyles.scrollContent}

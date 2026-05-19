@@ -1,7 +1,6 @@
 import { View, Text, ScrollView, StyleSheet, useWindowDimensions } from "react-native";
 import { useState, useEffect } from "react";
 import { commonStyles } from "../styles/commonStyles";
-import Header from "../components/common/Header";
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types/navigation';
 import ChatListPanel from "../components/MyChatPage/ChatListPanel";
@@ -93,7 +92,7 @@ export default function MyChat({ navigation }: Props) {
 
   return (
     <View style={commonStyles.container}>
-      <Header />
+
       <ScrollView
         contentContainerStyle={[commonStyles.scrollContent, isMobile && { flex: 1, paddingBottom: 0 }]}
         scrollEnabled={!isMobile} // 모바일에서는 내부 스크롤 사용
