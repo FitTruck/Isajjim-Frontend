@@ -6,6 +6,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types/navigation';
 import { useAuth } from '../context/AuthContext';
 import { getRedirectPath, clearRedirectPath } from '../auth/tokenStorage';
+import { registerFCMToken } from '../utils/fcm';
 import { getAgreeTerms, postAgreeTerms } from '../api/terms';
 import TermsModal from '../components/common/TermsModal';
 
@@ -40,6 +41,7 @@ export default function AuthCallbackPage() {
 
     if (accessToken && refreshToken) {
       login(accessToken, refreshToken);
+      registerFCMToken();
 
       const redirectPath = getRedirectPath();
       clearRedirectPath();

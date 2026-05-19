@@ -12,6 +12,7 @@ import { RootStackParamList } from '../types/navigation';
 import { useAuth } from '../context/AuthContext';
 import BottomTabBar, { TabKey } from '../components/common/BottomTabBar';
 import api from '../api/axiosInstance';
+import { unregisterFCMToken } from '../utils/fcm';
 
 const TERMS_URL = 'https://www.notion.so/35842810fb17802896e5cb20c8596218';
 const PRIVACY_URL = 'https://www.notion.so/35842810fb1780239b8cf7769880d809';
@@ -62,7 +63,8 @@ export default function SettingsPage() {
     else if (tab === 'chat') navigation.navigate('MyChat');
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    await unregisterFCMToken();
     logout();
     navigation.reset({ index: 0, routes: [{ name: 'Login' }] });
   };

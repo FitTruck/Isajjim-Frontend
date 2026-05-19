@@ -6,6 +6,8 @@ import { navigationRef } from './src/auth/navigationRef';
 import { useFonts } from 'expo-font';
 import { Text, Platform, View } from 'react-native';
 import { useEffect } from 'react';
+import { registerFCMToken, setupNotificationTapHandler } from './src/utils/fcm';
+import { getAccessToken } from './src/auth/tokenStorage';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 // 각 화면 컴포넌트 import
@@ -87,6 +89,14 @@ export default function App() {
   useEffect(() => {
     if (fontsLoaded && Platform.OS === 'web') injectPretendardCSS();
   }, [fontsLoaded]);
+
+  useEffect(() => {
+    if (Platform.OS === 'web') return;
+    // 로그인 상태일 때만 FCM 토큰 등록
+    if (getAccessToken()) registerFCMToken();
+    const cleanup = setupNotificationTapHandler();
+    return cleanup;
+  }, []);
 
 
   if (!fontsLoaded) return <View style={{ flex: 1, backgroundColor: '#fff' }} />;
