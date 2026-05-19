@@ -23,15 +23,15 @@ class ChatSocketManager {
         return new WS(WS_URL, [], { headers: { 'User-Agent': 'IsajjimApp/1.0' } });
       },
       connectHeaders: { Authorization: `Bearer ${token}` },
-      reconnectDelay: 0,
+      reconnectDelay: 3000,
       forceBinaryWSFrames: true,
       appendMissingNULLonIncoming: true,
       debug: (str) => console.log('[STOMP]', str),
       onConnect: () => {
         console.log('[WS] CONNECTED ✓');
-        // 대기 중인 모든 구독 전송
+        // 모든 구독 재등록 (최초 연결 + 재연결 모두 처리)
         this.subs.forEach((sub, id) => {
-          if (!sub.stompSub) this.doSubscribe(id, sub.destination, sub.handler);
+          this.doSubscribe(id, sub.destination, sub.handler);
         });
         this.flushQueue();
       },
@@ -42,7 +42,13 @@ class ChatSocketManager {
         }
       },
       onWebSocketError: (evt) => console.error('[WS] WebSocket ERROR:', evt),
-      onDisconnect: () => console.warn('[WS] DISCONNECTED'),
+      onDisconnect: () => {
+        console.warn('[WS] DISCONNECTED → 3초 후 재연결 시도');
+        // stompSub 참조 초기화 (재연결 시 onConnect에서 새로 등록됨)
+        this.subs.forEach((sub, id) => {
+          this.subs.set(id, { ...sub, stompSub: undefined });
+        });
+      },
       onWebSocketClose: (evt) =>
         console.warn('[WS] CLOSE | code:', (evt as CloseEvent).code),
     });
@@ -110,8 +116,12 @@ class ChatSocketManager {
     console.log('[WS] disconnect');
     this.subs.forEach(sub => sub.stompSub?.unsubscribe());
     this.subs.clear();
-    this.client?.deactivate();
-    this.client = null;
+    // reconnectDelay 무력화 후 종료 (의도적 disconnect는 재연결 안 함)
+    if (this.client) {
+      this.client.reconnectDelay = 0;
+      this.client.deactivate();
+      this.client = null;
+    }
     this.sendQueue = [];
   }
 
