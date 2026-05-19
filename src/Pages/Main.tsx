@@ -5,7 +5,6 @@ import Header from '../components/common/Header';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types/navigation';
 import MyTouch from '../components/common/MyTouch';
-import { ArrowUpRight } from 'lucide-react-native';
 import ImageComparisonSlider from '../components/IntroPage/ImageComparisonSlider';
 import { useAuth } from '../context/AuthContext';
 import { setRedirectPath } from '../auth/tokenStorage';
@@ -42,8 +41,7 @@ export default function Main({ navigation }: Props) {
         style={[styles.startButton, isMobile && styles.mobileStartButton]}
         onPress={handleStart}
       >
-        <Text style={[styles.startButtonText, isMobile && styles.mobileStartButtonText]}>시작하기</Text>
-        <ArrowUpRight size={20} color="white" strokeWidth={3} />
+        <Text style={styles.startButtonText}>시작하기</Text>
       </MyTouch>
     </View>
   );
@@ -65,7 +63,8 @@ export default function Main({ navigation }: Props) {
   );
 
   const handleTabPress = (tab: TabKey) => {
-    if (tab === 'estimate') navigation.navigate('MyEstimate');
+    if (tab === 'partner') navigation.navigate('PartnerSearch');
+    else if (tab === 'estimate') navigation.navigate('MyEstimate');
     else if (tab === 'chat') navigation.navigate('MyChat');
     else if (tab === 'settings') navigation.navigate('Settings');
   };
@@ -203,31 +202,17 @@ const styles = StyleSheet.create({
 
   // ── Button ───────────────────────────────────────────
   startButton: {
-    flexDirection: 'row',
+    height: 48,
+    backgroundColor: '#006FFD',
+    borderRadius: 12,
     alignItems: 'center',
-    gap: 8,
-    paddingHorizontal: 27,
-    paddingVertical: 10,
-    backgroundColor: '#F0893B',
-    borderRadius: 50,
-    shadowColor: '#F0893B',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 10,
-    elevation: 5,
-    alignSelf: 'flex-start',
+    justifyContent: 'center',
+    width: '50%',
   },
-  mobileStartButton: {
-    alignSelf: 'center',
-    paddingHorizontal: 36,
-    paddingVertical: 14,
-  },
+  mobileStartButton: {},
   startButtonText: {
-    fontSize: 18,
-    fontWeight: '500',
-    color: 'white',
-  },
-  mobileStartButtonText: {
-    fontSize: 16,
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#fff',
   },
 });

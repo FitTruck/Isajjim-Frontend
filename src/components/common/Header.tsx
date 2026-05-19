@@ -71,7 +71,6 @@ const styles = StyleSheet.create({
   logoIcon: {
     width: 40,
     height: 40,
-    marginTop: 10,
     resizeMode: 'contain',
   },
   logoText: {

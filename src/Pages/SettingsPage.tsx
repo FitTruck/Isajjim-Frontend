@@ -57,6 +57,7 @@ export default function SettingsPage() {
 
   const handleTabPress = (tab: TabKey) => {
     if (tab === 'home') navigation.navigate('Main');
+    else if (tab === 'partner') navigation.navigate('PartnerSearch');
     else if (tab === 'estimate') navigation.navigate('MyEstimate');
     else if (tab === 'chat') navigation.navigate('MyChat');
   };
