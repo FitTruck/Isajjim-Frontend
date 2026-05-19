@@ -9,6 +9,7 @@ import { ArrowUpRight } from 'lucide-react-native';
 import ImageComparisonSlider from '../components/IntroPage/ImageComparisonSlider';
 import { useAuth } from '../context/AuthContext';
 import { setRedirectPath } from '../auth/tokenStorage';
+import BottomTabBar, { TabKey } from '../components/common/BottomTabBar';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Main'>;
 
@@ -63,12 +64,16 @@ export default function Main({ navigation }: Props) {
     </View>
   );
 
+  const handleTabPress = (tab: TabKey) => {
+    if (tab === 'estimate') navigation.navigate('MyEstimate');
+    else if (tab === 'chat') navigation.navigate('MyChat');
+  };
+
   if (isMobile) {
     return (
       <View style={styles.container}>
         <Header />
         <ScrollView contentContainerStyle={styles.mobileScrollContent}>
-          {/* 이미지 → 텍스트+버튼 순서 */}
           <View style={styles.mobileVisualSection}>
             {imageContent}
           </View>
@@ -76,6 +81,7 @@ export default function Main({ navigation }: Props) {
             {textContent}
           </View>
         </ScrollView>
+        <BottomTabBar activeTab="home" onTabPress={handleTabPress} />
       </View>
     );
   }

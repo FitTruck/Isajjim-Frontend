@@ -19,6 +19,7 @@ import Main from './src/Pages/Main';
 import LoginPage from './src/Pages/LoginPage';
 import AuthCallbackPage from './src/Pages/AuthCallbackPage';
 import AuthFailedPage from './src/Pages/AuthFailedPage';
+import SplashPage from './src/Pages/SplashPage';
 
 // 각 화면의 매개변수 타입들을 정의하고 있는 타입 import
 import { RootStackParamList } from './src/types/navigation';
@@ -114,7 +115,7 @@ export default function App() {
         <NavigationContainer linking={linking} ref={navigationRef}>
           {/* Stack.Navigator: 각 화면을 스택처럼 쌓아 관리 */}
           <Stack.Navigator
-            initialRouteName="Main" // 첫 화면의 name
+            initialRouteName="Splash" // 첫 화면의 name
             screenOptions={{
               headerShown: false, // 헤더 숨김
               contentStyle: { backgroundColor: 'white' },
@@ -123,6 +124,7 @@ export default function App() {
           >
             {/* Stack.Screen: 각 화면을 정의. 각각의 component에는 컴포넌트 명을 써야함 */}
             {/* name은 MainScreen이나 UserSelect에서 부를 때 파라미터와 일치해야함 */}
+            <Stack.Screen name="Splash" component={SplashPage} />
             <Stack.Screen name="Main" component={Main} />
             <Stack.Screen name="Upload" component={UploadScreen} />
             <Stack.Screen name="UserSelect" component={UserSelect} />
