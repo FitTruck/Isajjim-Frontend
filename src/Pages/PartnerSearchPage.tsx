@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Star, MapPin } from 'lucide-react-native';
+import { Star, MapPin, MessageCircle } from 'lucide-react-native';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types/navigation';
@@ -9,6 +9,7 @@ import BottomTabBar, { TabKey } from '../components/common/BottomTabBar';
 
 interface Partner {
   id: number;
+  targetId: number;
   name: string;
   rating: number;
   reviewCount: number;
@@ -20,94 +21,14 @@ interface Partner {
 }
 
 const MOCK_PARTNERS: Partner[] = [
-  {
-    id: 1,
-    name: '빠른이사 전문팀',
-    rating: 4.9,
-    reviewCount: 312,
-    region: '서울 전지역',
-    specialty: ['가정이사', '원룸이사'],
-    priceRange: '30만원~',
-    description: '10년 경력 전문 이사팀. 신속하고 꼼꼼한 포장으로 안전한 이사를 보장합니다.',
-    experience: 10,
-  },
-  {
-    id: 2,
-    name: '믿음이사',
-    rating: 4.8,
-    reviewCount: 241,
-    region: '서울·경기',
-    specialty: ['가정이사', '사무실이사'],
-    priceRange: '40만원~',
-    description: '대형 이사부터 소형 이사까지. 분리수거 서비스 포함.',
-    experience: 8,
-  },
-  {
-    id: 3,
-    name: '편한이사 서비스',
-    rating: 4.7,
-    reviewCount: 188,
-    region: '경기 전지역',
-    specialty: ['원룸이사', '포장이사'],
-    priceRange: '25만원~',
-    description: '합리적인 가격에 프리미엄 서비스. 포장재 무상 제공.',
-    experience: 6,
-  },
-  {
-    id: 4,
-    name: '안심이사',
-    rating: 4.7,
-    reviewCount: 156,
-    region: '서울 강남·송파',
-    specialty: ['가정이사', '피아노이사'],
-    priceRange: '50만원~',
-    description: '피아노, 금고 등 특수물품 이사 전문. 파손 시 100% 보상.',
-    experience: 12,
-  },
-  {
-    id: 5,
-    name: '스마트무빙',
-    rating: 4.6,
-    reviewCount: 134,
-    region: '인천·부천',
-    specialty: ['원룸이사', '가정이사'],
-    priceRange: '20만원~',
-    description: '1인 가구 전문 이사 서비스. 당일 이사 가능.',
-    experience: 4,
-  },
-  {
-    id: 6,
-    name: '하나이사센터',
-    rating: 4.6,
-    reviewCount: 98,
-    region: '서울 마포·은평',
-    specialty: ['사무실이사', '가정이사'],
-    priceRange: '45만원~',
-    description: '사무실 이사 전문. 야간·주말 이사 가능.',
-    experience: 9,
-  },
-  {
-    id: 7,
-    name: '나라이사',
-    rating: 4.5,
-    reviewCount: 87,
-    region: '수원·용인',
-    specialty: ['가정이사', '장거리이사'],
-    priceRange: '35만원~',
-    description: '수도권 전 지역 장거리 이사 전문.',
-    experience: 7,
-  },
-  {
-    id: 8,
-    name: '친절이사 24',
-    rating: 4.5,
-    reviewCount: 73,
-    region: '서울 노원·도봉',
-    specialty: ['원룸이사', '포장이사'],
-    priceRange: '22만원~',
-    description: '24시간 상담 가능. 이사 당일까지 친절 안내.',
-    experience: 5,
-  },
+  { id: 1, targetId: 2,  name: '빠른이사 전문팀',  rating: 4.9, reviewCount: 312, region: '서울 전지역',     specialty: ['가정이사', '원룸이사'],   priceRange: '30만원~', description: '10년 경력 전문 이사팀. 신속하고 꼼꼼한 포장으로 안전한 이사를 보장합니다.', experience: 10 },
+  { id: 2, targetId: 3,  name: '믿음이사',          rating: 4.8, reviewCount: 241, region: '서울·경기',       specialty: ['가정이사', '사무실이사'], priceRange: '40만원~', description: '대형 이사부터 소형 이사까지. 분리수거 서비스 포함.',                         experience: 8  },
+  { id: 3, targetId: 4,  name: '편한이사 서비스',   rating: 4.7, reviewCount: 188, region: '경기 전지역',     specialty: ['원룸이사', '포장이사'],   priceRange: '25만원~', description: '합리적인 가격에 프리미엄 서비스. 포장재 무상 제공.',                        experience: 6  },
+  { id: 4, targetId: 5,  name: '안심이사',           rating: 4.7, reviewCount: 156, region: '서울 강남·송파', specialty: ['가정이사', '피아노이사'], priceRange: '50만원~', description: '피아노, 금고 등 특수물품 이사 전문. 파손 시 100% 보상.',                   experience: 12 },
+  { id: 5, targetId: 6,  name: '스마트무빙',         rating: 4.6, reviewCount: 134, region: '인천·부천',       specialty: ['원룸이사', '가정이사'],   priceRange: '20만원~', description: '1인 가구 전문 이사 서비스. 당일 이사 가능.',                               experience: 4  },
+  { id: 6, targetId: 7,  name: '하나이사센터',       rating: 4.6, reviewCount: 98,  region: '서울 마포·은평', specialty: ['사무실이사', '가정이사'], priceRange: '45만원~', description: '사무실 이사 전문. 야간·주말 이사 가능.',                                   experience: 9  },
+  { id: 7, targetId: 8,  name: '나라이사',           rating: 4.5, reviewCount: 87,  region: '수원·용인',       specialty: ['가정이사', '장거리이사'], priceRange: '35만원~', description: '수도권 전 지역 장거리 이사 전문.',                                          experience: 7  },
+  { id: 8, targetId: 9,  name: '친절이사 24',        rating: 4.5, reviewCount: 73,  region: '서울 노원·도봉', specialty: ['원룸이사', '포장이사'],   priceRange: '22만원~', description: '24시간 상담 가능. 이사 당일까지 친절 안내.',                               experience: 5  },
 ];
 
 const StarRating = ({ rating }: { rating: number }) => (
@@ -117,8 +38,8 @@ const StarRating = ({ rating }: { rating: number }) => (
   </View>
 );
 
-const PartnerCard = ({ partner }: { partner: Partner }) => (
-  <TouchableOpacity style={styles.card} activeOpacity={0.75}>
+const PartnerCard = ({ partner, onChat }: { partner: Partner; onChat: () => void }) => (
+  <View style={styles.card}>
     <View style={styles.cardBody}>
       <View style={styles.cardHeader}>
         <Text style={styles.cardName}>{partner.name}</Text>
@@ -135,15 +56,21 @@ const PartnerCard = ({ partner }: { partner: Partner }) => (
         <Text style={styles.regionText}>{partner.region}</Text>
       </View>
       <Text style={styles.description} numberOfLines={2}>{partner.description}</Text>
-      <View style={styles.tagRow}>
-        {partner.specialty.map(tag => (
-          <View key={tag} style={styles.tag}>
-            <Text style={styles.tagText}>{tag}</Text>
-          </View>
-        ))}
+      <View style={styles.cardFooter}>
+        <View style={styles.tagRow}>
+          {partner.specialty.map(tag => (
+            <View key={tag} style={styles.tag}>
+              <Text style={styles.tagText}>{tag}</Text>
+            </View>
+          ))}
+        </View>
+        <TouchableOpacity style={styles.chatBtn} onPress={onChat} activeOpacity={0.8}>
+          <MessageCircle size={14} color="#fff" />
+          <Text style={styles.chatBtnText}>채팅하기</Text>
+        </TouchableOpacity>
       </View>
     </View>
-  </TouchableOpacity>
+  </View>
 );
 
 export default function PartnerSearchPage() {
@@ -169,7 +96,15 @@ export default function PartnerSearchPage() {
       <FlatList
         data={MOCK_PARTNERS}
         keyExtractor={item => String(item.id)}
-        renderItem={({ item }) => <PartnerCard partner={item} />}
+        renderItem={({ item }) => (
+          <PartnerCard
+            partner={item}
+            onChat={() => navigation.navigate('ChatRoom', {
+              targetId: item.targetId,
+              targetName: item.name,
+            })}
+          />
+        )}
         contentContainerStyle={styles.listContent}
         showsVerticalScrollIndicator={false}
         ListEmptyComponent={
@@ -212,7 +147,14 @@ const styles = StyleSheet.create({
   regionRow: { flexDirection: 'row', alignItems: 'center', gap: 3 },
   regionText: { fontSize: 11, color: '#8F9098' },
   description: { fontSize: 12, color: '#71727A', lineHeight: 17, marginTop: 2 },
-  tagRow: { flexDirection: 'row', gap: 6, marginTop: 4 },
+  cardFooter: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 8, gap: 8 },
+  tagRow: { flexDirection: 'row', gap: 6, flexWrap: 'wrap', flex: 1 },
+  chatBtn: {
+    flexDirection: 'row', alignItems: 'center', gap: 4,
+    backgroundColor: '#006FFD', borderRadius: 8,
+    paddingHorizontal: 12, paddingVertical: 7,
+  },
+  chatBtnText: { fontSize: 12, fontWeight: '600', color: '#fff' },
   tag: {
     paddingHorizontal: 8, paddingVertical: 3,
     backgroundColor: '#EAF2FF', borderRadius: 6,
