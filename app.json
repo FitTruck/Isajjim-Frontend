@@ -17,7 +17,15 @@
     },
     "plugins": [
       "expo-asset",
-      "expo-web-browser"
+      "expo-web-browser",
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/logo.png",
+          "color": "#006FFD",
+          "sounds": []
+        }
+      ]
     ],
     "scheme": "isajjim",
     "android": {
