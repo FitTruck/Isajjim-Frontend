@@ -1,33 +1,63 @@
 import React, { useRef, useEffect, useLayoutEffect, useMemo, useState, useCallback, forwardRef, useImperativeHandle } from 'react';
 import { View, TouchableOpacity, Text, StyleSheet } from 'react-native';
-import { Canvas, extend, useThree, useFrame } from '@react-three/fiber';
-import { OrbitControls as OrbitControlsStd } from 'three-stdlib';
+import { Canvas, useThree, useFrame } from '@react-three/fiber';
+import { OrbitControls } from '@react-three/drei';
 import * as THREE from 'three';
 import TruckContainer from './TruckContainer';
-import { loadPLY, getGeometrySize } from './utils/plyLoader';
 import { Space3DProps, TruckType, TRUCK_DIMENSIONS, SimulationTruckResult } from '../../types/simulation';
 import { optimizeOBB, packMultiTruck } from '../../binPacking/packer';
 import { OBBItem, PlacedBox, Orientation, TruckPlacement } from '../../binPacking/types';
 
-extend({ OrbitControlsStd });
+// label → hue 매핑 (사용 빈도 순 정렬 후 골든 앵글 137.5° 배분)
+// 자주 함께 등장하는 BED/SOFA/DESK가 서로 멀리 떨어진 색상을 가짐
+const LABEL_HUE: Record<string, number> = {
+  BED: 0,              // 빨강
+  SOFA: 138,           // 초록
+  WARDROBE: 275,       // 보라
+  DINING_TABLE: 53,    // 주황-노랑
+  DESK: 190,           // 청록
+  REFRIGERATOR: 328,   // 핑크
+  WASHING_MACHINE: 105,// 연두
+  NIGHTSTAND: 243,     // 파랑-보라
+  CABINET: 20,         // 주황
+  CHAIR_STOOL: 158,    // 청록-초록
+  BOOKSHELF: 295,      // 자주
+  COFFEE_TABLE: 73,    // 노랑
+  MONITOR_TV: 210,     // 파랑
+  DRAWER: 348,         // 빨강-핑크
+  TV_STAND: 125,       // 연두-초록
+  POTTED_PLANT: 263,   // 남보라
+  DRYER: 40,           // 주황-노랑
+  DISPLAY_SHELF: 178,  // 청록
+  MIRROR: 315,         // 자주-핑크
+  VANITY_TABLE: 93,    // 노랑-연두
+  DISH_CABINET: 230,   // 파랑
+  MICROWAVE_OVEN: 8,   // 빨강-주황
+  AIR_CONDITIONER: 145,// 초록
+  PIANO: 283,          // 보라
+  MASSAGE_CHAIR: 60,   // 노랑-주황
+  TREADMILL: 198,      // 청록-파랑
+  EXERCISE_BIKE: 335,  // 빨강-핑크
+  STORAGE_BOX: 113,    // 연두
+  FAN: 250,            // 파랑-보라
+  box: 28,             // 주황 (fallback)
+};
 
-declare module '@react-three/fiber' {
-  interface ThreeElements {
-    orbitControlsStd: any;
-  }
+function generateColor(label: string): string {
+  const hue = label in LABEL_HUE
+    ? LABEL_HUE[label]
+    : Math.abs(label.split('').reduce((h, c) => ((h << 5) - h + c.charCodeAt(0)) | 0, 5381)) % 360;
+  return `hsl(${hue}, 65%, 60%)`;
 }
 
-// 로드된 가구 데이터
 interface LoadedFurniture {
   id: string;
-  geometry: THREE.BufferGeometry;
-  material: THREE.PointsMaterial;
-  // 박스 테두리 렌더링을 위한 엣지 지오메트리 (옵션)
-  edgesGeometry?: THREE.EdgesGeometry;
-  // PLY 바운딩박스 크기 (m) - AI 서버가 절대 크기로 제공
-  width: number;
-  depth: number;
-  height: number;
+  color: string;
+  geometry: THREE.BoxGeometry;
+  edgesGeometry: THREE.EdgesGeometry;
+  width: number;  // m
+  depth: number;  // m
+  height: number; // m
 }
 
 // 트럭 간 간격 (m)
@@ -59,8 +89,7 @@ const AnimatedControls: React.FC<AnimatedControlsProps> = ({
   targetPosition,
   animationDuration = 800,
 }) => {
-  const { camera, gl } = useThree();
-  const controlsRef = useRef<OrbitControlsStd>(null);
+  const controlsRef = useRef<any>(null);
 
   const cameraDistance = useMemo(() => {
     if (!truckType) return { min: 5, max: 100 };
@@ -69,17 +98,14 @@ const AnimatedControls: React.FC<AnimatedControlsProps> = ({
     return { min: maxDim * 1.5, max: maxDim * 10 };
   }, [truckType]);
 
-  // 애니메이션 상태
+  // target만 애니메이션 (camera.position 직접 조작 시 OrbitControls 내부 구면좌표 충돌)
   const animState = useRef({
     isAnimating: false,
     startTime: 0,
     startTarget: new THREE.Vector3(),
     endTarget: new THREE.Vector3(),
-    startCamPos: new THREE.Vector3(),
-    endCamPos: new THREE.Vector3(),
   });
 
-  // targetPosition 변경 시 애니메이션 시작
   useEffect(() => {
     if (!controlsRef.current) return;
 
@@ -88,53 +114,36 @@ const AnimatedControls: React.FC<AnimatedControlsProps> = ({
 
     if (current.distanceTo(target) < 0.01) return;
 
-    const offset = camera.position.clone().sub(current);
-
     animState.current = {
       isAnimating: true,
       startTime: performance.now(),
       startTarget: current,
       endTarget: target,
-      startCamPos: camera.position.clone(),
-      endCamPos: target.clone().add(offset),
     };
-  }, [targetPosition, camera]);
+  }, [targetPosition]);
 
-  // 프레임마다 애니메이션 업데이트
   useFrame(() => {
-    if (!controlsRef.current) return;
+    if (!controlsRef.current || !animState.current.isAnimating) return;
 
-    if (animState.current.isAnimating) {
-      const elapsed = performance.now() - animState.current.startTime;
-      const progress = Math.min(elapsed / animationDuration, 1);
-      const eased = easeOutCubic(progress);
+    const elapsed = performance.now() - animState.current.startTime;
+    const progress = Math.min(elapsed / animationDuration, 1);
+    const eased = easeOutCubic(progress);
 
-      // 타겟 보간
-      controlsRef.current.target.lerpVectors(
-        animState.current.startTarget,
-        animState.current.endTarget,
-        eased
-      );
+    controlsRef.current.target.lerpVectors(
+      animState.current.startTarget,
+      animState.current.endTarget,
+      eased
+    );
 
-      // 카메라 위치 보간
-      camera.position.lerpVectors(
-        animState.current.startCamPos,
-        animState.current.endCamPos,
-        eased
-      );
-
-      if (progress >= 1) {
-        animState.current.isAnimating = false;
-      }
+    if (progress >= 1) {
+      animState.current.isAnimating = false;
     }
-
-    controlsRef.current.update();
   });
 
   return (
-    <orbitControlsStd
+    <OrbitControls
       ref={controlsRef}
-      args={[camera, gl.domElement]}
+      makeDefault
       enableDamping={true}
       dampingFactor={0.05}
       minDistance={cameraDistance.min}
@@ -144,18 +153,14 @@ const AnimatedControls: React.FC<AnimatedControlsProps> = ({
   );
 };
 
-// 가구 메시 컴포넌트 (이미 로드된 geometry 사용)
-interface FurniturePointsProps {
+// 가구 박스 컴포넌트
+interface FurnitureBoxProps {
   furniture: LoadedFurniture;
   placement: PlacedBox;
   visible: boolean;
 }
 
-const FurniturePoints: React.FC<FurniturePointsProps> = ({
-  furniture,
-  placement,
-  visible,
-}) => {
+const FurnitureBox: React.FC<FurnitureBoxProps> = ({ furniture, placement, visible }) => {
   const groupRef = useRef<THREE.Group>(null);
   const hasAppeared = useRef(false);
 
@@ -164,18 +169,14 @@ const FurniturePoints: React.FC<FurniturePointsProps> = ({
   const targetY = placement.y / 100 + furniture.height / 2;
   const targetZ = placement.z / 100;
 
-  // 회전
   const rotationY = placement.orientation === Orientation.WLH ? Math.PI / 2 : 0;
 
-  // 첫 paint 전에 시작 위치 설정 (y=0 깜빡임 방지)
-  // useLayoutEffect는 브라우저 paint 전에 동기적으로 실행됨
   useLayoutEffect(() => {
     if (visible && groupRef.current && !hasAppeared.current) {
       groupRef.current.position.y = targetY + 1.5;
     }
   }, [visible, targetY]);
 
-  // visible이 true가 될 때 애니메이션
   useEffect(() => {
     if (visible && groupRef.current) {
       const isFirstAppearance = !hasAppeared.current;
@@ -189,13 +190,11 @@ const FurniturePoints: React.FC<FurniturePointsProps> = ({
         startY = groupRef.current.position.y;
       }
 
-      // 목표 위치와 차이가 적으면 바로 설정하고 종료
       if (Math.abs(startY - targetY) < 0.005) {
         groupRef.current.position.y = targetY;
         return;
       }
 
-      // 애니메이션 실행
       const duration = 270;
       const startTime = performance.now();
 
@@ -229,12 +228,12 @@ const FurniturePoints: React.FC<FurniturePointsProps> = ({
       position-z={targetZ}
       rotation={[0, rotationY, 0]}
     >
-      <points geometry={furniture.geometry} material={furniture.material} />
-      {furniture.edgesGeometry && (
-        <lineSegments geometry={furniture.edgesGeometry}>
-           <lineBasicMaterial color="#CC6600" />
-        </lineSegments>
-      )}
+      <mesh geometry={furniture.geometry}>
+        <meshStandardMaterial color={furniture.color} transparent opacity={0.85} />
+      </mesh>
+      <lineSegments geometry={furniture.edgesGeometry}>
+        <lineBasicMaterial color="#333333" transparent opacity={0.4} />
+      </lineSegments>
     </group>
   );
 };
@@ -288,7 +287,7 @@ const MultiTruckScene: React.FC<MultiTruckSceneProps> = ({
               if (!furniture) return null;
 
               return (
-                <FurniturePoints
+                <FurnitureBox
                   key={`${resetKey}-${truckIdx}-${placement.itemId}`}
                   furniture={furniture}
                   placement={placement}
@@ -303,11 +302,6 @@ const MultiTruckScene: React.FC<MultiTruckSceneProps> = ({
   );
 };
 
-// PLY 캐시 (ply_url → geometry/material) - 컴포넌트 외부에 선언하여 전역 캐시로 사용
-const plyCache = new Map<string, { geometry: THREE.BufferGeometry; material: THREE.PointsMaterial; edgesGeometry?: THREE.EdgesGeometry; width: number; depth: number; height: number }>();
-
-const renderCountRef = { current: 0 };
-
 export interface Space3DHandle {
   play: () => void;
 }
@@ -319,13 +313,9 @@ const Space3D = forwardRef<Space3DHandle, Space3DProps>(({
   onAnimationComplete,
   onTrucksChange,
 }, ref) => {
-  renderCountRef.current += 1;
-  console.log(`[Space3D] 렌더 #${renderCountRef.current} | furniture: ${furniture?.length}개 | plyCache: ${plyCache.size}개`);
-
   const [loadedFurniture, setLoadedFurniture] = useState<Map<string, LoadedFurniture>>(new Map());
   const [trucks, setTrucks] = useState<TruckPlacement[]>([]);
   const [currentTruckIndex, setCurrentTruckIndex] = useState(0);
-  const [isLoading, setIsLoading] = useState(false);
   const [visibleItemIds, setVisibleItemIds] = useState<Set<string>>(new Set());
   const [isPlaying, setIsPlaying] = useState(false);
   const [resetKey, setResetKey] = useState(0);
@@ -348,127 +338,31 @@ const Space3D = forwardRef<Space3DHandle, Space3DProps>(({
   const currentTruck = trucks[currentTruckIndex];
   const currentTruckType = currentTruck?.type || truckType || '2.5ton';
 
-  // 1. PLY 로드 (AI 서버가 절대 크기 PLY 제공 → 스케일링 불필요)
-  // 캐시를 사용하여 같은 ply_url은 다시 다운로드하지 않음
+  // 1. 가구 치수(m)로 BoxGeometry 생성
   useEffect(() => {
     if (!furniture || furniture.length === 0) {
       setLoadedFurniture(new Map());
       return;
     }
-    const loadAllPLY = async () => {
-      console.log(`[PLY] 로드 시작 | 가구: ${furniture.length}개 | 캐시: ${plyCache.size}개`);
-      const t0 = performance.now();
-      if (loadedFurniture.size === 0) {
-        setIsLoading(true);
-      }
-      const loaded = new Map<string, LoadedFurniture>();
 
-      // 1. 모든 비동기 작업(Promise)을 배열로 생성
-      const loadPromises = furniture.map(async (f) => {
-        if (!f.ply_url) return null;
-
-        // furnitureId를 직접 키로 사용 (배열 인덱스 제거)
-        const id = String(f.furnitureId);
-
-        // BOX_PLACEHOLDER 처리 (박스 추가 기능)
-        if (f.ply_url === 'BOX_PLACEHOLDER') {
-          let cached = plyCache.get('BOX_PLACEHOLDER');
-          if (!cached) {
-             // 50cm x 30cm x 35cm 박스 생성
-             const width = 0.5; 
-             const height = 0.35; 
-             const depth = 0.3; 
-             // 세그먼트를 50으로 증가시켜 점 밀도 향상
-             const geometry = new THREE.BoxGeometry(width, height, depth, 40, 40, 40);
-             // 테두리용 지오메트리 (세그먼트 없는 박스로 생성)
-             const edgesGeometry = new THREE.EdgesGeometry(new THREE.BoxGeometry(width, height, depth));
-             // 점 크기를 키워 가시성 향상
-             const material = new THREE.PointsMaterial({ size: 0.025, color: '#F0893B' });
-             cached = { geometry, material, edgesGeometry, width, depth, height };
-             plyCache.set('BOX_PLACEHOLDER', cached);
-          }
-          return {
-             id,
-             data: {
-               id,
-               geometry: cached.geometry,
-               material: cached.material,
-               edgesGeometry: cached.edgesGeometry,
-               width: cached.width,
-               depth: cached.depth,
-               height: cached.height,
-             }
-          };
-        }
-
-        // 캐시 확인
-        const cached = plyCache.get(f.ply_url);
-        if (cached) {
-          console.log(`[PLY 캐시 히트] ${id} (${f.ply_url.slice(-30)})`);
-          return {
-            id,
-            data: {
-              id,
-              geometry: cached.geometry,
-              material: cached.material,
-              edgesGeometry: cached.edgesGeometry,
-              width: cached.width,
-              depth: cached.depth,
-              height: cached.height,
-            }
-          };
-        }
-
-        // 캐시 미스 → 다운로드
-        try {
-          console.log(`[PLY 다운로드] ${id}`);
-          const { geometry, material } = await loadPLY(f.ply_url, 0.008, false);
-          geometry.center();
-          const size = getGeometrySize(geometry);
-
-          // 캐시에 저장
-          plyCache.set(f.ply_url, {
-            geometry,
-            material,
-            width: size.x,
-            depth: size.z,
-            height: size.y,
-          });
-
-          return {
-            id,
-            data: {
-              id,
-              geometry,
-              material,
-              width: size.x,
-              depth: size.z,
-              height: size.y,
-            }
-          };
-        } catch (err) {
-          console.error(`PLY 로드 실패: ${id}`, err);
-          return null;
-        }
+    const loaded = new Map<string, LoadedFurniture>();
+    furniture.forEach((f) => {
+      const id = String(f.furnitureId);
+      const w = Math.max(f.width / 1000, 0.001);  // mm → m
+      const d = Math.max(f.depth / 1000, 0.001);
+      const h = Math.max(f.height / 1000, 0.001);
+      loaded.set(id, {
+        id,
+        color: generateColor(f.label),
+        geometry: new THREE.BoxGeometry(w, h, d),
+        edgesGeometry: new THREE.EdgesGeometry(new THREE.BoxGeometry(w, h, d)),
+        width: w,
+        depth: d,
+        height: h,
       });
+    });
 
-      // 2. Promise.all로 모든 요청을 병렬로 처리
-      const results = await Promise.all(loadPromises);
-
-      // 3. 결과값을 Map에 세팅
-      results.forEach((result) => {
-        if (result) {
-          loaded.set(result.id, result.data);
-          console.log(`[PLY 로드 완료] ${result.id}`);
-        }
-      });
-
-      console.log(`[PLY] 로드 완료 | ${loaded.size}개 | ${(performance.now() - t0).toFixed(0)}ms`);
-      setLoadedFurniture(loaded);
-      setIsLoading(false);
-    };
-
-    loadAllPLY();
+    setLoadedFurniture(loaded);
   }, [furniture]);
 
   // 2. PLY 로드 완료 후 binPacking 실행 (quantity 반영)
@@ -625,52 +519,22 @@ const Space3D = forwardRef<Space3DHandle, Space3DProps>(({
 
   useEffect(() => {
     return () => {
-      console.warn(`[Space3D] 클린업 실행! loadedFurniture: ${loadedFurniture.size}개, plyCache: ${plyCache.size}개 → 캐시 삭제됨`);
-      loadedFurniture.forEach((furniture) => {
+      loadedFurniture.forEach((item) => {
         try {
-          if (furniture.geometry) {
-            furniture.geometry.dispose();
-          }
-          if (furniture.material) {
-            furniture.material.dispose();
-          }
-          if (furniture.edgesGeometry) {
-            furniture.edgesGeometry.dispose();
-          }
-        } catch (error) {
-          // 에러 무시
-        }
+          item.geometry.dispose();
+          item.edgesGeometry.dispose();
+        } catch (_) {}
       });
-      
-      // 2. PLY 캐시의 모든 리소스 dispose
-      plyCache.forEach((cached) => {
-        try {
-          if (cached.geometry) {
-            cached.geometry.dispose();
-          }
-          if (cached.material) {
-            cached.material.dispose();
-          }
-          if (cached.edgesGeometry) {
-            cached.edgesGeometry.dispose();
-          }
-        } catch (error) {
-          // 에러 무시
-        }
-      });
-      
-      // 3. 캐시 클리어
-      plyCache.clear();
     };
-  }, [loadedFurniture]); // loadedFurniture가 변경될 때마다 새로운 cleanup 함수 생성
+  }, [loadedFurniture]);
 
   // autoPlay 처리: 데이터 준비 완료 시 자동 재생
   useEffect(() => {
     // simulationState가 idle이고 visible 아이템이 없을 때만 자동 재생
-    if (autoPlay && !isLoading && trucks.length > 0 && !isPlaying && visibleItemIds.size === 0 && simulationState === 'idle') {
+    if (autoPlay && trucks.length > 0 && !isPlaying && visibleItemIds.size === 0 && simulationState === 'idle') {
       play();
     }
-  }, [autoPlay, isLoading, trucks.length, visibleItemIds.size, simulationState]);
+  }, [autoPlay, trucks.length, visibleItemIds.size, simulationState]);
 
   // 최신 값을 참조하기 위한 ref
   const trucksRef = useRef(trucks);
@@ -859,9 +723,7 @@ const Space3D = forwardRef<Space3DHandle, Space3DProps>(({
       {/* 컨트롤 UI */}
       {hasSimulation && (
         <View style={styles.controlsOverlay}>
-          {isLoading ? (
-            <Text style={styles.loadingText}>가구 가져오는 중...</Text>
-          ) : trucks.length === 0 ? (
+          {trucks.length === 0 ? (
             <Text style={styles.loadingText}>배치 계산 중...</Text>
           ) : (
             <View style={styles.controlsRow}>

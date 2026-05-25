@@ -99,19 +99,14 @@ export default function Result({ navigation }: Props) {
           height: data[i].height,
         } : null,
         // furnitureList : userselect에서 전달받은 가구 정보
-        // V2.5: 확장된 가구 데이터 (ply_url, width, depth, height, volume)
         contents: imgResult.furnitureList ? imgResult.furnitureList.map((f: any) => ({
           furnitureId: f.furnitureId,
           label: f.label,
           type: f.type,
           quantity: f.quantity,
-          // V2.5 추가 필드
           width: f.width || 0,      // mm
           depth: f.depth || 0,      // mm
           height: f.height || 0,    // mm
-          volume: f.volume || 0,    // m³
-          ply_url: f.plyUrl || null,  // PLY URL (백엔드: plyUrl)
-          // 객체 중심 좌표 (이미지 위 마커 표시용)
           centerX: f.centerX,
           centerY: f.centerY,
         })) : []
@@ -138,7 +133,7 @@ export default function Result({ navigation }: Props) {
 
     const furniture = results.flatMap((result) =>
       result.contents
-        .filter((c: any) => c.ply_url && c.quantity > 0)  // PLY가 있고 quantity > 0인 것만
+        .filter((c: any) => c.quantity > 0)
         .map((c: any): SimulationFurniture => ({
           furnitureId: c.furnitureId,
           label: c.label,
@@ -147,23 +142,19 @@ export default function Result({ navigation }: Props) {
           width: c.width,
           depth: c.depth,
           height: c.height,
-          volume: c.volume,
-          ply_url: c.ply_url,
         }))
     );
 
     // 박스 추가 - 단일 객체로 표현하고 quantity로 수량 관리
     if (boxQuantity > 0) {
       return [...furniture, {
-        furnitureId: 'box',  // 고정된 ID 사용
+        furnitureId: 'box',
         label: '박스',
         type: 'box',
-        quantity: boxQuantity,  // 수량으로 관리
-        width: 500,  // mm
-        depth: 300,  // mm
-        height: 350, // mm
-        volume: 0.0525,
-        ply_url: 'BOX_PLACEHOLDER',
+        quantity: boxQuantity,
+        width: 500,   // mm (50cm)
+        depth: 300,   // mm (30cm)
+        height: 350,  // mm (35cm)
       }];
     }
 
@@ -388,10 +379,10 @@ export default function Result({ navigation }: Props) {
             <Text style={mStyles.subtitle}>인식된 가구 목록을 확인해주세요.</Text>
           </View>
 
-          {/* 3D 시뮬레이션 - ScrollView 밖, 터치 이벤트 차단 */}
+          {/* 3D 시뮬레이션 - ScrollView 밖 */}
           {isFocused && (
             <View style={{ position: 'relative' }}>
-              <View style={mStyles.simulation} pointerEvents="none">
+              <View style={mStyles.simulation}>
                 <Space3D
                   ref={mobileSpace3DRef}
                   furniture={simulationFurniture}
@@ -477,7 +468,7 @@ export default function Result({ navigation }: Props) {
             onRequestClose={() => setIsMobileFullscreen(false)}
           >
             <View style={mStyles.fullscreenContainer}>
-              <View style={{ flex: 1 }} pointerEvents="none">
+              <View style={{ flex: 1 }}>
                 <Space3D
                   ref={fullscreenSpace3DRef}
                   furniture={simulationFurniture}
