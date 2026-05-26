@@ -12,7 +12,7 @@ export default function PersonalInfoPage() {
     <SafeAreaView style={styles.container}>
       <View style={styles.navBar}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn} hitSlop={8}>
-          <ChevronLeft size={20} color="#1F2024" />
+          <ChevronLeft size={20} color="#423E3E" />
         </TouchableOpacity>
         <Text style={styles.navTitle}>개인정보 수정</Text>
       </View>
@@ -39,7 +39,7 @@ const styles = StyleSheet.create({
   backBtn: { width: 32, justifyContent: 'center' },
   navTitle: {
     flex: 1, textAlign: 'center',
-    fontSize: 14, fontWeight: '700', color: '#1F2024',
+    fontSize: 14, fontWeight: '700', color: '#423E3E',
     marginRight: 32,
   },
   content: {
@@ -47,11 +47,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24, gap: 10,
   },
   title: {
-    fontSize: 24, fontWeight: '800', color: '#1F2024',
+    fontSize: 24, fontWeight: '800', color: '#423E3E',
     textAlign: 'center', letterSpacing: 0.2,
   },
   subtitle: {
-    fontSize: 12, fontWeight: '500', color: '#71727A',
+    fontSize: 12, fontWeight: '500', color: '#949494',
     textAlign: 'center', lineHeight: 16, letterSpacing: 0.1,
   },
 });

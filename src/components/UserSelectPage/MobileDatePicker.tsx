@@ -86,10 +86,10 @@ export default function MobileDatePicker({ value, onSelect }: Props) {
           <Text style={styles.monthYear}>{year}년 {month + 1}월</Text>
           <View style={styles.controls}>
             <TouchableOpacity onPress={prevMonth} hitSlop={8} disabled={isPrevMonthDisabled}>
-              <ChevronLeft size={16} color={isPrevMonthDisabled ? '#C5C6CC' : '#1F2024'} />
+              <ChevronLeft size={16} color={isPrevMonthDisabled ? '#E8E8E8' : '#423E3E'} />
             </TouchableOpacity>
             <TouchableOpacity onPress={nextMonth} hitSlop={8}>
-              <ChevronRight size={16} color="#1F2024" />
+              <ChevronRight size={16} color="#423E3E" />
             </TouchableOpacity>
           </View>
         </View>
@@ -181,7 +181,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 14,
     fontWeight: '700',
-    color: '#1F2024',
+    color: '#423E3E',
   },
   controls: {
     flexDirection: 'row',
@@ -200,7 +200,7 @@ const styles = StyleSheet.create({
   weekText: {
     fontSize: 10,
     fontWeight: '600',
-    color: '#8F9098',
+    color: '#949494',
     letterSpacing: 0.5,
   },
   legend: {
@@ -214,11 +214,11 @@ const styles = StyleSheet.create({
     width: 5,
     height: 5,
     borderRadius: 3,
-    backgroundColor: '#006FFD',
+    backgroundColor: '#F36845',
   },
   legendText: {
     fontSize: 11,
-    color: '#71727A',
+    color: '#949494',
     fontWeight: '500',
   },
   daysContainer: {
@@ -236,18 +236,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   todayCell: {
-    backgroundColor: '#F8F9FE',
+    backgroundColor: '#FAF5F0',
   },
   selectedCell: {
-    backgroundColor: '#006FFD',
+    backgroundColor: '#F36845',
   },
   dayText: {
     fontSize: 12,
     fontWeight: '700',
-    color: '#494A50',
+    color: '#423E3E',
   },
   pastDayText: {
-    color: '#C5C6CC',
+    color: '#E8E8E8',
     fontWeight: '400',
   },
   selectedDayText: {
@@ -262,7 +262,7 @@ const styles = StyleSheet.create({
     width: 5,
     height: 5,
     borderRadius: 3,
-    backgroundColor: '#006FFD',
+    backgroundColor: '#F36845',
   },
   sonDotSelected: {
     backgroundColor: '#fff',

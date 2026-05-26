@@ -306,7 +306,7 @@ const styles = StyleSheet.create({
     color: '#333',
   },
   pastDayText: {
-    color: '#C5C6CC',
+    color: '#E8E8E8',
   },
   selectedDayText: {
     color: 'white',

@@ -104,7 +104,7 @@ export default function SettingsPage() {
                 <Text style={[styles.listLabel, item.label === '로그아웃' && styles.logoutLabel, item.label === '회원탈퇴' && styles.withdrawLabel]}>
                   {item.label}
                 </Text>
-                <ChevronRight size={12} color="#8F9098" />
+                <ChevronRight size={12} color="#949494" />
               </TouchableOpacity>
               {index < ITEMS.length - 1 && <View style={styles.divider} />}
             </React.Fragment>
@@ -182,7 +182,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: '#E5E5E5',
   },
-  navTitle: { fontSize: 14, fontWeight: '700', color: '#1F2024' },
+  navTitle: { fontSize: 14, fontWeight: '700', color: '#423E3E' },
   scrollContent: { paddingBottom: 24 },
   profileSection: {
     alignItems: 'center',
@@ -192,7 +192,7 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 40,
-    backgroundColor: '#EAF2FF',
+    backgroundColor: '#FFDEBB',
     justifyContent: 'flex-end',
     alignItems: 'center',
     overflow: 'hidden',
@@ -203,21 +203,21 @@ const styles = StyleSheet.create({
     width: 30,
     height: 30,
     borderRadius: 15,
-    backgroundColor: '#006FFD',
+    backgroundColor: '#F36845',
     opacity: 0.7,
   },
   avatarBody: {
     width: 56,
     height: 40,
     borderRadius: 28,
-    backgroundColor: '#006FFD',
+    backgroundColor: '#F36845',
     opacity: 0.7,
     marginBottom: -10,
   },
   settingsList: {
     marginHorizontal: 16,
     borderRadius: 12,
-    backgroundColor: '#F8F9FE',
+    backgroundColor: '#FAF5F0',
     paddingHorizontal: 16,
     paddingVertical: 8,
   },
@@ -228,8 +228,8 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     paddingHorizontal: 0,
   },
-  listLabel: { fontSize: 14, fontWeight: '500', color: '#1F2024' },
-  logoutLabel: { color: '#71727A' },
+  listLabel: { fontSize: 14, fontWeight: '500', color: '#423E3E' },
+  logoutLabel: { color: '#949494' },
   withdrawLabel: { color: '#FF4444' },
   divider: { height: StyleSheet.hairlineWidth, backgroundColor: '#E5E5EA' },
   overlay: {
@@ -248,11 +248,11 @@ const styles = StyleSheet.create({
   },
   dialogContent: { padding: 8, gap: 8, alignSelf: 'stretch', alignItems: 'center' },
   dialogTitle: {
-    fontSize: 16, fontWeight: '800', color: '#1F2024',
+    fontSize: 16, fontWeight: '800', color: '#423E3E',
     textAlign: 'center', letterSpacing: 0.1, alignSelf: 'stretch',
   },
   dialogDesc: {
-    fontSize: 12, fontWeight: '500', color: '#71727A',
+    fontSize: 12, fontWeight: '500', color: '#949494',
     textAlign: 'center', lineHeight: 16, letterSpacing: 0.1, alignSelf: 'stretch',
   },
   dialogActions: { flexDirection: 'row', gap: 8, alignSelf: 'stretch' },
@@ -260,8 +260,8 @@ const styles = StyleSheet.create({
     flex: 1, height: 40, borderRadius: 12,
     justifyContent: 'center', alignItems: 'center',
   },
-  dialogBtnOutline: { borderWidth: 2, borderColor: '#006FFD' },
-  dialogBtnOutlineText: { fontSize: 12, fontWeight: '600', color: '#006FFD' },
-  dialogBtnFill: { backgroundColor: '#006FFD' },
+  dialogBtnOutline: { borderWidth: 2, borderColor: '#F36845' },
+  dialogBtnOutlineText: { fontSize: 12, fontWeight: '600', color: '#F36845' },
+  dialogBtnFill: { backgroundColor: '#F36845' },
   dialogBtnFillText: { fontSize: 12, fontWeight: '600', color: '#fff' },
 });

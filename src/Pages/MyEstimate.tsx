@@ -25,7 +25,7 @@ const STATUS_CONFIG: Record<
   { label: string; color: string; bg: string }
 > = {
   pending:   { label: 'AI 분석 중',   color: '#F0893B', bg: '#FFF6EF' },
-  active:    { label: '견적 받는 중', color: '#006FFD', bg: '#EAF2FF' },
+  active:    { label: '견적 받는 중', color: '#F36845', bg: '#FFDEBB' },
   moving:    { label: '이사 진행 중', color: '#009443', bg: '#F0FFF7' },
   completed: { label: '완료',         color: '#888',    bg: '#F5F5F5' },
   cancelled: { label: '취소됨',       color: '#ADADAD', bg: '#F5F5F5' },
@@ -198,7 +198,7 @@ function DetailModal({ estimate, displayIndex, onClose }: { estimate: EstimateDa
               <Text style={modal.idText}>견적 #{displayIndex}</Text>
             </View>
             <TouchableOpacity onPress={onClose} style={modal.closeBtn} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
-              <X size={20} color="#71727A" />
+              <X size={20} color="#949494" />
             </TouchableOpacity>
           </View>
 
@@ -207,7 +207,7 @@ function DetailModal({ estimate, displayIndex, onClose }: { estimate: EstimateDa
             <View style={modal.section}>
               <View style={modal.infoRow}>
                 <View style={modal.infoLabelWrap}>
-                  <Calendar size={13} color="#71727A" />
+                  <Calendar size={13} color="#949494" />
                   <Text style={modal.infoLabel}>생성일</Text>
                 </View>
                 <Text style={modal.infoValue}>{formatDate(estimate.createdDate)}</Text>
@@ -221,7 +221,7 @@ function DetailModal({ estimate, displayIndex, onClose }: { estimate: EstimateDa
                 {estimate.preferredMovingDate && (
                   <View style={modal.infoRow}>
                     <View style={modal.infoLabelWrap}>
-                      <Calendar size={13} color="#71727A" />
+                      <Calendar size={13} color="#949494" />
                       <Text style={modal.infoLabel}>희망 날짜</Text>
                     </View>
                     <Text style={modal.infoValue}>{formatDate(estimate.preferredMovingDate)}</Text>
@@ -230,7 +230,7 @@ function DetailModal({ estimate, displayIndex, onClose }: { estimate: EstimateDa
                 {estimate.startLocation?.address && (
                   <View style={modal.infoRow}>
                     <View style={modal.infoLabelWrap}>
-                      <MapPin size={13} color="#71727A" />
+                      <MapPin size={13} color="#949494" />
                       <Text style={modal.infoLabel}>출발지</Text>
                     </View>
                     <Text style={modal.infoValue} numberOfLines={2}>
@@ -242,7 +242,7 @@ function DetailModal({ estimate, displayIndex, onClose }: { estimate: EstimateDa
                 {estimate.endLocation?.address && (
                   <View style={modal.infoRow}>
                     <View style={modal.infoLabelWrap}>
-                      <MapPin size={13} color="#006FFD" />
+                      <MapPin size={13} color="#F36845" />
                       <Text style={modal.infoLabel}>도착지</Text>
                     </View>
                     <Text style={modal.infoValue} numberOfLines={2}>
@@ -291,7 +291,7 @@ function DetailModal({ estimate, displayIndex, onClose }: { estimate: EstimateDa
               ) : (
                 trucks.map((t, idx) => (
                   <View key={idx} style={modal.listRow}>
-                    <Truck size={14} color="#71727A" style={{ marginRight: 6 }} />
+                    <Truck size={14} color="#949494" style={{ marginRight: 6 }} />
                     <Text style={modal.listName}>{formatTruckType(t.itemType)}</Text>
                     <Text style={modal.listQty}>{t.quantity}대</Text>
                   </View>
@@ -332,7 +332,7 @@ function EstimateCard({ estimate, displayIndex, onPress }: { estimate: EstimateD
         ) : (
           <View />
         )}
-        <ChevronRight size={16} color="#C5C6CC" />
+        <ChevronRight size={16} color="#E8E8E8" />
       </View>
 
       {/* 본문: 썸네일 + 정보 */}
@@ -341,7 +341,7 @@ function EstimateCard({ estimate, displayIndex, onPress }: { estimate: EstimateD
           <Image source={{ uri: thumbnail }} style={card.thumbnail} resizeMode="cover" />
         ) : (
           <View style={card.thumbPlaceholder}>
-            <ClipboardList size={22} color="#C5C6CC" />
+            <ClipboardList size={22} color="#E8E8E8" />
           </View>
         )}
 
@@ -352,7 +352,7 @@ function EstimateCard({ estimate, displayIndex, onPress }: { estimate: EstimateD
           {/* 이사 희망일 */}
           {estimate.preferredMovingDate ? (
             <View style={card.row}>
-              <Calendar size={13} color="#71727A" />
+              <Calendar size={13} color="#949494" />
               <Text style={card.metaText}>{formatDate(estimate.preferredMovingDate)} 이사 희망</Text>
             </View>
           ) : null}
@@ -360,7 +360,7 @@ function EstimateCard({ estimate, displayIndex, onPress }: { estimate: EstimateD
           {/* 출발지 */}
           {estimate.startLocation?.address ? (
             <View style={card.row}>
-              <MapPin size={13} color="#71727A" />
+              <MapPin size={13} color="#949494" />
               <Text style={card.metaText} numberOfLines={1}>{estimate.startLocation.address}</Text>
             </View>
           ) : null}
@@ -368,21 +368,21 @@ function EstimateCard({ estimate, displayIndex, onPress }: { estimate: EstimateD
           {/* 도착지 */}
           {estimate.endLocation?.address ? (
             <View style={card.row}>
-              <MapPin size={13} color="#006FFD" />
+              <MapPin size={13} color="#F36845" />
               <Text style={card.metaText} numberOfLines={1}>{estimate.endLocation.address}</Text>
             </View>
           ) : null}
 
           {/* 가구 개수 */}
           <View style={card.row}>
-            <Package size={13} color="#71727A" />
+            <Package size={13} color="#949494" />
             <Text style={card.metaText}>가구 {count}개</Text>
           </View>
 
           {/* 트럭 */}
           {estimate.items.filter(i => i.category === 'TRUCK').map((t, idx) => (
             <View key={idx} style={card.row}>
-              <Truck size={13} color="#71727A" />
+              <Truck size={13} color="#949494" />
               <Text style={card.metaText}>{formatTruckType(t.itemType)}</Text>
             </View>
           ))}
@@ -432,7 +432,7 @@ export default function MyEstimate({ navigation }: Props) {
   };
 
   const renderBody = () => {
-    if (isLoading) return <ActivityIndicator color="#006FFD" style={page.loader} />;
+    if (isLoading) return <ActivityIndicator color="#F36845" style={page.loader} />;
 
     if (hasError) return (
       <View style={page.center}>
@@ -447,7 +447,7 @@ export default function MyEstimate({ navigation }: Props) {
 
     if (estimates.length === 0) return (
       <View style={page.center}>
-        <ClipboardList size={48} color="#D4D6DD" />
+        <ClipboardList size={48} color="#E8E8E8" />
         <Text style={page.emptyTitle}>신청한 견적이 없어요</Text>
         <Text style={page.emptyDesc}>이사 사진을 업로드하면 AI가 견적을 분석해드려요.</Text>
         <TouchableOpacity style={page.actionBtn} onPress={() => navigation.navigate('Upload')}>
@@ -480,7 +480,7 @@ export default function MyEstimate({ navigation }: Props) {
       <ScrollView
         contentContainerStyle={[page.scroll, !isMobile && page.scrollWide]}
         refreshControl={
-          <RefreshControl refreshing={isRefreshing} onRefresh={() => load(true)} tintColor="#006FFD" />
+          <RefreshControl refreshing={isRefreshing} onRefresh={() => load(true)} tintColor="#F36845" />
         }
       >
         {renderBody()}
@@ -501,7 +501,7 @@ const card = StyleSheet.create({
     backgroundColor: '#fff',
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: '#E8E9F1',
+    borderColor: '#E8E8E8',
     padding: 16,
     gap: 10,
     shadowColor: '#000',
@@ -540,15 +540,15 @@ const card = StyleSheet.create({
     width: 76,
     height: 76,
     borderRadius: 10,
-    backgroundColor: '#F8F9FE',
+    backgroundColor: '#FAF5F0',
     justifyContent: 'center',
     alignItems: 'center',
     flexShrink: 0,
   },
   info: { flex: 1, gap: 5 },
-  estimateId: { fontSize: 14, fontWeight: '700', color: '#1F2024', marginBottom: 2 },
+  estimateId: { fontSize: 14, fontWeight: '700', color: '#423E3E', marginBottom: 2 },
   row: { flexDirection: 'row', alignItems: 'center', gap: 5 },
-  metaText: { fontSize: 13, color: '#71727A' },
+  metaText: { fontSize: 13, color: '#949494' },
 });
 
 // ── 뷰어 스타일 ───────────────────────────────────────────
@@ -619,7 +619,7 @@ const modal = StyleSheet.create({
     width: 36,
     height: 4,
     borderRadius: 2,
-    backgroundColor: '#D4D6DD',
+    backgroundColor: '#E8E8E8',
     alignSelf: 'center',
     marginBottom: 16,
   },
@@ -641,12 +641,12 @@ const modal = StyleSheet.create({
   },
   dot: { width: 6, height: 6, borderRadius: 3 },
   badgeText: { fontSize: 12, fontWeight: '600' },
-  idText: { fontSize: 16, fontWeight: '700', color: '#1F2024' },
+  idText: { fontSize: 16, fontWeight: '700', color: '#423E3E' },
   closeBtn: {
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: '#F8F9FE',
+    backgroundColor: '#FAF5F0',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -657,7 +657,7 @@ const modal = StyleSheet.create({
   sectionTitle: {
     fontSize: 14,
     fontWeight: '700',
-    color: '#1F2024',
+    color: '#423E3E',
     marginBottom: 12,
   },
   infoRow: {
@@ -678,12 +678,12 @@ const modal = StyleSheet.create({
   },
   infoLabel: {
     fontSize: 13,
-    color: '#71727A',
+    color: '#949494',
   },
   infoValue: {
     flex: 1,
     fontSize: 13,
-    color: '#1F2024',
+    color: '#423E3E',
     fontWeight: '500',
     textAlign: 'right',
   },
@@ -704,12 +704,12 @@ const modal = StyleSheet.create({
   listName: {
     flex: 1,
     fontSize: 14,
-    color: '#1F2024',
+    color: '#423E3E',
   },
   listQty: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#1F2024',
+    color: '#423E3E',
   },
   emptyText: {
     fontSize: 13,
@@ -720,15 +720,15 @@ const modal = StyleSheet.create({
 
 // ── 페이지 스타일 ─────────────────────────────────────────
 const page = StyleSheet.create({
-  root: { flex: 1, backgroundColor: '#F8F9FE' },
+  root: { flex: 1, backgroundColor: '#FAF5F0' },
   header: {
     paddingHorizontal: 24,
     paddingVertical: 16,
     backgroundColor: '#fff',
     borderBottomWidth: 1,
-    borderBottomColor: '#E8E9F1',
+    borderBottomColor: '#E8E8E8',
   },
-  headerTitle: { fontSize: 18, fontWeight: '700', color: '#1F2024' },
+  headerTitle: { fontSize: 18, fontWeight: '700', color: '#423E3E' },
   scroll: { padding: 16, gap: 12, flexGrow: 1 },
   scrollWide: { maxWidth: 640, alignSelf: 'center', width: '100%' },
   loader: { marginTop: 60 },
@@ -739,10 +739,10 @@ const page = StyleSheet.create({
     paddingTop: 80,
     gap: 12,
   },
-  emptyTitle: { fontSize: 16, fontWeight: '700', color: '#1F2024', marginTop: 8 },
+  emptyTitle: { fontSize: 16, fontWeight: '700', color: '#423E3E', marginTop: 8 },
   emptyDesc: {
     fontSize: 13,
-    color: '#71727A',
+    color: '#949494',
     textAlign: 'center',
     lineHeight: 18,
     paddingHorizontal: 32,
@@ -752,7 +752,7 @@ const page = StyleSheet.create({
     alignItems: 'center',
     gap: 6,
     marginTop: 8,
-    backgroundColor: '#006FFD',
+    backgroundColor: '#F36845',
     paddingHorizontal: 24,
     paddingVertical: 12,
     borderRadius: 10,

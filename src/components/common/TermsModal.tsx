@@ -153,14 +153,14 @@ const styles = StyleSheet.create({
     width: 40,
     height: 4,
     borderRadius: 2,
-    backgroundColor: '#D4D6DD',
+    backgroundColor: '#E8E8E8',
     alignSelf: 'center',
     marginBottom: 20,
   },
   title: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#1F2024',
+    color: '#423E3E',
     marginBottom: 20,
   },
   allRow: {
@@ -173,7 +173,7 @@ const styles = StyleSheet.create({
   allLabel: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#1F2024',
+    color: '#423E3E',
   },
   divider: {
     height: 1,
@@ -194,16 +194,16 @@ const styles = StyleSheet.create({
   },
   itemLabel: {
     fontSize: 14,
-    color: '#1F2024',
+    color: '#423E3E',
     fontWeight: '500',
     flex: 1,
   },
   required: {
-    color: '#006FFD',
+    color: '#F36845',
   },
   viewLink: {
     fontSize: 13,
-    color: '#71727A',
+    color: '#949494',
     textDecorationLine: 'underline',
     marginLeft: 8,
   },
@@ -212,13 +212,13 @@ const styles = StyleSheet.create({
     height: 22,
     borderRadius: 6,
     borderWidth: 1.5,
-    borderColor: '#D4D6DD',
+    borderColor: '#E8E8E8',
     alignItems: 'center',
     justifyContent: 'center',
   },
   checkboxChecked: {
-    backgroundColor: '#006FFD',
-    borderColor: '#006FFD',
+    backgroundColor: '#F36845',
+    borderColor: '#F36845',
   },
   checkMark: {
     color: '#fff',
@@ -228,14 +228,14 @@ const styles = StyleSheet.create({
   },
   confirmBtn: {
     marginTop: 8,
-    backgroundColor: '#006FFD',
+    backgroundColor: '#F36845',
     borderRadius: 12,
     height: 52,
     alignItems: 'center',
     justifyContent: 'center',
   },
   confirmBtnDisabled: {
-    backgroundColor: '#D4D6DD',
+    backgroundColor: '#E8E8E8',
   },
   confirmText: {
     color: '#fff',

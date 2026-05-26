@@ -52,7 +52,7 @@ const PartnerCard = ({ partner, onChat }: { partner: Partner; onChat: () => void
         <Text style={styles.experience}>경력 {partner.experience}년</Text>
       </View>
       <View style={styles.regionRow}>
-        <MapPin size={11} color="#8F9098" />
+        <MapPin size={11} color="#949494" />
         <Text style={styles.regionText}>{partner.region}</Text>
       </View>
       <Text style={styles.description} numberOfLines={2}>{partner.description}</Text>
@@ -120,13 +120,13 @@ export default function PartnerSearchPage() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#F8F9FE' },
+  container: { flex: 1, backgroundColor: '#FAF5F0' },
   navBar: {
     height: 56, justifyContent: 'center', alignItems: 'center',
     backgroundColor: '#fff',
     borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: '#E5E5E5',
   },
-  navTitle: { fontSize: 14, fontWeight: '700', color: '#1F2024' },
+  navTitle: { fontSize: 14, fontWeight: '700', color: '#423E3E' },
   listContent: { paddingHorizontal: 16, paddingTop: 12, paddingBottom: 24, gap: 12 },
   card: {
     backgroundColor: '#fff', borderRadius: 16,
@@ -136,30 +136,30 @@ const styles = StyleSheet.create({
   },
   cardBody: { flex: 1, gap: 4 },
   cardHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  cardName: { fontSize: 15, fontWeight: '700', color: '#1F2024' },
-  priceRange: { fontSize: 13, fontWeight: '600', color: '#006FFD' },
+  cardName: { fontSize: 15, fontWeight: '700', color: '#423E3E' },
+  priceRange: { fontSize: 13, fontWeight: '600', color: '#F36845' },
   cardMeta: { flexDirection: 'row', alignItems: 'center', gap: 4 },
   starRow: { flexDirection: 'row', alignItems: 'center', gap: 2 },
-  ratingText: { fontSize: 12, fontWeight: '600', color: '#1F2024' },
-  reviewCount: { fontSize: 11, color: '#8F9098' },
-  dot: { fontSize: 11, color: '#C5C6CC' },
-  experience: { fontSize: 11, color: '#8F9098' },
+  ratingText: { fontSize: 12, fontWeight: '600', color: '#423E3E' },
+  reviewCount: { fontSize: 11, color: '#949494' },
+  dot: { fontSize: 11, color: '#E8E8E8' },
+  experience: { fontSize: 11, color: '#949494' },
   regionRow: { flexDirection: 'row', alignItems: 'center', gap: 3 },
-  regionText: { fontSize: 11, color: '#8F9098' },
-  description: { fontSize: 12, color: '#71727A', lineHeight: 17, marginTop: 2 },
+  regionText: { fontSize: 11, color: '#949494' },
+  description: { fontSize: 12, color: '#949494', lineHeight: 17, marginTop: 2 },
   cardFooter: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 8, gap: 8 },
   tagRow: { flexDirection: 'row', gap: 6, flexWrap: 'wrap', flex: 1 },
   chatBtn: {
     flexDirection: 'row', alignItems: 'center', gap: 4,
-    backgroundColor: '#006FFD', borderRadius: 8,
+    backgroundColor: '#F36845', borderRadius: 8,
     paddingHorizontal: 12, paddingVertical: 7,
   },
   chatBtnText: { fontSize: 12, fontWeight: '600', color: '#fff' },
   tag: {
     paddingHorizontal: 8, paddingVertical: 3,
-    backgroundColor: '#EAF2FF', borderRadius: 6,
+    backgroundColor: '#FFDEBB', borderRadius: 6,
   },
-  tagText: { fontSize: 11, fontWeight: '500', color: '#006FFD' },
+  tagText: { fontSize: 11, fontWeight: '500', color: '#F36845' },
   empty: { paddingTop: 80, alignItems: 'center' },
-  emptyText: { fontSize: 14, color: '#8F9098' },
+  emptyText: { fontSize: 14, color: '#949494' },
 });

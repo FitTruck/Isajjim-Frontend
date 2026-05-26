@@ -369,14 +369,14 @@ export default function Result({ navigation }: Props) {
                 style={styles.qtyBtn}
                 onPress={() => item.quantity > 0 && handleUpdateQuantity(item.furnitureId, item.quantity - 1)}
               >
-                <Minus size={10} color="#006FFD" />
+                <Minus size={10} color="#F36845" />
               </TouchableOpacity>
               <Text style={styles.qtyText}>{item.quantity}</Text>
               <TouchableOpacity
                 style={[styles.qtyBtn, styles.qtyBtnPlus]}
                 onPress={() => handleUpdateQuantity(item.furnitureId, item.quantity + 1)}
               >
-                <Plus size={10} color="#1F2024" />
+                <Plus size={10} color="#423E3E" />
               </TouchableOpacity>
             </View>
           </View>
@@ -396,8 +396,8 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#fff' },
   scrollContent: { paddingBottom: 24 },
   titleSection: { paddingHorizontal: 24, paddingTop: 32, paddingBottom: 24, gap: 10 },
-  title: { fontSize: 24, fontWeight: '800', color: '#1F2024', letterSpacing: 0.2 },
-  subtitle: { fontSize: 12, fontWeight: '500', color: '#71727A', lineHeight: 16, letterSpacing: 0.1 },
+  title: { fontSize: 24, fontWeight: '800', color: '#423E3E', letterSpacing: 0.2 },
+  subtitle: { fontSize: 12, fontWeight: '500', color: '#949494', lineHeight: 16, letterSpacing: 0.1 },
   simulation: { width: '100%', height: 221, backgroundColor: '#F5F5F5' },
   replayButton: {
     position: 'absolute', bottom: 10, alignSelf: 'center',
@@ -416,43 +416,43 @@ const styles = StyleSheet.create({
   section: { paddingHorizontal: 24, paddingTop: 16 },
   sectionLabel: { fontSize: 12, fontWeight: '700', color: '#000', marginBottom: 8 },
   dashedBox: {
-    borderWidth: 1, borderColor: '#C5C6CC', borderStyle: 'dashed',
+    borderWidth: 1, borderColor: '#E8E8E8', borderStyle: 'dashed',
     borderRadius: 16, padding: 24, gap: 5,
   },
   row: { flexDirection: 'row', alignItems: 'center', alignSelf: 'stretch' },
-  rowLabel: { flex: 1, fontSize: 12, fontWeight: '700', color: '#2F3036' },
-  rowValue: { fontSize: 14, color: '#1F2024' },
-  emptyText: { fontSize: 12, color: '#8F9098' },
+  rowLabel: { flex: 1, fontSize: 12, fontWeight: '700', color: '#423E3E' },
+  rowValue: { fontSize: 14, color: '#423E3E' },
+  emptyText: { fontSize: 12, color: '#949494' },
   bottomBar: {
     flexDirection: 'row', gap: 24, paddingHorizontal: 24, paddingTop: 24, backgroundColor: '#fff',
   },
   outlineBtn: {
     flex: 1, height: 48, borderRadius: 12, justifyContent: 'center', alignItems: 'center',
-    backgroundColor: '#B4DBFF',
+    backgroundColor: '#FFDEBB',
   },
-  outlineBtnText: { fontSize: 14, fontWeight: '600', color: '#006FFD' },
+  outlineBtnText: { fontSize: 14, fontWeight: '600', color: '#F36845' },
   fillBtn: {
     flex: 1, height: 48, borderRadius: 12, justifyContent: 'center', alignItems: 'center',
-    backgroundColor: '#006FFD',
+    backgroundColor: '#F36845',
   },
   fillBtnText: { fontSize: 14, fontWeight: '600', color: '#fff' },
   carouselImage: { height: 240, backgroundColor: '#F5F6FA' },
   dotsRow: { flexDirection: 'row', justifyContent: 'center', gap: 8, marginTop: 8 },
   dot: { width: 8, height: 8, borderRadius: 4, backgroundColor: '#E5E5EA' },
-  dotActive: { backgroundColor: '#006FFD' },
+  dotActive: { backgroundColor: '#F36845' },
   editList: { flex: 1 },
   editListContent: {
     marginHorizontal: 24, marginTop: 16,
-    borderWidth: 1, borderColor: '#C5C6CC', borderStyle: 'dashed',
+    borderWidth: 1, borderColor: '#E8E8E8', borderStyle: 'dashed',
     borderRadius: 16, padding: 24, gap: 5,
   },
   editRow: { flexDirection: 'row', alignItems: 'center', alignSelf: 'stretch' },
-  editLabel: { flex: 1, fontSize: 12, fontWeight: '700', color: '#2F3036' },
+  editLabel: { flex: 1, fontSize: 12, fontWeight: '700', color: '#423E3E' },
   qtyRow: { flexDirection: 'row', alignItems: 'center', gap: 4 },
   qtyBtn: {
-    width: 24, height: 24, borderRadius: 12, backgroundColor: '#EAF2FF',
+    width: 24, height: 24, borderRadius: 12, backgroundColor: '#FFDEBB',
     justifyContent: 'center', alignItems: 'center',
   },
   qtyBtnPlus: { backgroundColor: '#F5F6FA' },
-  qtyText: { width: 24, textAlign: 'center', fontSize: 14, color: '#1F2024', lineHeight: 18 },
+  qtyText: { width: 24, textAlign: 'center', fontSize: 14, color: '#423E3E', lineHeight: 18 },
 });

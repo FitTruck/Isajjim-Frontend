@@ -203,7 +203,7 @@ const styles = StyleSheet.create({
   // ── Button ───────────────────────────────────────────
   startButton: {
     height: 48,
-    backgroundColor: '#006FFD',
+    backgroundColor: '#F36845',
     borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',

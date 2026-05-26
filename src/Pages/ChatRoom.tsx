@@ -198,7 +198,7 @@ export default function ChatRoom({ route, navigation }: Props) {
       {/* 네비 바 */}
       <View style={styles.navBar}>
         <TouchableOpacity style={styles.backBtn} onPress={() => navigation.goBack()}>
-          <ChevronLeft size={24} color="#1F2024" />
+          <ChevronLeft size={24} color="#423E3E" />
         </TouchableOpacity>
         <Text style={styles.navTitle} numberOfLines={1}>{targetName}</Text>
         <View style={styles.navAvatar}>
@@ -213,7 +213,7 @@ export default function ChatRoom({ route, navigation }: Props) {
         keyboardVerticalOffset={0}
       >
         {isLoading ? (
-          <ActivityIndicator style={styles.flex} color="#006FFD" />
+          <ActivityIndicator style={styles.flex} color="#F36845" />
         ) : (
           <FlatList
             ref={flatListRef}
@@ -223,7 +223,7 @@ export default function ChatRoom({ route, navigation }: Props) {
             contentContainerStyle={styles.messageList}
             onStartReachedThreshold={0.1}
             onStartReached={loadMore}
-            ListHeaderComponent={isLoadingMore ? <ActivityIndicator color="#006FFD" style={{ marginVertical: 8 }} /> : null}
+            ListHeaderComponent={isLoadingMore ? <ActivityIndicator color="#F36845" style={{ marginVertical: 8 }} /> : null}
           />
         )}
 
@@ -231,9 +231,9 @@ export default function ChatRoom({ route, navigation }: Props) {
         <View style={[styles.inputBar, { paddingBottom: Math.max(insets.bottom, 8) }]}>
           <TouchableOpacity style={styles.addBtn} onPress={sendImage} disabled={isSending}>
             {isSending ? (
-              <ActivityIndicator size="small" color="#006FFD" />
+              <ActivityIndicator size="small" color="#F36845" />
             ) : (
-              <Plus size={20} color="#71727A" />
+              <Plus size={20} color="#949494" />
             )}
           </TouchableOpacity>
           <View style={styles.inputWrap}>
@@ -242,7 +242,7 @@ export default function ChatRoom({ route, navigation }: Props) {
               value={inputText}
               onChangeText={setInputText}
               placeholder="메시지를 입력하세요"
-              placeholderTextColor="#8F9098"
+              placeholderTextColor="#949494"
               multiline
               maxLength={2000}
               returnKeyType="default"
@@ -300,14 +300,14 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: 14,
     fontWeight: '700',
-    color: '#1F2024',
+    color: '#423E3E',
   },
   navAvatar: { width: 40, alignItems: 'flex-end' },
   avatarPlaceholder: {
     width: 32,
     height: 32,
     borderRadius: 12,
-    backgroundColor: '#EAF2FF',
+    backgroundColor: '#FFDEBB',
   },
   messageList: {
     paddingHorizontal: 16,
@@ -329,18 +329,18 @@ const styles = StyleSheet.create({
     borderRadius: 20,
   },
   bubbleOther: {
-    backgroundColor: '#F8F9FE',
+    backgroundColor: '#FAF5F0',
     borderTopLeftRadius: 4,
   },
   bubbleMine: {
-    backgroundColor: '#006FFD',
+    backgroundColor: '#F36845',
     borderTopRightRadius: 4,
   },
   messageText: {
     fontSize: 14,
     fontWeight: '500',
     lineHeight: 20,
-    color: '#1F2024',
+    color: '#423E3E',
   },
   messageTextMine: { color: '#fff' },
   imageMessage: {
@@ -349,7 +349,7 @@ const styles = StyleSheet.create({
   },
   timeText: {
     fontSize: 10,
-    color: '#8F9098',
+    color: '#949494',
     marginBottom: 2,
   },
   timePlaceholder: {
@@ -405,7 +405,7 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#F8F9FE',
+    backgroundColor: '#FAF5F0',
     borderRadius: 24,
     paddingLeft: 16,
     paddingRight: 6,
@@ -417,16 +417,16 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 14,
     fontWeight: '500',
-    color: '#1F2024',
+    color: '#423E3E',
     maxHeight: 120,
   },
   sendBtn: {
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: '#006FFD',
+    backgroundColor: '#F36845',
     justifyContent: 'center',
     alignItems: 'center',
   },
-  sendBtnDisabled: { backgroundColor: '#C5C6CC' },
+  sendBtnDisabled: { backgroundColor: '#E8E8E8' },
 });

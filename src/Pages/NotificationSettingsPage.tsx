@@ -22,7 +22,7 @@ export default function NotificationSettingsPage() {
     <SafeAreaView style={styles.container}>
       <View style={styles.navBar}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn} hitSlop={8}>
-          <ChevronLeft size={20} color="#1F2024" />
+          <ChevronLeft size={20} color="#423E3E" />
         </TouchableOpacity>
         <Text style={styles.navTitle}>알림 설정</Text>
       </View>
@@ -35,9 +35,9 @@ export default function NotificationSettingsPage() {
             <Switch
               value={toggles[key]}
               onValueChange={() => toggle(key)}
-              trackColor={{ false: '#D4D6DD', true: '#006FFD' }}
+              trackColor={{ false: '#E8E8E8', true: '#F36845' }}
               thumbColor="#fff"
-              ios_backgroundColor="#D4D6DD"
+              ios_backgroundColor="#E8E8E8"
             />
           </View>
         ))}
@@ -60,16 +60,16 @@ const styles = StyleSheet.create({
   backBtn: { width: 32, justifyContent: 'center' },
   navTitle: {
     flex: 1, textAlign: 'center',
-    fontSize: 14, fontWeight: '700', color: '#1F2024',
+    fontSize: 14, fontWeight: '700', color: '#423E3E',
     marginRight: 32,
   },
   content: { paddingHorizontal: 24, paddingTop: 32, gap: 10 },
   sectionTitle: {
-    fontSize: 18, fontWeight: '800', color: '#1F2024', letterSpacing: 0.1,
+    fontSize: 18, fontWeight: '800', color: '#423E3E', letterSpacing: 0.1,
   },
   listItem: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
     paddingVertical: 16, borderRadius: 12,
   },
-  listLabel: { fontSize: 14, fontWeight: '500', color: '#1F2024' },
+  listLabel: { fontSize: 14, fontWeight: '500', color: '#423E3E' },
 });

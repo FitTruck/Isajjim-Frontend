@@ -35,7 +35,7 @@ export default function BottomTabBar({ activeTab = 'home', onTabPress }: Props) 
             <Ionicons
               name={isActive ? iconActive : icon}
               size={22}
-              color={isActive ? '#006FFD' : '#D4D6DD'}
+              color={isActive ? '#F36845' : '#E8E8E8'}
             />
             <Text style={[styles.label, isActive ? styles.labelActive : styles.labelInactive]}>
               {label}
@@ -68,13 +68,13 @@ const styles = StyleSheet.create({
   labelActive: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#1F2024',
+    color: '#423E3E',
   },
   labelInactive: {
     fontSize: 12,
     fontWeight: '500',
     lineHeight: 16,
     letterSpacing: 0.12,
-    color: '#71727A',
+    color: '#949494',
   },
 });

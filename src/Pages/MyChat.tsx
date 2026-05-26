@@ -175,19 +175,19 @@ export default function MyChat({ navigation }: Props) {
 
         {/* 검색 바 */}
         <View style={styles.searchBar}>
-          <Search size={16} color="#8F9098" />
+          <Search size={16} color="#949494" />
           <TextInput
             style={styles.searchInput}
             value={search}
             onChangeText={setSearch}
             placeholder="검색"
-            placeholderTextColor="#8F9098"
+            placeholderTextColor="#949494"
           />
         </View>
 
         {/* 채팅 목록 */}
         {isLoading ? (
-          <ActivityIndicator style={styles.flex} color="#006FFD" />
+          <ActivityIndicator style={styles.flex} color="#F36845" />
         ) : (
           <FlatList
             data={filtered}
@@ -275,7 +275,7 @@ const styles = StyleSheet.create({
   navTitle: {
     fontSize: 14,
     fontWeight: '700',
-    color: '#1F2024',
+    color: '#423E3E',
   },
   editBtn: {
     position: 'absolute',
@@ -284,7 +284,7 @@ const styles = StyleSheet.create({
   editText: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#006FFD',
+    color: '#F36845',
   },
 
   searchBar: {
@@ -293,7 +293,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
-    backgroundColor: '#F8F9FE',
+    backgroundColor: '#FAF5F0',
     borderRadius: 24,
     paddingHorizontal: 16,
     paddingVertical: 10,
@@ -302,7 +302,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 14,
     fontWeight: '500',
-    color: '#1F2024',
+    color: '#423E3E',
   },
 
   listContent: { paddingHorizontal: 8, paddingVertical: 8 },
@@ -319,7 +319,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 16,
-    backgroundColor: '#EAF2FF',
+    backgroundColor: '#FFDEBB',
     overflow: 'hidden',
     justifyContent: 'center',
     alignItems: 'center',
@@ -327,18 +327,18 @@ const styles = StyleSheet.create({
   avatarDefault: {
     width: '60%',
     height: '100%',
-    backgroundColor: '#B4DBFF',
+    backgroundColor: '#FFDEBB',
     borderRadius: 8,
   },
   roomName: {
     fontSize: 12,
     fontWeight: '700',
-    color: '#1F2024',
+    color: '#423E3E',
   },
   lastMessage: {
     fontSize: 12,
     fontWeight: '500',
-    color: '#71727A',
+    color: '#949494',
     lineHeight: 16,
   },
   rightCol: {
@@ -348,13 +348,13 @@ const styles = StyleSheet.create({
   },
   timeText: {
     fontSize: 10,
-    color: '#8F9098',
+    color: '#949494',
   },
   badge: {
     minWidth: 20,
     height: 20,
     borderRadius: 10,
-    backgroundColor: '#006FFD',
+    backgroundColor: '#F36845',
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: 5,
@@ -369,6 +369,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 60,
     fontSize: 14,
-    color: '#8F9098',
+    color: '#949494',
   },
 });

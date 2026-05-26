@@ -35,7 +35,7 @@ export default function Main() {
           style={styles.backButton}
           hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
         >
-          <ChevronLeft size={20} color="#1F2024" />
+          <ChevronLeft size={20} color="#423E3E" />
         </Pressable>
         <View style={styles.progressTrack}>
           <View style={styles.progressFill} />
@@ -93,13 +93,13 @@ const styles = StyleSheet.create({
     flex: 1,
     height: 8,
     borderRadius: 4,
-    backgroundColor: '#E8E9F1',
+    backgroundColor: '#E8E8E8',
     overflow: 'hidden',
   },
   progressFill: {
     width: '25%',
     height: '100%',
-    backgroundColor: '#006FFD',
+    backgroundColor: '#F36845',
     borderRadius: 8,
   },
   titleSection: {
@@ -111,13 +111,13 @@ const styles = StyleSheet.create({
   pageTitle: {
     fontSize: 24,
     fontWeight: '800',
-    color: '#1F2024',
+    color: '#423E3E',
     letterSpacing: 0.2,
   },
   pageSubtitle: {
     fontSize: 12,
     fontWeight: '500',
-    color: '#71727A',
+    color: '#949494',
     lineHeight: 16,
     letterSpacing: 0.1,
   },

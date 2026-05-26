@@ -139,8 +139,8 @@ export default function UploadBox({ onFilesSelected, selectedImages = [] }: Uplo
       onPress={handlePress}
       activeOpacity={0.85}
       // @ts-ignore
-      onMouseEnter={Platform.OS === 'web' ? (e: any) => e.currentTarget.style.borderColor = '#006FFD' : undefined}
-      onMouseLeave={Platform.OS === 'web' ? (e: any) => e.currentTarget.style.borderColor = isDragging ? '#006FFD' : '#D4D6DD' : undefined}
+      onMouseEnter={Platform.OS === 'web' ? (e: any) => e.currentTarget.style.borderColor = '#F36845' : undefined}
+      onMouseLeave={Platform.OS === 'web' ? (e: any) => e.currentTarget.style.borderColor = isDragging ? '#F36845' : '#E8E8E8' : undefined}
     >
       {hasImages ? (
         <View style={styles.imageGrid}>
@@ -148,16 +148,16 @@ export default function UploadBox({ onFilesSelected, selectedImages = [] }: Uplo
             <Image key={idx} source={{ uri: img.localUri }} style={styles.thumb} />
           ))}
           <View style={styles.addMoreBox}>
-            <Plus size={20} color="#006FFD" />
+            <Plus size={20} color="#F36845" />
           </View>
         </View>
       ) : (
         <View style={styles.emptyContent}>
           <View style={styles.iconBox}>
-            <ImageIcon size={32} color="#006FFD" />
+            <ImageIcon size={32} color="#F36845" />
           </View>
           <View style={styles.addButton}>
-            <Plus size={12} color="#006FFD" />
+            <Plus size={12} color="#F36845" />
             <Text style={styles.addButtonText}>사진 추가하기</Text>
           </View>
           {Platform.OS === 'web' && (
@@ -174,7 +174,7 @@ const styles = StyleSheet.create({
     flex: 1,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: '#D4D6DD',
+    borderColor: '#E8E8E8',
     justifyContent: 'flex-start',
     alignItems: 'flex-start',
     padding: 16,
@@ -183,8 +183,8 @@ const styles = StyleSheet.create({
     }),
   },
   boxDragging: {
-    borderColor: '#006FFD',
-    backgroundColor: '#EAF2FF',
+    borderColor: '#F36845',
+    backgroundColor: '#FFDEBB',
   },
   emptyContent: {
     flex: 1,
@@ -196,7 +196,7 @@ const styles = StyleSheet.create({
   iconBox: {
     width: 80,
     height: 69,
-    backgroundColor: '#EAF2FF',
+    backgroundColor: '#FFDEBB',
     borderRadius: 8,
     justifyContent: 'center',
     alignItems: 'center',
@@ -212,7 +212,7 @@ const styles = StyleSheet.create({
   addButtonText: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#006FFD',
+    color: '#F36845',
   },
   dragHint: {
     fontSize: 12,
@@ -236,7 +236,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     borderWidth: 1,
     borderStyle: 'dashed',
-    borderColor: '#006FFD',
+    borderColor: '#F36845',
     justifyContent: 'center',
     alignItems: 'center',
   },

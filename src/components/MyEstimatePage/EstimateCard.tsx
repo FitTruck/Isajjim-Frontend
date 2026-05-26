@@ -1,13 +1,18 @@
 ﻿import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, useWindowDimensions } from 'react-native';
-import { MapPin, ChevronRight, FileText, CircleStop, Star, MessageCircle } from 'lucide-react-native';
+import { View, Text, Image, StyleSheet, TouchableOpacity, useWindowDimensions } from 'react-native';
+import { MapPin, ChevronRight, FileText, CircleStop, Star, MessageCircle, Armchair, Truck } from 'lucide-react-native';
 import RequestDetailModal from "../common/RequestDetailModal";
 
 interface EstimateCardProps {
   status: 'pending' | 'active' | 'moving' | 'completed'| 'cancelled' ;
   date: string;
   locations: { start: string; end: string };
-  
+  estimateId?: number;
+  estimateItems?: {
+    furnitureCount: number;
+    trucks: string[];
+    thumbnailUrl?: string;
+  };
   quoteInfo?: {
     isLowest?: boolean;
     price: string;
@@ -20,7 +25,7 @@ interface EstimateCardProps {
 
 import { useEstimate, RequestData } from '../../context/EstimateContext';
 
-export default function EstimateCard({ status, date, locations, quoteInfo, timelineStep = 2 }: EstimateCardProps) {
+export default function EstimateCard({ status, date, locations, estimateId, estimateItems, quoteInfo, timelineStep = 2 }: EstimateCardProps) {
   const { width } = useWindowDimensions();
   const isMobile = width < 768;
   const { requestData, confirmedCompany } = useEstimate();
@@ -248,6 +253,32 @@ export default function EstimateCard({ status, date, locations, quoteInfo, timel
                  <View style={styles.verticalDivider} />
                  <Text style={styles.movingPrice}>{confirmedCompany?.price ?? ''}</Text>
               </View>
+            </View>
+          </View>
+        ) : estimateItems && !quoteInfo ? (
+          // API 데이터 기반: 가구/트럭 요약
+          <View style={styles.itemsSummary}>
+            {estimateItems.thumbnailUrl ? (
+              <Image
+                source={{ uri: estimateItems.thumbnailUrl }}
+                style={styles.thumbnail}
+                resizeMode="cover"
+              />
+            ) : null}
+            <View style={styles.itemsDetail}>
+              <View style={styles.itemRow}>
+                <Armchair size={16} color="#555" style={{ marginRight: 6 }} />
+                <Text style={styles.itemText}>가구 {estimateItems.furnitureCount}점 감지</Text>
+              </View>
+              {estimateItems.trucks.map((truck, idx) => (
+                <View key={idx} style={styles.itemRow}>
+                  <Truck size={16} color="#555" style={{ marginRight: 6 }} />
+                  <Text style={styles.itemText}>{truck}</Text>
+                </View>
+              ))}
+              {estimateId !== undefined && (
+                <Text style={styles.estimateIdText}>견적 #{estimateId}</Text>
+              )}
             </View>
           </View>
         ) : quoteInfo ? (
@@ -653,6 +684,39 @@ const styles = StyleSheet.create({
     color: '#777',
   },
   
+  // Items Summary (API 데이터 기반)
+  itemsSummary: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'flex-start',
+    gap: 8,
+    paddingVertical: 8,
+  },
+  thumbnail: {
+    width: '100%',
+    height: 80,
+    borderRadius: 6,
+    marginBottom: 8,
+  },
+  itemsDetail: {
+    gap: 8,
+    width: '100%',
+  },
+  itemRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  itemText: {
+    fontSize: 14,
+    color: '#333',
+    fontWeight: '500',
+  },
+  estimateIdText: {
+    marginTop: 4,
+    fontSize: 12,
+    color: '#B2B2B2',
+  },
+
   // Mobile Styles
   mobileCardContainer: {
     width: '100%',

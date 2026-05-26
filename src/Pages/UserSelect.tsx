@@ -166,7 +166,7 @@ export default function UserSelect({ route }: Props) {
       {/* 헤더 */}
       <View style={styles.header}>
         <Pressable onPress={handleBack} style={styles.backButton} hitSlop={8}>
-          <ChevronLeft size={20} color="#1F2024" />
+          <ChevronLeft size={20} color="#423E3E" />
         </Pressable>
         <View style={styles.progressTrack}>
           <View style={[styles.progressFill, { width: progress }]} />
@@ -233,12 +233,12 @@ const styles = StyleSheet.create({
     flex: 1,
     height: 8,
     borderRadius: 4,
-    backgroundColor: '#E8E9F1',
+    backgroundColor: '#E8E8E8',
     overflow: 'hidden',
   },
   progressFill: {
     height: '100%',
-    backgroundColor: '#006FFD',
+    backgroundColor: '#F36845',
     borderRadius: 8,
   },
   titleSection: {
@@ -250,13 +250,13 @@ const styles = StyleSheet.create({
   pageTitle: {
     fontSize: 24,
     fontWeight: '800',
-    color: '#1F2024',
+    color: '#423E3E',
     letterSpacing: 0.2,
   },
   pageSubtitle: {
     fontSize: 12,
     fontWeight: '500',
-    color: '#71727A',
+    color: '#949494',
     lineHeight: 16,
     letterSpacing: 0.1,
   },
@@ -273,7 +273,7 @@ const styles = StyleSheet.create({
   },
   nextButton: {
     height: 48,
-    backgroundColor: '#006FFD',
+    backgroundColor: '#F36845',
     borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',

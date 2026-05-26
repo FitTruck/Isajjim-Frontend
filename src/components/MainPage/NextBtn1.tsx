@@ -141,7 +141,7 @@ export default function NextBtn1({ imageList, onShowAlert }: NextBtnProps) {
 
 const styles = StyleSheet.create({
   nextBtn: {
-    backgroundColor: '#006FFD',
+    backgroundColor: '#F36845',
     height: 48,
     borderRadius: 12,
     width: '100%',
