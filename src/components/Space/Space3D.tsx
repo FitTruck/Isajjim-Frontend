@@ -1,7 +1,15 @@
 import React, { useRef, useEffect, useLayoutEffect, useMemo, useState, useCallback, forwardRef, useImperativeHandle } from 'react';
-import { View, TouchableOpacity, Text, StyleSheet } from 'react-native';
-import { Canvas, useThree, useFrame } from '@react-three/fiber';
+import ResizeObserverPolyfill from 'resize-observer-polyfill';
+if (typeof window !== 'undefined' && !window.ResizeObserver) {
+  window.ResizeObserver = ResizeObserverPolyfill;
+}
+import { View, TouchableOpacity, Text, StyleSheet, Platform } from 'react-native';
+import { Canvas as WebCanvas, useThree, useFrame } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
+
+const Canvas: typeof WebCanvas = Platform.OS === 'web'
+  ? WebCanvas
+  : require('@react-three/fiber/native').Canvas;
 import * as THREE from 'three';
 import TruckContainer from './TruckContainer';
 import { Space3DProps, TruckType, TRUCK_DIMENSIONS, SimulationTruckResult } from '../../types/simulation';
