@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
   View, Text, StyleSheet, FlatList, TouchableOpacity,
-  TextInput, Image, ActivityIndicator, useWindowDimensions,
+  TextInput, Image, ActivityIndicator,
 } from 'react-native';
-import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types/navigation';
 import { ChatRoom } from '../types/chat';
@@ -13,11 +13,7 @@ import { getMyUserId } from '../auth/tokenStorage';
 import { Search } from 'lucide-react-native';
 import BottomTabBar from '../components/common/BottomTabBar';
 import { useIsFocused } from '@react-navigation/native';
-
-// 웹/태블릿 split-view용 기존 패널 유지
-import ChatListPanel from '../components/MyChatPage/ChatListPanel';
-import ChatRoomPanel from '../components/MyChatPage/ChatRoomPanel';
-import { useEstimate, ChatItemData } from '../context/EstimateContext';
+import { ChatItemData } from '../context/EstimateContext';
 
 // 하위 호환성: 기존 컴포넌트들이 import해서 사용하는 타입과 더미 데이터
 export type { ChatItemData };
@@ -75,20 +71,12 @@ function previewContent(content?: string): string {
 }
 
 export default function MyChat({ navigation }: Props) {
-  const { width } = useWindowDimensions();
-  const isMobile = width < 768;
   const isFocused = useIsFocused();
-  const insets = useSafeAreaInsets();
 
   const [rooms, setRooms] = useState<ChatRoom[]>([]);
   const [filtered, setFiltered] = useState<ChatRoom[]>([]);
   const [search, setSearch] = useState('');
   const [isLoading, setIsLoading] = useState(true);
-
-  // 웹 split-view 상태
-  const { chatList, setChatList } = useEstimate();
-  const [selectedChatId, setSelectedChatId] = useState<string | null>(chatList[0]?.id ?? null);
-  const selectedChat = chatList.find(c => c.id === selectedChatId) ?? null;
 
   const load = useCallback(async () => {
     try {
@@ -159,101 +147,81 @@ export default function MyChat({ navigation }: Props) {
     if (map[tab]) navigation.navigate(map[tab] as any);
   };
 
-  // ── 모바일 뷰 ──────────────────────────────────────────
-  if (isMobile) {
-    return (
-      <View style={styles.container}>
-        <SafeAreaView edges={['top']} />
-
-        {/* 네비 바 */}
-        <View style={styles.navBar}>
-          <Text style={styles.navTitle}>채팅</Text>
-          <TouchableOpacity style={styles.editBtn}>
-            <Text style={styles.editText}>편집</Text>
-          </TouchableOpacity>
-        </View>
-
-        {/* 검색 바 */}
-        <View style={styles.searchBar}>
-          <Search size={16} color="#949494" />
-          <TextInput
-            style={styles.searchInput}
-            value={search}
-            onChangeText={setSearch}
-            placeholder="검색"
-            placeholderTextColor="#949494"
-          />
-        </View>
-
-        {/* 채팅 목록 */}
-        {isLoading ? (
-          <ActivityIndicator style={styles.flex} color="#F36845" />
-        ) : (
-          <FlatList
-            data={filtered}
-            keyExtractor={item => String(item.roomId)}
-            style={styles.flex}
-            contentContainerStyle={styles.listContent}
-            renderItem={({ item }) => (
-              <TouchableOpacity style={styles.listItem} onPress={() => goToRoom(item)} activeOpacity={0.7}>
-                {/* 아바타 */}
-                <View style={styles.avatar}>
-                  {item.target.profileImageUrl ? (
-                    <Image source={{ uri: item.target.profileImageUrl }} style={StyleSheet.absoluteFill} resizeMode="cover" />
-                  ) : (
-                    <View style={styles.avatarDefault} />
-                  )}
-                </View>
-
-                {/* 텍스트 */}
-                <View style={styles.listContent2}>
-                  <Text style={styles.roomName} numberOfLines={1}>{item.target.name}</Text>
-                  <Text style={styles.lastMessage} numberOfLines={1}>
-                    {previewContent(item.lastMessageContent)}
-                  </Text>
-                </View>
-
-                {/* 우측: 시간 + 뱃지 */}
-                <View style={styles.rightCol}>
-                  <Text style={styles.timeText}>{formatTime(item.lastMessageAt)}</Text>
-                  {item.unreadCount > 0 && (
-                    <View style={styles.badge}>
-                      <Text style={styles.badgeText}>
-                        {item.unreadCount > 99 ? '99+' : String(item.unreadCount)}
-                      </Text>
-                    </View>
-                  )}
-                </View>
-              </TouchableOpacity>
-            )}
-            ListEmptyComponent={
-              <Text style={styles.emptyText}>
-                {search ? '검색 결과가 없습니다.' : '채팅방이 없습니다.'}
-              </Text>
-            }
-          />
-        )}
-
-        {/* 하단 탭 바 */}
-        <BottomTabBar activeTab="chat" onTabPress={goTab} />
-      </View>
-    );
-  }
-
-  // ── 데스크톱/태블릿 split-view ─────────────────────────
   return (
-    <View style={styles.desktopContainer}>
-      <ChatListPanel
-        chatList={chatList}
-        selectedChatId={selectedChatId}
-        onSelectChat={setSelectedChatId}
-      />
-      {selectedChatId && (
-        <ChatRoomPanel
-          data={selectedChat}
-          onBack={() => setSelectedChatId(null)}
+    <View style={styles.container}>
+      <SafeAreaView edges={['top']} />
+
+      {/* 네비 바 */}
+      <View style={styles.navBar}>
+        <Text style={styles.navTitle}>채팅</Text>
+        <TouchableOpacity style={styles.editBtn}>
+          <Text style={styles.editText}>편집</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* 검색 바 */}
+      <View style={styles.searchBar}>
+        <Search size={16} color="#949494" />
+        <TextInput
+          style={styles.searchInput}
+          value={search}
+          onChangeText={setSearch}
+          placeholder="검색"
+          placeholderTextColor="#949494"
+        />
+      </View>
+
+      {/* 채팅 목록 */}
+      {isLoading ? (
+        <ActivityIndicator style={styles.flex} color="#F36845" />
+      ) : (
+        <FlatList
+          data={filtered}
+          keyExtractor={item => String(item.roomId)}
+          style={styles.flex}
+          contentContainerStyle={styles.listContent}
+          renderItem={({ item }) => (
+            <TouchableOpacity style={styles.listItem} onPress={() => goToRoom(item)} activeOpacity={0.7}>
+              {/* 아바타 */}
+              <View style={styles.avatar}>
+                {item.target.profileImageUrl ? (
+                  <Image source={{ uri: item.target.profileImageUrl }} style={StyleSheet.absoluteFill} resizeMode="cover" />
+                ) : (
+                  <View style={styles.avatarDefault} />
+                )}
+              </View>
+
+              {/* 텍스트 */}
+              <View style={styles.listContent2}>
+                <Text style={styles.roomName} numberOfLines={1}>{item.target.name}</Text>
+                <Text style={styles.lastMessage} numberOfLines={1}>
+                  {previewContent(item.lastMessageContent)}
+                </Text>
+              </View>
+
+              {/* 우측: 시간 + 뱃지 */}
+              <View style={styles.rightCol}>
+                <Text style={styles.timeText}>{formatTime(item.lastMessageAt)}</Text>
+                {item.unreadCount > 0 && (
+                  <View style={styles.badge}>
+                    <Text style={styles.badgeText}>
+                      {item.unreadCount > 99 ? '99+' : String(item.unreadCount)}
+                    </Text>
+                  </View>
+                )}
+              </View>
+            </TouchableOpacity>
+          )}
+          ListEmptyComponent={
+            <Text style={styles.emptyText}>
+              {search ? '검색 결과가 없습니다.' : '채팅방이 없습니다.'}
+            </Text>
+          }
         />
       )}
+
+      {/* 하단 탭 바 */}
+      <BottomTabBar activeTab="chat" onTabPress={goTab} />
     </View>
   );
 }
@@ -261,7 +229,6 @@ export default function MyChat({ navigation }: Props) {
 const styles = StyleSheet.create({
   flex: { flex: 1 },
   container: { flex: 1, backgroundColor: '#fff' },
-  desktopContainer: { flex: 1, flexDirection: 'row', backgroundColor: '#fff' },
 
   navBar: {
     height: 56,
