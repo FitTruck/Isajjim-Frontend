@@ -47,12 +47,18 @@ export default function DateSelector({ date, onSelect, isOpen: controlledOpen, o
     }
   };
 
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const isPrevMonthDisabled =
+    currentYear === today.getFullYear() && currentMonth === today.getMonth();
+
   const weekDays = ['일', '월', '화', '수', '목', '금', '토'];
 
   const getDaysArray = (year: number, month: number) => {
     const firstDay = new Date(year, month, 1).getDay();
     const lastDate = new Date(year, month + 1, 0).getDate();
-    
+
     const days = [];
     for (let i = 0; i < firstDay; i++) {
       days.push(null);
@@ -64,6 +70,7 @@ export default function DateSelector({ date, onSelect, isOpen: controlledOpen, o
   };
 
   const handlePrevMonth = () => {
+    if (isPrevMonthDisabled) return;
     if (currentMonth === 0) {
       setCurrentYear(prev => prev - 1);
       setCurrentMonth(11);
@@ -105,8 +112,12 @@ export default function DateSelector({ date, onSelect, isOpen: controlledOpen, o
         <View style={[styles.calendarContainer, isMobile && styles.mobileCalendarContainer]}>
             {/* Header */}
             <View style={styles.header}>
-              <TouchableOpacity onPress={handlePrevMonth} style={styles.arrowButton}>
-                <ChevronLeft size={24} color="#333" />
+              <TouchableOpacity
+                onPress={handlePrevMonth}
+                style={styles.arrowButton}
+                disabled={isPrevMonthDisabled}
+              >
+                <ChevronLeft size={24} color={isPrevMonthDisabled ? '#CCC' : '#333'} />
               </TouchableOpacity>
               <Text style={styles.headerTitle}>
                 {currentYear}년 {currentMonth + 1}월
@@ -133,8 +144,10 @@ export default function DateSelector({ date, onSelect, isOpen: controlledOpen, o
             <View style={styles.daysGrid}>
               {days.map((day, index) => {
                 const isPlaceholder = day === null;
-                const isSelectedDay = 
-                  date && 
+                const cellDate = day ? new Date(currentYear, currentMonth, day) : null;
+                const isPast = cellDate ? cellDate < today : false;
+                const isSelectedDay =
+                  date &&
                   String(day).padStart(2, '0') === date.split('-')[2] &&
                   (currentMonth + 1) === parseInt(date.split('-')[1]) &&
                   currentYear === parseInt(date.split('-')[0]);
@@ -145,24 +158,24 @@ export default function DateSelector({ date, onSelect, isOpen: controlledOpen, o
                     style={[
                       styles.dayCell,
                       isSelectedDay && styles.selectedDayCell,
-                      isMobile && styles.mobileDayCell
+                      isMobile && styles.mobileDayCell,
                     ]}
-                    disabled={isPlaceholder}
+                    disabled={isPlaceholder || isPast}
                     onPress={() => {
-                        if (day) {
-                             const monthStr = String(currentMonth + 1).padStart(2, '0');
-                             const dayStr = String(day).padStart(2, '0');
-                             const dateStr = `${currentYear}-${monthStr}-${dayStr}`;
-                             handleSelect(dateStr);
-                        }
+                      if (day && !isPast) {
+                        const monthStr = String(currentMonth + 1).padStart(2, '0');
+                        const dayStr = String(day).padStart(2, '0');
+                        handleSelect(`${currentYear}-${monthStr}-${dayStr}`);
+                      }
                     }}
                   >
                     {!isPlaceholder && (
                       <Text style={[
                         styles.dayText,
-                        index % 7 === 0 && styles.sundayText,
-                        index % 7 === 6 && styles.saturdayText, 
-                        isSelectedDay && styles.selectedDayText
+                        isPast && styles.pastDayText,
+                        !isPast && index % 7 === 0 && styles.sundayText,
+                        !isPast && index % 7 === 6 && styles.saturdayText,
+                        isSelectedDay && styles.selectedDayText,
                       ]}>
                         {day}
                       </Text>
@@ -291,6 +304,9 @@ const styles = StyleSheet.create({
   dayText: {
     fontSize: 16,
     color: '#333',
+  },
+  pastDayText: {
+    color: '#C5C6CC',
   },
   selectedDayText: {
     color: 'white',

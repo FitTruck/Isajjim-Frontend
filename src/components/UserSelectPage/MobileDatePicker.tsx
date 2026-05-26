@@ -20,10 +20,15 @@ function getLunarDay(year: number, month: number, day: number): number {
 
 export default function MobileDatePicker({ value, onSelect }: Props) {
   const today = new Date();
+  today.setHours(0, 0, 0, 0);
   const [year, setYear] = useState(today.getFullYear());
   const [month, setMonth] = useState(today.getMonth());
 
+  const isPrevMonthDisabled =
+    year === today.getFullYear() && month === today.getMonth();
+
   const prevMonth = () => {
+    if (isPrevMonthDisabled) return;
     if (month === 0) { setYear(y => y - 1); setMonth(11); }
     else setMonth(m => m - 1);
   };
@@ -80,8 +85,8 @@ export default function MobileDatePicker({ value, onSelect }: Props) {
         <View style={styles.titleRow}>
           <Text style={styles.monthYear}>{year}년 {month + 1}월</Text>
           <View style={styles.controls}>
-            <TouchableOpacity onPress={prevMonth} hitSlop={8}>
-              <ChevronLeft size={16} color="#1F2024" />
+            <TouchableOpacity onPress={prevMonth} hitSlop={8} disabled={isPrevMonthDisabled}>
+              <ChevronLeft size={16} color={isPrevMonthDisabled ? '#C5C6CC' : '#1F2024'} />
             </TouchableOpacity>
             <TouchableOpacity onPress={nextMonth} hitSlop={8}>
               <ChevronRight size={16} color="#1F2024" />
@@ -104,9 +109,10 @@ export default function MobileDatePicker({ value, onSelect }: Props) {
         {weeks.map((week, wi) => (
           <View key={wi} style={styles.weekDayRow}>
             {week.map((day, di) => {
-              const selected = day !== null && isSelected(day);
+              const isPast = day !== null && new Date(year, month, day) < today;
+              const selected = day !== null && !isPast && isSelected(day);
               const todayCell = day !== null && isToday(day);
-              const sonEomnun = day !== null && sonEomnunSet.has(day);
+              const sonEomnun = day !== null && !isPast && sonEomnunSet.has(day);
               const holidayKey = day !== null
                 ? `${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`
                 : null;
@@ -119,15 +125,16 @@ export default function MobileDatePicker({ value, onSelect }: Props) {
                     todayCell && !selected && styles.todayCell,
                     selected && styles.selectedCell,
                   ]}
-                  onPress={() => day && handlePress(day)}
-                  disabled={day === null}
+                  onPress={() => day && !isPast && handlePress(day)}
+                  disabled={day === null || isPast}
                   activeOpacity={0.7}
                 >
                   {day !== null && (
                     <>
                       <Text style={[
                         styles.dayText,
-                        (isHoliday || di === 0) && styles.holidayText,
+                        isPast && styles.pastDayText,
+                        !isPast && (isHoliday || di === 0) && styles.holidayText,
                         selected && styles.selectedDayText,
                       ]}>
                         {day}
@@ -238,6 +245,10 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '700',
     color: '#494A50',
+  },
+  pastDayText: {
+    color: '#C5C6CC',
+    fontWeight: '400',
   },
   selectedDayText: {
     color: '#fff',

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { StyleSheet, TouchableOpacity, Text,useWindowDimensions, Platform, Alert } from 'react-native';
+import { StyleSheet, TouchableOpacity, Text, Platform, Alert } from 'react-native';
 import * as ImageManipulator from 'expo-image-manipulator';
 import { v4 as uuidv4 } from 'uuid';
 import { UploadedImage } from '../../types/common';
@@ -18,8 +18,6 @@ export default function NextBtn1({ imageList, onShowAlert }: NextBtnProps) {
   
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const [isLoading, setIsLoading] = useState(false);
-  const { width } = useWindowDimensions();
-  const isMobile = width < 768;
   const { requestData, setRequestData } = useEstimate();
 
   const handleNextStep = async () => {
@@ -133,46 +131,29 @@ export default function NextBtn1({ imageList, onShowAlert }: NextBtnProps) {
 
   return (
     <TouchableOpacity
-      style={[styles.nextBtn, isMobile && styles.mobileNextBtn, isLoading && styles.nextBtnDisabled]}
+      style={[styles.nextBtn, isLoading && styles.nextBtnDisabled]}
       onPress={handleNextStep}
     >
-      <Text style={[styles.nextBtnText, isMobile && styles.mobileNextBtnText]}>
-        {isMobile ? '다음으로' : '다음 단계'}
-      </Text>
+      <Text style={styles.nextBtnText}>다음으로</Text>
     </TouchableOpacity>
   );
 }
 
 const styles = StyleSheet.create({
   nextBtn: {
-    paddingHorizontal: 15,
-    paddingVertical: 8,
-    backgroundColor: '#F0893B',
-    borderRadius: 4,
-    justifyContent: 'center', 
-    alignItems: 'center',
-    marginTop: 0,
-  },
-  mobileNextBtn: {
     backgroundColor: '#006FFD',
     height: 48,
     borderRadius: 12,
     width: '100%',
-    paddingHorizontal: 16,
-    paddingVertical: 0,
-    marginTop: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   nextBtnText: {
-    color: 'white',
-    fontSize: 17,
-    fontWeight: '400',
-  },
-  mobileNextBtnText: {
+    color: '#fff',
     fontSize: 14,
     fontWeight: '600',
   },
   nextBtnDisabled: {
-    backgroundColor: '#666',
-    opacity: 0.7
-  }
+    opacity: 0.5,
+  },
 });

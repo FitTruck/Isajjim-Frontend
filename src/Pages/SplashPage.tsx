@@ -1,18 +1,20 @@
 import React, { useEffect } from 'react';
 import { Image, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { NavigationProp, useNavigation } from '@react-navigation/native';
+import { NavigationProp, useNavigation, useIsFocused } from '@react-navigation/native';
 import { RootStackParamList } from '../types/navigation';
 
 export default function SplashPage() {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+  const isFocused = useIsFocused();
 
   useEffect(() => {
+    if (!isFocused) return;
     const timer = setTimeout(() => {
       navigation.reset({ index: 0, routes: [{ name: 'Main' }] });
     }, 1000);
     return () => clearTimeout(timer);
-  }, [navigation]);
+  }, [navigation, isFocused]);
 
   return (
     <SafeAreaView style={styles.container}>
