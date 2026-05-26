@@ -369,7 +369,7 @@ export default function Result({ navigation }: Props) {
                 style={styles.qtyBtn}
                 onPress={() => item.quantity > 0 && handleUpdateQuantity(item.furnitureId, item.quantity - 1)}
               >
-                <Minus size={10} color="#F36845" />
+                <Minus size={10} color="#423E3E" />
               </TouchableOpacity>
               <Text style={styles.qtyText}>{item.quantity}</Text>
               <TouchableOpacity
@@ -450,9 +450,9 @@ const styles = StyleSheet.create({
   editLabel: { flex: 1, fontSize: 12, fontWeight: '700', color: '#423E3E' },
   qtyRow: { flexDirection: 'row', alignItems: 'center', gap: 4 },
   qtyBtn: {
-    width: 24, height: 24, borderRadius: 12, backgroundColor: '#FFDEBB',
+    width: 24, height: 24, borderRadius: 12, backgroundColor: '#F5F6FA',
     justifyContent: 'center', alignItems: 'center',
   },
-  qtyBtnPlus: { backgroundColor: '#F5F6FA' },
+  qtyBtnPlus: {},
   qtyText: { width: 24, textAlign: 'center', fontSize: 14, color: '#423E3E', lineHeight: 18 },
 });

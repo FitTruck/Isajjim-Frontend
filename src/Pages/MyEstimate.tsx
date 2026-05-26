@@ -203,7 +203,7 @@ function DetailModal({ estimate, displayIndex, onClose }: { estimate: EstimateDa
           </View>
 
           <ScrollView style={modal.scroll} showsVerticalScrollIndicator={false}>
-            {/* 생성일 */}
+            {/* 생성일 · 이사 정보 */}
             <View style={modal.section}>
               <View style={modal.infoRow}>
                 <View style={modal.infoLabelWrap}>
@@ -212,47 +212,40 @@ function DetailModal({ estimate, displayIndex, onClose }: { estimate: EstimateDa
                 </View>
                 <Text style={modal.infoValue}>{formatDate(estimate.createdDate)}</Text>
               </View>
+              {estimate.preferredMovingDate && (
+                <View style={modal.infoRow}>
+                  <View style={modal.infoLabelWrap}>
+                    <Calendar size={13} color="#949494" />
+                    <Text style={modal.infoLabel}>희망 날짜</Text>
+                  </View>
+                  <Text style={modal.infoValue}>{formatDate(estimate.preferredMovingDate)}</Text>
+                </View>
+              )}
+              {estimate.startLocation?.address && (
+                <View style={modal.infoRow}>
+                  <View style={modal.infoLabelWrap}>
+                    <MapPin size={13} color="#949494" />
+                    <Text style={modal.infoLabel}>출발지</Text>
+                  </View>
+                  <Text style={modal.infoValue} numberOfLines={2}>
+                    {estimate.startLocation.address}
+                    {estimate.startLocation.detailAddress ? `\n${estimate.startLocation.detailAddress}` : ''}
+                  </Text>
+                </View>
+              )}
+              {estimate.endLocation?.address && (
+                <View style={modal.infoRow}>
+                  <View style={modal.infoLabelWrap}>
+                    <MapPin size={13} color="#F36845" />
+                    <Text style={modal.infoLabel}>도착지</Text>
+                  </View>
+                  <Text style={modal.infoValue} numberOfLines={2}>
+                    {estimate.endLocation.address}
+                    {estimate.endLocation.detailAddress ? `\n${estimate.endLocation.detailAddress}` : ''}
+                  </Text>
+                </View>
+              )}
             </View>
-
-            {/* 이사 정보 */}
-            {(estimate.startLocation || estimate.endLocation || estimate.preferredMovingDate) && (
-              <View style={modal.section}>
-                <Text style={modal.sectionTitle}>이사 정보</Text>
-                {estimate.preferredMovingDate && (
-                  <View style={modal.infoRow}>
-                    <View style={modal.infoLabelWrap}>
-                      <Calendar size={13} color="#949494" />
-                      <Text style={modal.infoLabel}>희망 날짜</Text>
-                    </View>
-                    <Text style={modal.infoValue}>{formatDate(estimate.preferredMovingDate)}</Text>
-                  </View>
-                )}
-                {estimate.startLocation?.address && (
-                  <View style={modal.infoRow}>
-                    <View style={modal.infoLabelWrap}>
-                      <MapPin size={13} color="#949494" />
-                      <Text style={modal.infoLabel}>출발지</Text>
-                    </View>
-                    <Text style={modal.infoValue} numberOfLines={2}>
-                      {estimate.startLocation.address}
-                      {estimate.startLocation.detailAddress ? `\n${estimate.startLocation.detailAddress}` : ''}
-                    </Text>
-                  </View>
-                )}
-                {estimate.endLocation?.address && (
-                  <View style={modal.infoRow}>
-                    <View style={modal.infoLabelWrap}>
-                      <MapPin size={13} color="#F36845" />
-                      <Text style={modal.infoLabel}>도착지</Text>
-                    </View>
-                    <Text style={modal.infoValue} numberOfLines={2}>
-                      {estimate.endLocation.address}
-                      {estimate.endLocation.detailAddress ? `\n${estimate.endLocation.detailAddress}` : ''}
-                    </Text>
-                  </View>
-                )}
-              </View>
-            )}
 
             {/* 이미지 */}
             {allImages.length > 0 && (

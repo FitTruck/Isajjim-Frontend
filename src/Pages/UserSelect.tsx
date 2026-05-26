@@ -135,6 +135,16 @@ export default function UserSelect({ route }: Props) {
   const isDeparture = mobileStep === 'departure';
   const isArrival = mobileStep === 'arrival';
   const isDate = mobileStep === 'date';
+
+  const isDepartureComplete =
+    !!adress1 && !!buildingType1 && !!floor1 && !!roomSize1 && !!roomType1 &&
+    parking1 !== null && elevator1 !== null && !!ladderTruck1 && duplex1 !== null && groundStair1 !== null;
+
+  const isArrivalComplete =
+    !!adress2 && !!buildingType2 && !!floor2 && !!roomSize2 && !!roomType2 &&
+    parking2 !== null && elevator2 !== null && !!ladderTruck2 && duplex2 !== null && groundStair2 !== null;
+
+  const isStepComplete = isDeparture ? isDepartureComplete : isArrival ? isArrivalComplete : !!movingDate;
   const progress = isDeparture ? '50%' : isArrival ? '75%' : '100%';
   const title = isDeparture ? '출발지' : isArrival ? '도착지' : '이사 희망 날짜';
   const subtitle = isDate
@@ -194,8 +204,12 @@ export default function UserSelect({ route }: Props) {
 
       {/* 하단 버튼 */}
       <View style={[styles.bottomBar, { paddingBottom: Math.max(insets.bottom, 24) }]}>
-        <TouchableOpacity style={styles.nextButton} onPress={handleNext} activeOpacity={0.85}>
-          <Text style={styles.nextButtonText}>다음으로</Text>
+        <TouchableOpacity
+          style={[styles.nextButton, !isStepComplete && styles.nextButtonDisabled]}
+          onPress={handleNext}
+          activeOpacity={0.85}
+        >
+          <Text style={[styles.nextButtonText, !isStepComplete && styles.nextButtonDisabledText]}>다음으로</Text>
         </TouchableOpacity>
       </View>
 
@@ -282,5 +296,11 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
     color: '#fff',
+  },
+  nextButtonDisabled: {
+    backgroundColor: '#E8E8E8',
+  },
+  nextButtonDisabledText: {
+    color: '#949494',
   },
 });
