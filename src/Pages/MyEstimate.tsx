@@ -164,7 +164,7 @@ function ImageViewer({ images, initialIndex, onClose }: {
           }}
           keyExtractor={item => String(item.imageId)}
           renderItem={({ item }) => (
-            <View style={{ width, height }}>
+            <View style={{ width, height, justifyContent: 'center', alignItems: 'center' }}>
               <AnnotatedImage img={item} style={viewer.image} resizeMode="contain" markerSize={22} />
             </View>
           )}
