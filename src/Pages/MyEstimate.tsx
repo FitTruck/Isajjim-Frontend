@@ -176,13 +176,15 @@ function DetailModal({ estimate, displayIndex, onClose }: { estimate: EstimateDa
   const trucks = estimate.items.filter(i => i.category === 'TRUCK');
   const allImages = estimate.images.filter(i => i.imageUrl);
   const [viewerIndex, setViewerIndex] = useState<number | null>(null);
+  const insets = useSafeAreaInsets();
+  const { height: screenHeight } = useWindowDimensions();
 
   return (
     <Modal visible animationType="slide" transparent onRequestClose={onClose}>
       <View style={modal.overlay}>
         <Pressable style={modal.backdrop} onPress={onClose} />
 
-        <View style={modal.sheet}>
+        <View style={[modal.sheet, { height: screenHeight * 0.85, paddingBottom: Math.max(insets.bottom, 16) }]}>
           {/* 핸들 */}
           <View style={modal.handle} />
 
@@ -390,6 +392,7 @@ export default function MyEstimate({ navigation }: Props) {
   const { width } = useWindowDimensions();
   const isMobile = width < 768;
   const isFocused = useIsFocused();
+  const insets = useSafeAreaInsets();
 
   const [estimates, setEstimates] = useState<EstimateData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -471,7 +474,7 @@ export default function MyEstimate({ navigation }: Props) {
       </View>
 
       <ScrollView
-        contentContainerStyle={[page.scroll, !isMobile && page.scrollWide]}
+        contentContainerStyle={[page.scroll, !isMobile && page.scrollWide, isMobile && { paddingBottom: 80 + Math.max(insets.bottom, 16) }]}
         refreshControl={
           <RefreshControl refreshing={isRefreshing} onRefresh={() => load(true)} tintColor="#F36845" />
         }
@@ -479,7 +482,7 @@ export default function MyEstimate({ navigation }: Props) {
         {renderBody()}
       </ScrollView>
 
-      {isMobile && <BottomTabBar activeTab="estimate" onTabPress={handleTabPress} />}
+      {isMobile && !selected && <BottomTabBar activeTab="estimate" onTabPress={handleTabPress} />}
 
       {selected && (
         <DetailModal estimate={selected.estimate} displayIndex={selected.displayIndex} onClose={() => setSelected(null)} />
@@ -599,14 +602,15 @@ const modal = StyleSheet.create({
   backdrop: {
     ...StyleSheet.absoluteFillObject,
     backgroundColor: 'rgba(0,0,0,0.4)',
+    zIndex: 0,
   },
   sheet: {
     backgroundColor: '#fff',
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
-    maxHeight: '85%',
     paddingHorizontal: 20,
     paddingTop: 12,
+    zIndex: 1,
   },
   handle: {
     width: 36,
