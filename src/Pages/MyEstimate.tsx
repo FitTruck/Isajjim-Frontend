@@ -1,6 +1,6 @@
-import React, { useState, useCallback, useEffect, useMemo } from 'react';
+import React, { useState, useCallback, useEffect, useMemo, useRef } from 'react';
 import {
-  View, Text, StyleSheet, ScrollView, Modal,
+  View, Text, StyleSheet, ScrollView, Modal, FlatList,
   TouchableOpacity, ActivityIndicator, RefreshControl,
   useWindowDimensions, Pressable,
 } from 'react-native';
@@ -136,8 +136,8 @@ function ImageViewer({ images, initialIndex, onClose }: {
   onClose: () => void;
 }) {
   const [index, setIndex] = useState(initialIndex);
-  const prev = () => setIndex(i => Math.max(0, i - 1));
-  const next = () => setIndex(i => Math.min(images.length - 1, i + 1));
+  const { width, height } = useWindowDimensions();
+  const listRef = useRef<FlatList>(null);
 
   return (
     <Modal visible animationType="fade" transparent onRequestClose={onClose}>
@@ -150,22 +150,25 @@ function ImageViewer({ images, initialIndex, onClose }: {
         {/* 페이지 표시 */}
         <Text style={viewer.counter}>{index + 1} / {images.length}</Text>
 
-        {/* 이미지 */}
-        <AnnotatedImage img={images[index]} style={viewer.image} resizeMode="contain" markerSize={22} />
-
-        {/* 이전 */}
-        {index > 0 && (
-          <TouchableOpacity style={[viewer.arrow, viewer.arrowLeft]} onPress={prev}>
-            <ChevronLeft size={28} color="#fff" />
-          </TouchableOpacity>
-        )}
-
-        {/* 다음 */}
-        {index < images.length - 1 && (
-          <TouchableOpacity style={[viewer.arrow, viewer.arrowRight]} onPress={next}>
-            <ChevronRight size={28} color="#fff" />
-          </TouchableOpacity>
-        )}
+        {/* 스와이프 이미지 리스트 */}
+        <FlatList
+          ref={listRef}
+          data={images}
+          horizontal
+          pagingEnabled
+          showsHorizontalScrollIndicator={false}
+          initialScrollIndex={initialIndex}
+          getItemLayout={(_, i) => ({ length: width, offset: width * i, index: i })}
+          onMomentumScrollEnd={e => {
+            setIndex(Math.round(e.nativeEvent.contentOffset.x / width));
+          }}
+          keyExtractor={item => String(item.imageId)}
+          renderItem={({ item }) => (
+            <View style={{ width, height }}>
+              <AnnotatedImage img={item} style={viewer.image} resizeMode="contain" markerSize={22} />
+            </View>
+          )}
+        />
       </View>
     </Modal>
   );
