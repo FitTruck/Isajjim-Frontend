@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import {
-  View, Text, StyleSheet, ScrollView, Image, Modal,
+  View, Text, StyleSheet, ScrollView, Modal,
   TouchableOpacity, ActivityIndicator, RefreshControl,
   useWindowDimensions, Pressable,
 } from 'react-native';
@@ -9,6 +9,7 @@ import { useIsFocused } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { Package, Truck, RefreshCw, ClipboardList, X, ChevronRight, Calendar, ChevronLeft, MapPin } from 'lucide-react-native';
 
+import { Image } from 'expo-image';
 import { RootStackParamList } from '../types/navigation';
 import BottomTabBar from '../components/common/BottomTabBar';
 import {
@@ -105,7 +106,7 @@ function AnnotatedImage({
         setDisplaySize({ w: width, h: height });
       }}
     >
-      <Image source={{ uri: img.imageUrl }} style={StyleSheet.absoluteFill} resizeMode={resizeMode} />
+      <Image source={{ uri: img.imageUrl }} style={StyleSheet.absoluteFill} contentFit={resizeMode} cachePolicy="memory-disk" />
       {markers.map((m, i) => (
         <Text
           key={i}
@@ -333,7 +334,7 @@ function EstimateCard({ estimate, displayIndex, onPress }: { estimate: EstimateD
       {/* 본문: 썸네일 + 정보 */}
       <View style={card.body}>
         {thumbnail ? (
-          <Image source={{ uri: thumbnail }} style={card.thumbnail} resizeMode="cover" />
+          <Image source={{ uri: thumbnail }} style={card.thumbnail} contentFit="cover" cachePolicy="memory-disk" />
         ) : (
           <View style={card.thumbPlaceholder}>
             <ClipboardList size={22} color="#E8E8E8" />

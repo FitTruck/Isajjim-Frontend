@@ -1,5 +1,6 @@
 ﻿import React, { useState } from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity, useWindowDimensions } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, useWindowDimensions } from 'react-native';
+import { Image } from 'expo-image';
 import { MapPin, ChevronRight, FileText, CircleStop, Star, MessageCircle, Armchair, Truck } from 'lucide-react-native';
 import RequestDetailModal from "../common/RequestDetailModal";
 
@@ -262,7 +263,8 @@ export default function EstimateCard({ status, date, locations, estimateId, esti
               <Image
                 source={{ uri: estimateItems.thumbnailUrl }}
                 style={styles.thumbnail}
-                resizeMode="cover"
+                contentFit="cover"
+                cachePolicy="memory-disk"
               />
             ) : null}
             <View style={styles.itemsDetail}>

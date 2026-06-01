@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
   View, Text, StyleSheet, FlatList, TouchableOpacity,
-  TextInput, Image, ActivityIndicator,
+  TextInput, ActivityIndicator,
 } from 'react-native';
+import { Image } from 'expo-image';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types/navigation';
@@ -185,7 +186,7 @@ export default function MyChat({ navigation }: Props) {
               {/* 아바타 */}
               <View style={styles.avatar}>
                 {item.target.profileImageUrl ? (
-                  <Image source={{ uri: item.target.profileImageUrl }} style={StyleSheet.absoluteFill} resizeMode="cover" />
+                  <Image source={{ uri: item.target.profileImageUrl }} style={StyleSheet.absoluteFill} contentFit="cover" cachePolicy="memory-disk" />
                 ) : (
                   <View style={styles.avatarDefault} />
                 )}

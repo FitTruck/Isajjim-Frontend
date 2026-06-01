@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
   View, Text, StyleSheet, TextInput, TouchableOpacity, FlatList,
-  KeyboardAvoidingView, Platform, Image, ActivityIndicator, Alert, Modal,
+  KeyboardAvoidingView, Platform, ActivityIndicator, Alert, Modal,
   Dimensions,
 } from 'react-native';
+import { Image } from 'expo-image';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types/navigation';
@@ -176,7 +177,7 @@ export default function ChatRoom({ route, navigation }: Props) {
         <View style={[styles.bubble, isMine ? styles.bubbleMine : styles.bubbleOther]}>
           {isImage ? (
             <TouchableOpacity onPress={() => setPreviewUri(item.content)} activeOpacity={0.9}>
-              <Image source={{ uri: item.content }} style={styles.imageMessage} resizeMode="cover" />
+              <Image source={{ uri: item.content }} style={styles.imageMessage} contentFit="cover" cachePolicy="memory-disk" />
             </TouchableOpacity>
           ) : (
             <Text style={[styles.messageText, isMine && styles.messageTextMine]}>
@@ -264,7 +265,8 @@ export default function ChatRoom({ route, navigation }: Props) {
           <Image
             source={{ uri: previewUri ?? '' }}
             style={styles.previewImage}
-            resizeMode="contain"
+            contentFit="contain"
+            cachePolicy="memory-disk"
           />
           {/* 닫기 */}
           <TouchableOpacity style={styles.previewClose} onPress={() => setPreviewUri(null)}>
