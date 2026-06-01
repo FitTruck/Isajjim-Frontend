@@ -9,6 +9,7 @@ import { useEffect } from 'react';
 import { registerFCMToken, setupNotificationTapHandler } from './src/utils/fcm';
 import { getAccessToken } from './src/auth/tokenStorage';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 // 각 화면 컴포넌트 import
 import UploadScreen from './src/Pages/MainScreen';
@@ -124,6 +125,7 @@ export default function App() {
 
   return (
     // NavigationContainer: 앱의 네비게이션 트리를 관리하는 최상위 컴포넌트
+    <GestureHandlerRootView style={{ flex: 1 }}>
     <SafeAreaProvider>
     <AuthProvider>
       <EstimateProvider>
@@ -161,5 +163,6 @@ export default function App() {
       </EstimateProvider>
     </AuthProvider>
     </SafeAreaProvider>
+    </GestureHandlerRootView>
   );
 }
