@@ -1,17 +1,18 @@
-import React, { useState, useCallback, useEffect, useMemo, useRef } from 'react';
+import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import {
-  View, Text, StyleSheet, ScrollView, Modal, FlatList,
+  View, Text, StyleSheet, ScrollView, Modal,
   TouchableOpacity, ActivityIndicator, RefreshControl,
   useWindowDimensions, Pressable,
 } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useIsFocused } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { Package, Truck, RefreshCw, ClipboardList, X, ChevronRight, Calendar, ChevronLeft, MapPin } from 'lucide-react-native';
+import { Package, Truck, RefreshCw, ClipboardList, X, ChevronRight, Calendar, MapPin } from 'lucide-react-native';
 
 import { Image, ImageLoadEventData } from 'expo-image';
 import { RootStackParamList } from '../types/navigation';
 import BottomTabBar from '../components/common/BottomTabBar';
+import ImageViewerModal from '../components/common/ImageViewerModal';
 import {
   getEstimates, mapAiStatus, formatTruckType,
   EstimateData, EstimateImage,
@@ -129,50 +130,6 @@ function AnnotatedImage({
   );
 }
 
-// ── 전체화면 이미지 뷰어 ──────────────────────────────────
-function ImageViewer({ images, initialIndex, onClose }: {
-  images: EstimateImage[];
-  initialIndex: number;
-  onClose: () => void;
-}) {
-  const [index, setIndex] = useState(initialIndex);
-  const { width, height } = useWindowDimensions();
-  const listRef = useRef<FlatList>(null);
-
-  return (
-    <Modal visible animationType="fade" transparent onRequestClose={onClose}>
-      <View style={viewer.overlay}>
-        {/* 닫기 */}
-        <TouchableOpacity style={viewer.closeBtn} onPress={onClose} hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}>
-          <X size={24} color="#fff" />
-        </TouchableOpacity>
-
-        {/* 페이지 표시 */}
-        <Text style={viewer.counter}>{index + 1} / {images.length}</Text>
-
-        {/* 스와이프 이미지 리스트 */}
-        <FlatList
-          ref={listRef}
-          data={images}
-          horizontal
-          pagingEnabled
-          showsHorizontalScrollIndicator={false}
-          initialScrollIndex={initialIndex}
-          getItemLayout={(_, i) => ({ length: width, offset: width * i, index: i })}
-          onMomentumScrollEnd={e => {
-            setIndex(Math.round(e.nativeEvent.contentOffset.x / width));
-          }}
-          keyExtractor={item => String(item.imageId)}
-          renderItem={({ item }) => (
-            <View style={{ width, height, justifyContent: 'center', alignItems: 'center' }}>
-              <AnnotatedImage img={item} style={viewer.image} resizeMode="contain" markerSize={22} />
-            </View>
-          )}
-        />
-      </View>
-    </Modal>
-  );
-}
 
 // ── 상세 모달 ─────────────────────────────────────────────
 function DetailModal({ estimate, displayIndex, onClose }: { estimate: EstimateData; displayIndex: number; onClose: () => void }) {
@@ -304,10 +261,14 @@ function DetailModal({ estimate, displayIndex, onClose }: { estimate: EstimateDa
       </View>
 
       {viewerIndex !== null && (
-        <ImageViewer
-          images={allImages}
+        <ImageViewerModal
+          visible
+          count={allImages.length}
           initialIndex={viewerIndex}
           onClose={() => setViewerIndex(null)}
+          renderImage={(i, w, h) => (
+            <AnnotatedImage img={allImages[i]} style={{ width: w, height: h * 0.8 }} resizeMode="contain" markerSize={22} />
+          )}
         />
       )}
     </Modal>
@@ -553,51 +514,6 @@ const card = StyleSheet.create({
   metaText: { fontSize: 13, color: '#949494' },
 });
 
-// ── 뷰어 스타일 ───────────────────────────────────────────
-const viewer = StyleSheet.create({
-  overlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.92)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  image: {
-    width: '100%',
-    height: '80%',
-  },
-  closeBtn: {
-    position: 'absolute',
-    top: 52,
-    right: 20,
-    zIndex: 10,
-    width: 40,
-    height: 40,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  counter: {
-    position: 'absolute',
-    top: 56,
-    alignSelf: 'center',
-    color: '#fff',
-    fontSize: 14,
-    fontWeight: '600',
-    zIndex: 10,
-  },
-  arrow: {
-    position: 'absolute',
-    top: '50%',
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: 'rgba(255,255,255,0.15)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    zIndex: 10,
-  },
-  arrowLeft: { left: 16 },
-  arrowRight: { right: 16 },
-});
 
 // ── 모달 스타일 ───────────────────────────────────────────
 const modal = StyleSheet.create({

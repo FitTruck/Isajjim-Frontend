@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
   View, Text, StyleSheet, TextInput, TouchableOpacity, FlatList,
-  KeyboardAvoidingView, Platform, ActivityIndicator, Alert, Modal,
+  KeyboardAvoidingView, Platform, ActivityIndicator, Alert,
   Dimensions,
 } from 'react-native';
 import { Image } from 'expo-image';
@@ -12,10 +12,11 @@ import { ChatMessage } from '../types/chat';
 import { createOrGetRoom, getMessages, markRead, getChatPresignedUrls } from '../api/chatApi';
 import { chatSocket } from '../api/chatSocket';
 import { getMyUserId } from '../auth/tokenStorage';
-import { ChevronLeft, Plus, Send, X, Download } from 'lucide-react-native';
+import { ChevronLeft, Plus, Send, Download } from 'lucide-react-native';
 import * as ImagePicker from 'expo-image-picker';
 import * as MediaLibrary from 'expo-media-library';
 import * as FileSystem from 'expo-file-system/legacy';
+import ImageViewerModal from '../components/common/ImageViewerModal';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'ChatRoom'>;
 
@@ -260,25 +261,25 @@ export default function ChatRoom({ route, navigation }: Props) {
       </KeyboardAvoidingView>
 
       {/* 이미지 전체화면 모달 */}
-      <Modal visible={!!previewUri} transparent animationType="fade" statusBarTranslucent onRequestClose={() => setPreviewUri(null)}>
-        <View style={styles.previewOverlay}>
+      <ImageViewerModal
+        visible={!!previewUri}
+        onClose={() => setPreviewUri(null)}
+        count={1}
+        renderImage={(_, w, h) => (
           <Image
             source={{ uri: previewUri ?? '' }}
-            style={styles.previewImage}
+            style={{ width: w, height: h * 0.85 }}
             contentFit="contain"
             cachePolicy="memory-disk"
           />
-          {/* 닫기 */}
-          <TouchableOpacity style={styles.previewClose} onPress={() => setPreviewUri(null)}>
-            <X size={22} color="#fff" />
-          </TouchableOpacity>
-          {/* 저장 */}
+        )}
+        bottomActions={
           <TouchableOpacity style={styles.previewSave} onPress={() => previewUri && saveImage(previewUri)}>
             <Download size={20} color="#fff" />
             <Text style={styles.previewSaveText}>저장</Text>
           </TouchableOpacity>
-        </View>
-      </Modal>
+        }
+      />
     </View>
   );
 }
