@@ -2,7 +2,7 @@ import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import {
   View, Text, StyleSheet, ScrollView, Modal,
   TouchableOpacity, ActivityIndicator, RefreshControl,
-  useWindowDimensions, Pressable,
+  useWindowDimensions, Pressable, Image as RNImage,
 } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useIsFocused } from '@react-navigation/native';
@@ -81,7 +81,7 @@ function AnnotatedImage({
   const [displaySize, setDisplaySize] = useState<{ w: number; h: number } | null>(null);
 
   useEffect(() => {
-    Image.getSize(img.imageUrl, (w, h) => setNaturalSize({ w, h }), () => {});
+    RNImage.getSize(img.imageUrl, (w, h) => setNaturalSize({ w, h }), () => {});
   }, [img.imageUrl]);
 
   const markers = useMemo(() => {
