@@ -2,14 +2,14 @@ import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import {
   View, Text, StyleSheet, ScrollView, Modal,
   TouchableOpacity, ActivityIndicator, RefreshControl,
-  useWindowDimensions, Pressable, Image as RNImage,
+  useWindowDimensions, Pressable,
 } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useIsFocused } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { Package, Truck, RefreshCw, ClipboardList, X, ChevronRight, Calendar, ChevronLeft, MapPin } from 'lucide-react-native';
 
-import { Image } from 'expo-image';
+import { Image, ImageLoadEventData } from 'expo-image';
 import { RootStackParamList } from '../types/navigation';
 import BottomTabBar from '../components/common/BottomTabBar';
 import {
@@ -80,10 +80,6 @@ function AnnotatedImage({
   const [naturalSize, setNaturalSize] = useState<{ w: number; h: number } | null>(null);
   const [displaySize, setDisplaySize] = useState<{ w: number; h: number } | null>(null);
 
-  useEffect(() => {
-    RNImage.getSize(img.imageUrl, (w, h) => setNaturalSize({ w, h }), () => {});
-  }, [img.imageUrl]);
-
   const markers = useMemo(() => {
     if (!naturalSize || !displaySize) return [];
     const { w: natW, h: natH } = naturalSize;
@@ -106,7 +102,13 @@ function AnnotatedImage({
         setDisplaySize({ w: width, h: height });
       }}
     >
-      <Image source={{ uri: img.imageUrl }} style={StyleSheet.absoluteFill} contentFit={resizeMode} cachePolicy="memory-disk" />
+      <Image
+        source={{ uri: img.imageUrl }}
+        style={StyleSheet.absoluteFill}
+        contentFit={resizeMode}
+        cachePolicy="memory-disk"
+        onLoad={(e: ImageLoadEventData) => setNaturalSize({ w: e.source.width, h: e.source.height })}
+      />
       {markers.map((m, i) => (
         <Text
           key={i}
