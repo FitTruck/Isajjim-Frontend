@@ -21,6 +21,9 @@ export type RootStackParamList = {
     targetId?: number; // 다른 화면에서 새 채팅 시작 시
     targetName: string;
   };
+  FinalEstimate: {
+    simulationTrucks: { type: string; quantity: number }[];
+  };
   SimulationTest: undefined; // 시뮬레이션 테스트 페이지
   Main: undefined; // 메인 페이지
   PartnerSearch: undefined;

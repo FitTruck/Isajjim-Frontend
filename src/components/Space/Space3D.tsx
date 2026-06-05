@@ -318,6 +318,7 @@ const Space3D = forwardRef<Space3DHandle, Space3DProps>(({
   furniture,
   truckType,
   autoPlay = false,
+  instantResult = false,
   onAnimationComplete,
   onTrucksChange,
 }, ref) => {
@@ -441,6 +442,15 @@ const Space3D = forwardRef<Space3DHandle, Space3DProps>(({
     setTrucks(newTrucks);
     setPackingMessage(newMessage);
 
+    if (instantResult) {
+      // 즉시 결과 표시 — 애니메이션 없이 모든 아이템 한 번에 표시
+      setVisibleItemIds(newAllItemIds);
+      setSimulationState('completed');
+      simulationStateRef.current = 'completed';
+      onAnimationComplete?.();
+      return;
+    }
+
     if (!isSameTruckConfig) {
       // 트럭 구성 변경 → 전체 초기화
       console.log('[시뮬레이션] 트럭 구성 변경 → 전체 초기화');
@@ -496,7 +506,7 @@ const Space3D = forwardRef<Space3DHandle, Space3DProps>(({
     }
 
     prevTrucksRef.current = { types: newTruckTypes, count: newTruckCount };
-  }, [loadedFurniture, truckType, furniture]);
+  }, [loadedFurniture, truckType, furniture, instantResult]);
 
   // 트럭 결과가 변경되면 부모에게 알림
   useEffect(() => {

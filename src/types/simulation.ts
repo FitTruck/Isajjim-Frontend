@@ -25,6 +25,7 @@ export interface Space3DProps {
   furniture?: SimulationFurniture[];
   truckType?: TruckType;
   autoPlay?: boolean;
+  instantResult?: boolean;
   onAnimationComplete?: () => void;
   onTrucksChange?: (trucks: SimulationTruckResult[]) => void;
 }

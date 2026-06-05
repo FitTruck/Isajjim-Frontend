@@ -15,7 +15,7 @@ import { useIsFocused } from '@react-navigation/native';
 type Props = NativeStackScreenProps<RootStackParamList, 'Result'>;
 
 export default function Result({ navigation }: Props) {
-  const { requestData, setRequestData, setChatStartTime } = useEstimate();
+  const { requestData, setRequestData } = useEstimate();
   const { width } = useWindowDimensions();
   const isFocused = useIsFocused();
   const insets = useSafeAreaInsets();
@@ -28,10 +28,7 @@ export default function Result({ navigation }: Props) {
   const truckInfo = requestData?.truckInfo;
 
   const onNavigateNext = () => {
-    const now = new Date();
-    const timeString = now.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' });
-    setChatStartTime(timeString);
-    navigation.navigate('MyEstimate');
+    navigation.navigate('FinalEstimate', { simulationTrucks });
   };
 
   const [results, setResults] = useState<any[]>([]);
