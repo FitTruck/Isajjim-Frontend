@@ -29,6 +29,7 @@ import NotificationSettingsPage from './src/Pages/NotificationSettingsPage';
 import PartnerSearchPage from './src/Pages/PartnerSearchPage';
 import ChatRoom from './src/Pages/ChatRoom';
 import FinalEstimatePage from './src/Pages/FinalEstimatePage';
+import EstimateOffersPage from './src/Pages/EstimateOffersPage';
 
 // 각 화면의 매개변수 타입들을 정의하고 있는 타입 import
 import { RootStackParamList } from './src/types/navigation';
@@ -148,6 +149,7 @@ export default function App() {
             <Stack.Screen name="UserSelect" component={UserSelect} />
             <Stack.Screen name="Result" component={Result} />
             <Stack.Screen name="FinalEstimate" component={FinalEstimatePage} />
+            <Stack.Screen name="EstimateOffers" component={EstimateOffersPage} />
             <Stack.Screen name="MyEstimate" component={MyEstimate} />
             <Stack.Screen name="MyChat" component={MyChat} />
             <Stack.Screen name="ChatRoom" component={ChatRoom} />

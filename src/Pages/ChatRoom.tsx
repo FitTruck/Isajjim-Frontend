@@ -21,7 +21,7 @@ import ImageViewerModal from '../components/common/ImageViewerModal';
 type Props = NativeStackScreenProps<RootStackParamList, 'ChatRoom'>;
 
 export default function ChatRoom({ route, navigation }: Props) {
-  const { roomId: initRoomId, targetId, targetName: initTargetName } = route.params;
+  const { roomId: initRoomId, targetId, targetName: initTargetName, mockInitialMessage } = route.params;
   const insets = useSafeAreaInsets();
   const myUserId = getMyUserId();
 
@@ -66,8 +66,22 @@ export default function ChatRoom({ route, navigation }: Props) {
       setRoomId(id);
 
       const pageData = await getMessages(id, 0);
-      // REST 응답은 최신순(내림차순) → 화면 표시용 오름차순으로 역순
-      setMessages([...pageData.messages].reverse());
+      const realMessages = [...pageData.messages].reverse();
+
+      if (realMessages.length === 0 && mockInitialMessage) {
+        const fakeMsg: ChatMessage = {
+          messageId: -1,
+          roomId: id,
+          senderId: targetId ?? 3,
+          content: mockInitialMessage,
+          type: 'TEXT',
+          createdAt: new Date().toISOString(),
+        };
+        setMessages([fakeMsg]);
+      } else {
+        setMessages(realMessages);
+      }
+
       setHasNext(pageData.hasNext);
       setPage(0);
 

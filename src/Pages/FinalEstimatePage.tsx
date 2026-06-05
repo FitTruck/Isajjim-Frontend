@@ -101,7 +101,7 @@ export default function FinalEstimatePage({ navigation, route }: Props) {
     const now = new Date();
     const timeString = now.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' });
     setChatStartTime(timeString);
-    navigation.navigate('MyEstimate');
+    navigation.navigate('EstimateOffers');
   };
 
   const startAddress = [startLoc?.address, startLoc?.detailAddress].filter(Boolean).join(' ');

@@ -3,6 +3,17 @@ import * as Notifications from 'expo-notifications';
 import api from '../api/axiosInstance';
 import { navigateTo } from '../auth/navigationRef';
 
+// Android 헤즈업(플로팅) 알림을 위해 HIGH importance 채널 생성
+if (Platform.OS === 'android') {
+  Notifications.setNotificationChannelAsync('default', {
+    name: '기본 알림',
+    importance: Notifications.AndroidImportance.HIGH,
+    vibrationPattern: [0, 250, 250, 250],
+    lightColor: '#F36845',
+    showBadge: true,
+  });
+}
+
 // 알림 수신 시 배너 표시 설정
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -31,7 +42,9 @@ export async function registerFCMToken(): Promise<void> {
       return;
     }
 
-    const { data: token } = await Notifications.getDevicePushTokenAsync();
+    const { data: token } = Platform.OS === 'ios'
+      ? await Notifications.getExpoPushTokenAsync()
+      : await Notifications.getDevicePushTokenAsync();
     _token = token;
     console.log('[FCM] 토큰:', token);
 

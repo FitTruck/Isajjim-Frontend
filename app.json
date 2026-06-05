@@ -23,7 +23,8 @@
         {
           "icon": "./assets/logo.png",
           "color": "#F36845",
-          "sounds": []
+          "sounds": [],
+          "defaultChannel": "default"
         }
       ]
     ],
