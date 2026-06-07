@@ -70,16 +70,29 @@ function mergeFurniture(estimate: EstimateData): Array<{ name: string; type: str
 }
 
 // ── 가구 위치 마커 오버레이 이미지 ────────────────────────
+const COLOR_PALETTE = [
+  '#EF4444', '#3B82F6', '#22C55E', '#F97316', '#A855F7',
+  '#14B8A6', '#EC4899', '#06B6D4', '#EAB308', '#84CC16',
+  '#6366F1', '#F43F5E',
+];
+
 function AnnotatedImage({
-  img, style, resizeMode = 'cover', markerSize = 14,
+  img, style, resizeMode = 'cover',
 }: {
   img: EstimateImage;
   style: any;
   resizeMode?: 'cover' | 'contain';
-  markerSize?: number;
 }) {
   const [naturalSize, setNaturalSize] = useState<{ w: number; h: number } | null>(null);
   const [displaySize, setDisplaySize] = useState<{ w: number; h: number } | null>(null);
+
+  const colorMap = useMemo(() => {
+    const map = new Map<number, string>();
+    img.furnitureList.forEach((f, i) => {
+      map.set(f.furnitureId, COLOR_PALETTE[i % COLOR_PALETTE.length]);
+    });
+    return map;
+  }, [img.furnitureList]);
 
   const markers = useMemo(() => {
     if (!naturalSize || !displaySize) return [];
@@ -91,9 +104,14 @@ function AnnotatedImage({
     const offsetX = (dispW - natW * scale) / 2;
     const offsetY = (dispH - natH * scale) / 2;
     return img.furnitureList
-      .map(f => ({ x: f.centerX * scale + offsetX, y: f.centerY * scale + offsetY }))
-      .filter(m => m.x >= 0 && m.x <= dispW && m.y >= 0 && m.y <= dispH);
-  }, [naturalSize, displaySize, img.furnitureList, resizeMode]);
+      .filter(f => f.centerX != null && f.centerY != null)
+      .map(f => ({
+        x: f.centerX * scale + offsetX,
+        y: f.centerY * scale + offsetY,
+        color: colorMap.get(f.furnitureId) ?? '#F36845',
+      }))
+      .filter(m => m.x >= 5 && m.x <= dispW - 5 && m.y >= 5 && m.y <= dispH - 5);
+  }, [naturalSize, displaySize, img.furnitureList, resizeMode, colorMap]);
 
   return (
     <View
@@ -111,20 +129,20 @@ function AnnotatedImage({
         onLoad={(e: ImageLoadEventData) => setNaturalSize({ w: e.source.width, h: e.source.height })}
       />
       {markers.map((m, i) => (
-        <Text
+        <View
           key={i}
           style={{
             position: 'absolute',
-            left: m.x - markerSize / 2,
-            top: m.y - markerSize / 2,
-            fontSize: markerSize,
-            lineHeight: markerSize,
-            // @ts-ignore
-            userSelect: 'none',
+            left: m.x - 5,
+            top: m.y - 5,
+            width: 10,
+            height: 10,
+            borderRadius: 5,
+            backgroundColor: m.color,
+            borderWidth: 1.5,
+            borderColor: '#fff',
           }}
-        >
-          ✅
-        </Text>
+        />
       ))}
     </View>
   );
@@ -219,7 +237,7 @@ function DetailModal({ estimate, displayIndex, onClose }: { estimate: EstimateDa
                 <ScrollView horizontal showsHorizontalScrollIndicator={false} style={modal.imageScroll}>
                   {allImages.map((img, idx) => (
                     <TouchableOpacity key={img.imageId} onPress={() => setViewerIndex(idx)} activeOpacity={0.85}>
-                      <AnnotatedImage img={img} style={modal.image} resizeMode="cover" markerSize={14} />
+                      <AnnotatedImage img={img} style={modal.image} resizeMode="cover" />
                     </TouchableOpacity>
                   ))}
                 </ScrollView>
@@ -267,7 +285,7 @@ function DetailModal({ estimate, displayIndex, onClose }: { estimate: EstimateDa
           initialIndex={viewerIndex}
           onClose={() => setViewerIndex(null)}
           renderImage={(i, w, h) => (
-            <AnnotatedImage img={allImages[i]} style={{ width: w, height: h * 0.8 }} resizeMode="contain" markerSize={22} />
+            <AnnotatedImage img={allImages[i]} style={{ width: w, height: h * 0.8 }} resizeMode="contain" />
           )}
         />
       )}

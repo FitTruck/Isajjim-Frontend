@@ -4,7 +4,7 @@ import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types/navigation';
 import { Star } from 'lucide-react-native';
-import BottomTabBar from '../components/common/BottomTabBar';
+
 
 type Props = NativeStackScreenProps<RootStackParamList, 'EstimateOffers'>;
 
@@ -89,17 +89,6 @@ export default function EstimateOffersPage({ navigation }: Props) {
     });
   };
 
-  const goTab = (tab: string) => {
-    const map: Record<string, keyof RootStackParamList> = {
-      home: 'Main',
-      partner: 'PartnerSearch',
-      chat: 'MyChat',
-      estimate: 'MyEstimate',
-      settings: 'Settings',
-    };
-    if (map[tab]) navigation.navigate(map[tab] as any);
-  };
-
   return (
     <View style={styles.container}>
       <SafeAreaView edges={['top']} />
@@ -110,7 +99,7 @@ export default function EstimateOffersPage({ navigation }: Props) {
       </View>
 
       <ScrollView
-        contentContainerStyle={[styles.scroll, { paddingBottom: 80 + Math.max(insets.bottom, 16) }]}
+        contentContainerStyle={[styles.scroll, { paddingBottom: Math.max(insets.bottom, 16) + 16 }]}
         showsVerticalScrollIndicator={false}
       >
         {MOCK_COMPANIES.map((company, i) => (
@@ -118,7 +107,6 @@ export default function EstimateOffersPage({ navigation }: Props) {
         ))}
       </ScrollView>
 
-      <BottomTabBar activeTab="chat" onTabPress={goTab} />
     </View>
   );
 }

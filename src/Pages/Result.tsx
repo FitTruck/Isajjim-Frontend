@@ -1,10 +1,10 @@
 import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
-import { View, ScrollView, StyleSheet, Alert, useWindowDimensions, Image, TouchableOpacity, FlatList, Text, Modal } from 'react-native';
+import { View, ScrollView, StyleSheet, Alert, useWindowDimensions, Image, TouchableOpacity, FlatList, Text, Modal, LayoutChangeEvent } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import api from '../api/axiosInstance';
 import { translateLabel } from '../utils/Translator';
 import Space3D, { Space3DHandle } from '../components/Space/Space3D';
-import { X, Maximize, Minus, Plus } from 'lucide-react-native';
+import { X, Maximize, Minus, Plus, Hand } from 'lucide-react-native';
 import { SimulationFurniture, SimulationTruckResult } from '../types/simulation';
 import { useEstimate } from '../context/EstimateContext';
 
@@ -14,6 +14,102 @@ import { useIsFocused } from '@react-navigation/native';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Result'>;
 
+const CAROUSEL_HEIGHT = 240;
+
+const COLOR_PALETTE = [
+  '#EF4444', '#3B82F6', '#22C55E', '#F97316', '#A855F7',
+  '#14B8A6', '#EC4899', '#06B6D4', '#EAB308', '#84CC16',
+  '#6366F1', '#F43F5E',
+];
+
+interface FurnitureMarker {
+  furnitureId: string | number;
+  centerX: number;
+  centerY: number;
+  label: string;
+  quantity: number;
+}
+
+function AnnotatedCarouselImage({
+  image,
+  contents,
+  displayWidth,
+  colorMap,
+  selectedId,
+}: {
+  image: { localUri: string; width: number; height: number };
+  contents: FurnitureMarker[];
+  displayWidth: number;
+  colorMap: Map<string, string>;
+  selectedId: string | null;
+}) {
+  const [containerHeight, setContainerHeight] = useState(CAROUSEL_HEIGHT);
+
+  const markers = useMemo(() => {
+    if (!containerHeight || !image.width || !image.height) return [];
+    const scale = Math.min(displayWidth / image.width, containerHeight / image.height);
+    const offsetX = (displayWidth - image.width * scale) / 2;
+    const offsetY = (containerHeight - image.height * scale) / 2;
+    return contents
+      .filter(c => c.quantity > 0 && c.centerX != null && c.centerY != null)
+      .map(c => ({
+        x: c.centerX * scale + offsetX,
+        y: c.centerY * scale + offsetY,
+        id: String(c.furnitureId),
+        color: colorMap.get(String(c.furnitureId)) ?? '#F36845',
+      }))
+      .filter(m => m.x >= 8 && m.x <= displayWidth - 8 && m.y >= 8 && m.y <= containerHeight - 8);
+  }, [containerHeight, displayWidth, image, contents, colorMap]);
+
+  return (
+    <View
+      style={{ width: displayWidth, height: CAROUSEL_HEIGHT, backgroundColor: '#F5F6FA' }}
+      onLayout={(e: LayoutChangeEvent) => setContainerHeight(e.nativeEvent.layout.height)}
+    >
+      <Image
+        source={typeof image.localUri === 'string' ? { uri: image.localUri } : image.localUri}
+        style={{ width: displayWidth, height: CAROUSEL_HEIGHT }}
+        resizeMode="contain"
+      />
+      {markers.map((m, i) => {
+        const isSelected = selectedId === m.id;
+        const dimmed = selectedId !== null && !isSelected;
+        const size = isSelected ? 16 : 10;
+        return (
+          <View
+            key={i}
+            style={[
+              annotStyles.markerWrap,
+              { left: m.x - size / 2, top: m.y - size / 2, opacity: dimmed ? 0.25 : 1 },
+            ]}
+          >
+            <View style={[
+              annotStyles.dot,
+              {
+                width: size, height: size, borderRadius: size / 2,
+                backgroundColor: m.color,
+                borderWidth: isSelected ? 2 : 1.5,
+              },
+            ]} />
+          </View>
+        );
+      })}
+    </View>
+  );
+}
+
+const annotStyles = StyleSheet.create({
+  markerWrap: { position: 'absolute' },
+  dot: {
+    borderColor: '#fff',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.4,
+    shadowRadius: 2,
+    elevation: 4,
+  },
+});
+
 export default function Result({ navigation }: Props) {
   const { requestData, setRequestData } = useEstimate();
   const { width } = useWindowDimensions();
@@ -21,6 +117,8 @@ export default function Result({ navigation }: Props) {
   const insets = useSafeAreaInsets();
   const [mobileMode, setMobileMode] = useState<'review' | 'edit'>('review');
   const [editImageIndex, setEditImageIndex] = useState(0);
+  const [selectedFurnitureId, setSelectedFurnitureId] = useState<string | null>(null);
+  const [reviewSelectedLabel, setReviewSelectedLabel] = useState<string | null>(null);
 
   const data = requestData?.images || [];
   const estimateId = requestData?.estimateId;
@@ -32,7 +130,40 @@ export default function Result({ navigation }: Props) {
   };
 
   const [results, setResults] = useState<any[]>([]);
-  const [isMobileSimDone, setIsMobileSimDone] = useState(false);
+
+  const colorMap = useMemo(() => {
+    const map = new Map<string, string>();
+    let idx = 0;
+    results.forEach(result => {
+      result.contents.forEach((c: any) => {
+        const key = String(c.furnitureId);
+        if (!map.has(key)) {
+          map.set(key, COLOR_PALETTE[idx % COLOR_PALETTE.length]);
+          idx++;
+        }
+      });
+    });
+    return map;
+  }, [results]);
+
+  // review 모드: 선택된 라벨에 해당하는 furnitureId Set
+  const reviewHighlightedIds = useMemo((): Set<string> | null => {
+    if (!reviewSelectedLabel) return null;
+    const ids = new Set<string>();
+    results.forEach(r => {
+      r.contents.forEach((c: any) => {
+        if (translateLabel(c.label) === reviewSelectedLabel) ids.add(String(c.furnitureId));
+      });
+    });
+    return ids.size > 0 ? ids : null;
+  }, [reviewSelectedLabel, results]);
+
+  // edit 모드: 단일 선택 ID를 Set으로 변환
+  const editHighlightedIds = useMemo((): Set<string> | null => {
+    if (!selectedFurnitureId) return null;
+    return new Set([selectedFurnitureId]);
+  }, [selectedFurnitureId]);
+
   const [isMobileFullscreen, setIsMobileFullscreen] = useState(false);
   const mobileSpace3DRef = useRef<Space3DHandle>(null);
   const fullscreenSpace3DRef = useRef<Space3DHandle>(null);
@@ -192,7 +323,6 @@ export default function Result({ navigation }: Props) {
     }
   };
 
-  const handleSimulationComplete = () => setIsMobileSimDone(true);
 
   const handleTrucksChange = useCallback((trucks: SimulationTruckResult[]) => {
     setSimulationTrucks(trucks);
@@ -232,21 +362,13 @@ export default function Result({ navigation }: Props) {
                 ref={mobileSpace3DRef}
                 furniture={simulationFurniture}
                 autoPlay={true}
-                onAnimationComplete={handleSimulationComplete}
+                highlightedFurnitureIds={reviewHighlightedIds}
                 onTrucksChange={handleTrucksChange}
               />
             </View>
             <TouchableOpacity style={styles.fullscreenBtn} onPress={() => setIsMobileFullscreen(true)}>
               <Maximize size={16} color="#555" />
             </TouchableOpacity>
-            {isMobileSimDone && (
-              <TouchableOpacity
-                style={styles.replayButton}
-                onPress={() => { setIsMobileSimDone(false); mobileSpace3DRef.current?.play(); }}
-              >
-                <Text style={styles.replayButtonText}>다시 보기</Text>
-              </TouchableOpacity>
-            )}
           </View>
         )}
 
@@ -267,13 +389,25 @@ export default function Result({ navigation }: Props) {
             </View>
 
             <Text style={[styles.sectionLabel, { marginTop: 16 }]}>가구 목록</Text>
+            <View style={[styles.hintRow, { paddingHorizontal: 0 }]}>
+              <Hand size={12} color="#B0B0B0" />
+              <Text style={styles.hintText}>항목을 탭하면 3D에서 강조돼요</Text>
+            </View>
             <View style={styles.dashedBox}>
-              {groupedItems.map((item, i) => (
-                <View key={i} style={styles.row}>
-                  <Text style={styles.rowLabel}>{item.label}</Text>
-                  <Text style={styles.rowValue}>{item.quantity}개</Text>
-                </View>
-              ))}
+              {groupedItems.map((item, i) => {
+                const isSelected = reviewSelectedLabel === item.label;
+                return (
+                  <TouchableOpacity
+                    key={i}
+                    style={[styles.row, isSelected && styles.reviewRowSelected]}
+                    onPress={() => setReviewSelectedLabel(prev => prev === item.label ? null : item.label)}
+                    activeOpacity={0.7}
+                  >
+                    <Text style={[styles.rowLabel, isSelected && styles.reviewRowLabelSelected]}>{item.label}</Text>
+                    <Text style={[styles.rowValue, isSelected && styles.reviewRowLabelSelected]}>{item.quantity}개</Text>
+                  </TouchableOpacity>
+                );
+              })}
             </View>
           </View>
         </ScrollView>
@@ -294,21 +428,14 @@ export default function Result({ navigation }: Props) {
                 ref={fullscreenSpace3DRef}
                 furniture={simulationFurniture}
                 autoPlay={true}
-                onAnimationComplete={() => setIsMobileSimDone(true)}
+                cameraDistanceMultiplier={1.8}
+                highlightedFurnitureIds={reviewHighlightedIds}
                 onTrucksChange={handleTrucksChange}
               />
             </View>
             <TouchableOpacity style={styles.fullscreenClose} onPress={() => setIsMobileFullscreen(false)}>
               <X size={22} color="#fff" />
             </TouchableOpacity>
-            {isMobileSimDone && (
-              <TouchableOpacity
-                style={styles.replayButton}
-                onPress={() => { setIsMobileSimDone(false); fullscreenSpace3DRef.current?.play(); }}
-              >
-                <Text style={styles.replayButtonText}>다시 보기</Text>
-              </TouchableOpacity>
-            )}
           </View>
         </Modal>
       </View>
@@ -332,11 +459,13 @@ export default function Result({ navigation }: Props) {
             scrollEventThrottle={16}
           >
             {results.map((r, i) => r.image && (
-              <Image
+              <AnnotatedCarouselImage
                 key={i}
-                source={typeof r.image.localUri === 'string' ? { uri: r.image.localUri } : r.image.localUri}
-                style={[styles.carouselImage, { width }]}
-                resizeMode="contain"
+                image={r.image}
+                contents={r.contents}
+                displayWidth={width}
+                colorMap={colorMap}
+                selectedId={selectedFurnitureId}
               />
             ))}
           </ScrollView>
@@ -350,6 +479,11 @@ export default function Result({ navigation }: Props) {
         </View>
       )}
 
+      <View style={styles.hintRow}>
+        <Hand size={12} color="#B0B0B0" />
+        <Text style={styles.hintText}>항목을 탭하면 이미지에서 위치를 확인할 수 있어요</Text>
+      </View>
+
       <FlatList
         data={(results[editImageIndex]?.contents ?? []).map((item: any) => ({
           ...item,
@@ -357,27 +491,44 @@ export default function Result({ navigation }: Props) {
         }))}
         keyExtractor={(item, i) => String(item.furnitureId ?? i)}
         style={styles.editList}
-        contentContainerStyle={styles.editListContent}
-        renderItem={({ item }) => (
-          <View style={styles.editRow}>
-            <Text style={styles.editLabel}>{item.label}</Text>
-            <View style={styles.qtyRow}>
-              <TouchableOpacity
-                style={styles.qtyBtn}
-                onPress={() => item.quantity > 0 && handleUpdateQuantity(item.furnitureId, item.quantity - 1)}
-              >
-                <Minus size={10} color="#423E3E" />
-              </TouchableOpacity>
-              <Text style={styles.qtyText}>{item.quantity}</Text>
-              <TouchableOpacity
-                style={[styles.qtyBtn, styles.qtyBtnPlus]}
-                onPress={() => handleUpdateQuantity(item.furnitureId, item.quantity + 1)}
-              >
-                <Plus size={10} color="#423E3E" />
-              </TouchableOpacity>
-            </View>
+        contentContainerStyle={[styles.editListContent, { marginBottom: Math.max(insets.bottom, 16) + 24 }]}
+        ListEmptyComponent={
+          <View style={styles.editEmptyContainer}>
+            <Text style={styles.emptyText}>인식된 가구가 없습니다.</Text>
           </View>
-        )}
+        }
+        renderItem={({ item }) => {
+          const fid = String(item.furnitureId);
+          const color = colorMap.get(fid) ?? '#F36845';
+          const isSelected = selectedFurnitureId === fid;
+          return (
+            <TouchableOpacity
+              style={[styles.editRow, isSelected && styles.editRowSelected]}
+              onPress={() => setSelectedFurnitureId(prev => prev === fid ? null : fid)}
+              activeOpacity={0.7}
+            >
+              <View style={[styles.colorSwatch, { backgroundColor: color }]} />
+              <Text style={[styles.editLabel, isSelected && styles.editLabelSelected]}>
+                {item.label}
+              </Text>
+              <View style={styles.qtyRow}>
+                <TouchableOpacity
+                  style={styles.qtyBtn}
+                  onPress={() => item.quantity > 0 && handleUpdateQuantity(item.furnitureId, item.quantity - 1)}
+                >
+                  <Minus size={10} color="#423E3E" />
+                </TouchableOpacity>
+                <Text style={styles.qtyText}>{item.quantity}</Text>
+                <TouchableOpacity
+                  style={[styles.qtyBtn, styles.qtyBtnPlus]}
+                  onPress={() => handleUpdateQuantity(item.furnitureId, item.quantity + 1)}
+                >
+                  <Plus size={10} color="#423E3E" />
+                </TouchableOpacity>
+              </View>
+            </TouchableOpacity>
+          );
+        }}
       />
 
       <View style={[styles.bottomBar, { paddingBottom: Math.max(insets.bottom, 16) }]}>
@@ -396,11 +547,6 @@ const styles = StyleSheet.create({
   title: { fontSize: 24, fontWeight: '800', color: '#423E3E', letterSpacing: 0.2 },
   subtitle: { fontSize: 12, fontWeight: '500', color: '#949494', lineHeight: 16, letterSpacing: 0.1 },
   simulation: { width: '100%', height: 221, backgroundColor: '#F5F5F5' },
-  replayButton: {
-    position: 'absolute', bottom: 10, alignSelf: 'center',
-    backgroundColor: '#F0893B', paddingHorizontal: 16, paddingVertical: 8, borderRadius: 8, zIndex: 10,
-  },
-  replayButtonText: { color: '#fff', fontSize: 14, fontWeight: '600' },
   fullscreenBtn: {
     position: 'absolute', bottom: 10, right: 10,
     backgroundColor: 'rgba(255,255,255,0.85)', padding: 7, borderRadius: 8, zIndex: 10,
@@ -416,10 +562,13 @@ const styles = StyleSheet.create({
     borderWidth: 1, borderColor: '#E8E8E8', borderStyle: 'dashed',
     borderRadius: 16, padding: 24, gap: 5,
   },
-  row: { flexDirection: 'row', alignItems: 'center', alignSelf: 'stretch' },
+  row: { flexDirection: 'row', alignItems: 'center', alignSelf: 'stretch', paddingVertical: 2, paddingHorizontal: 5, marginHorizontal: -5, borderRadius: 6 },
+  reviewRowSelected: { backgroundColor: '#FFF5F0' },
+  reviewRowLabelSelected: { color: '#F36845' },
   rowLabel: { flex: 1, fontSize: 12, fontWeight: '700', color: '#423E3E' },
   rowValue: { fontSize: 14, color: '#423E3E' },
   emptyText: { fontSize: 12, color: '#949494' },
+  editEmptyContainer: { alignItems: 'center', justifyContent: 'center', paddingVertical: 40 },
   bottomBar: {
     flexDirection: 'row', gap: 24, paddingHorizontal: 24, paddingTop: 24, backgroundColor: '#fff',
   },
@@ -437,14 +586,23 @@ const styles = StyleSheet.create({
   dotsRow: { flexDirection: 'row', justifyContent: 'center', gap: 8, marginTop: 8 },
   dot: { width: 8, height: 8, borderRadius: 4, backgroundColor: '#E5E5EA' },
   dotActive: { backgroundColor: '#F36845' },
+  hintRow: {
+    flexDirection: 'row', alignItems: 'center', gap: 5,
+    paddingHorizontal: 24, paddingTop: 10, paddingBottom: 2,
+  },
+  hintText: { fontSize: 11, color: '#B0B0B0', flex: 1 },
   editList: { flex: 1 },
   editListContent: {
     marginHorizontal: 24, marginTop: 16,
     borderWidth: 1, borderColor: '#E8E8E8', borderStyle: 'dashed',
     borderRadius: 16, padding: 24, gap: 5,
+    flexGrow: 1,
   },
-  editRow: { flexDirection: 'row', alignItems: 'center', alignSelf: 'stretch' },
+  editRow: { flexDirection: 'row', alignItems: 'center', alignSelf: 'stretch', gap: 8, paddingVertical: 2, paddingHorizontal: 5, marginHorizontal: -5, borderRadius: 8 },
+  editRowSelected: { backgroundColor: '#FFF5F0' },
+  colorSwatch: { width: 10, height: 10, borderRadius: 5, flexShrink: 0 },
   editLabel: { flex: 1, fontSize: 12, fontWeight: '700', color: '#423E3E' },
+  editLabelSelected: { color: '#F36845' },
   qtyRow: { flexDirection: 'row', alignItems: 'center', gap: 4 },
   qtyBtn: {
     width: 24, height: 24, borderRadius: 12, backgroundColor: '#F5F6FA',

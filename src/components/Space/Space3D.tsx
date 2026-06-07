@@ -3,8 +3,7 @@ import ResizeObserverPolyfill from 'resize-observer-polyfill';
 if (typeof window !== 'undefined' && !window.ResizeObserver) {
   window.ResizeObserver = ResizeObserverPolyfill;
 }
-import { View, TouchableOpacity, Text, StyleSheet, Platform } from 'react-native';
-import { GestureDetector, Gesture } from 'react-native-gesture-handler';
+import { View, TouchableOpacity, Text, StyleSheet, Platform, PanResponder } from 'react-native';
 import { Canvas as WebCanvas, useThree, useFrame } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
 
@@ -192,9 +191,10 @@ interface FurnitureBoxProps {
   furniture: LoadedFurniture;
   placement: PlacedBox;
   visible: boolean;
+  dimmed?: boolean;
 }
 
-const FurnitureBox: React.FC<FurnitureBoxProps> = ({ furniture, placement, visible }) => {
+const FurnitureBox: React.FC<FurnitureBoxProps> = ({ furniture, placement, visible, dimmed = false }) => {
   const groupRef = useRef<THREE.Group>(null);
   const hasAppeared = useRef(false);
 
@@ -263,10 +263,14 @@ const FurnitureBox: React.FC<FurnitureBoxProps> = ({ furniture, placement, visib
       rotation={[0, rotationY, 0]}
     >
       <mesh geometry={furniture.geometry}>
-        <meshStandardMaterial color={furniture.color} transparent opacity={0.85} />
+        <meshStandardMaterial
+          color={dimmed ? '#999999' : furniture.color}
+          transparent
+          opacity={dimmed ? 0.15 : 0.85}
+        />
       </mesh>
       <lineSegments geometry={furniture.edgesGeometry}>
-        <lineBasicMaterial color="#333333" transparent opacity={0.4} />
+        <lineBasicMaterial color={dimmed ? '#aaaaaa' : '#333333'} transparent opacity={dimmed ? 0.1 : 0.4} />
       </lineSegments>
     </group>
   );
@@ -299,6 +303,7 @@ interface MultiTruckSceneProps {
   visibleItemIds: Set<string>;
   loadedFurniture: Map<string, LoadedFurniture>;
   resetKey: number;
+  highlightedFurnitureIds?: Set<string> | null;
 }
 
 const MultiTruckScene: React.FC<MultiTruckSceneProps> = ({
@@ -306,6 +311,7 @@ const MultiTruckScene: React.FC<MultiTruckSceneProps> = ({
   visibleItemIds,
   loadedFurniture,
   resetKey,
+  highlightedFurnitureIds,
 }) => {
   return (
     <group>
@@ -320,12 +326,14 @@ const MultiTruckScene: React.FC<MultiTruckSceneProps> = ({
               const furniture = loadedFurniture.get(baseId);
               if (!furniture) return null;
 
+              const dimmed = !!highlightedFurnitureIds && !highlightedFurnitureIds.has(baseId);
               return (
                 <FurnitureBox
                   key={`${resetKey}-${truckIdx}-${placement.itemId}`}
                   furniture={furniture}
                   placement={placement}
                   visible={visibleItemIds.has(placement.itemId)}
+                  dimmed={dimmed}
                 />
               );
             })}
@@ -345,6 +353,8 @@ const Space3D = forwardRef<Space3DHandle, Space3DProps>(({
   truckType,
   autoPlay = false,
   instantResult = false,
+  cameraDistanceMultiplier = 1.0,
+  highlightedFurnitureIds,
   onAnimationComplete,
   onTrucksChange,
 }, ref) => {
@@ -362,18 +372,28 @@ const Space3D = forwardRef<Space3DHandle, Space3DProps>(({
   // 핀치 줌용 refs
   const orbitControlsRef = useRef<any>(null);
   const zoomDeltaRef = useRef<number>(0);
-  const lastPinchScaleRef = useRef<number>(1);
+  const lastPinchDistRef = useRef<number | null>(null);
 
-  const pinchGesture = Gesture.Pinch()
-    .runOnJS(true)
-    .onUpdate((e) => {
-      const delta = e.scale - lastPinchScaleRef.current;
-      zoomDeltaRef.current += delta;
-      lastPinchScaleRef.current = e.scale;
+  const pinchResponder = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: (_, gs) => gs.numberActiveTouches === 2,
+      onMoveShouldSetPanResponder: (_, gs) => gs.numberActiveTouches === 2,
+      onPanResponderGrant: () => { lastPinchDistRef.current = null; },
+      onPanResponderMove: (e) => {
+        const touches = e.nativeEvent.touches;
+        if (touches.length !== 2) return;
+        const dx = touches[0].pageX - touches[1].pageX;
+        const dy = touches[0].pageY - touches[1].pageY;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (lastPinchDistRef.current != null) {
+          zoomDeltaRef.current += (dist - lastPinchDistRef.current) / 200;
+        }
+        lastPinchDistRef.current = dist;
+      },
+      onPanResponderRelease: () => { lastPinchDistRef.current = null; },
+      onPanResponderTerminate: () => { lastPinchDistRef.current = null; },
     })
-    .onEnd(() => {
-      lastPinchScaleRef.current = 1;
-    });
+  ).current;
 
   // 점진적 업데이트용 refs
   const pendingItemsRef = useRef<{ itemId: string; truckIdx: number }[]>([]);
@@ -714,7 +734,7 @@ const Space3D = forwardRef<Space3DHandle, Space3DProps>(({
     const maxDim = Math.max(dims.width, dims.depth, dims.height);
 
     // 멀티트럭일 때 거리 증가
-    let distance = maxDim * 2.5;
+    let distance = maxDim * cameraDistanceMultiplier;
     if (trucks.length > 1) {
       // 전체 트럭 배치의 너비 계산
       const totalWidth = calculateTruckXOffset(trucks, trucks.length - 1) + dims.width / 2;
@@ -722,7 +742,7 @@ const Space3D = forwardRef<Space3DHandle, Space3DProps>(({
     }
 
     return [distance, distance * 0.8, distance];
-  }, [hasSimulation, currentTruckType, trucks]);
+  }, [hasSimulation, currentTruckType, trucks, cameraDistanceMultiplier]);
 
   // 컨테이너 중앙 (카메라 타겟)
   const containerCenter = useMemo((): [number, number, number] => {
@@ -743,8 +763,7 @@ const Space3D = forwardRef<Space3DHandle, Space3DProps>(({
   }, [currentTruckType, trucks, currentTruckIndex, simulationState]);
 
   return (
-    <GestureDetector gesture={pinchGesture}>
-    <View style={styles.canvasContainer}>
+    <View style={styles.canvasContainer} {...pinchResponder.panHandlers}>
       <Canvas
         shadows
         camera={{ position: cameraPosition, fov: 50 }}
@@ -770,6 +789,7 @@ const Space3D = forwardRef<Space3DHandle, Space3DProps>(({
             visibleItemIds={visibleItemIds}
             loadedFurniture={loadedFurniture}
             resetKey={resetKey}
+            highlightedFurnitureIds={highlightedFurnitureIds}
           />
         ) : (
           <TruckContainer truckType="2.5ton" />
@@ -784,26 +804,17 @@ const Space3D = forwardRef<Space3DHandle, Space3DProps>(({
       </Canvas>
 
       {/* 컨트롤 UI */}
-      {hasSimulation && (
+      {hasSimulation && trucks.length === 0 && (
         <View style={styles.controlsOverlay}>
-          {trucks.length === 0 ? (
-            <Text style={styles.loadingText}>배치 계산 중...</Text>
-          ) : (
-            <View style={styles.controlsRow}>
-              {simulationState === 'running' && (
-                <Text style={styles.loadingText}>적재 중...</Text>
-              )}
-              {simulationState === 'completed' && (
-                <TouchableOpacity style={styles.playButton} onPress={play}>
-                  <Text style={styles.buttonText}>다시 보기</Text>
-                </TouchableOpacity>
-              )}
-            </View>
-          )}
+          <Text style={styles.loadingText}>배치 계산 중...</Text>
+        </View>
+      )}
+      {hasSimulation && simulationState === 'running' && (
+        <View style={styles.controlsOverlay}>
+          <Text style={styles.loadingText}>적재 중...</Text>
         </View>
       )}
     </View>
-    </GestureDetector>
   );
 });
 
@@ -820,21 +831,6 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     alignItems: 'center',
-  },
-  controlsRow: {
-    flexDirection: 'row',
-    gap: 10,
-  },
-  playButton: {
-    backgroundColor: '#F0893B',
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
-  },
-  buttonText: {
-    color: 'white',
-    fontSize: 12,
-    fontWeight: '600',
   },
   loadingText: {
     color: 'white',

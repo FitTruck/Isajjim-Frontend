@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { StyleSheet, TouchableOpacity, Text, Platform, Alert } from 'react-native';
+import { StyleSheet, TouchableOpacity, Text, Platform, Alert, Modal, View } from 'react-native';
 import * as ImageManipulator from 'expo-image-manipulator';
 import { v4 as uuidv4 } from 'uuid';
 import { UploadedImage } from '../../types/common';
@@ -18,6 +18,8 @@ export default function NextBtn1({ imageList, onShowAlert }: NextBtnProps) {
   
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const [isLoading, setIsLoading] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [statusText, setStatusText] = useState('');
   const { requestData, setRequestData } = useEstimate();
 
   const handleNextStep = async () => {
@@ -35,6 +37,8 @@ export default function NextBtn1({ imageList, onShowAlert }: NextBtnProps) {
     }
 
     setIsLoading(true);
+    setProgress(0);
+    setStatusText('업로드를 준비하고 있어요...');
     try {
       // 이미지 업로드용 Presigned Url 발급
       const presignedResponse = await api.post('/api/v1/presigned-url', {
@@ -42,10 +46,16 @@ export default function NextBtn1({ imageList, onShowAlert }: NextBtnProps) {
         folder: 'ROOM',
       });
 
+      setProgress(10);
+      setStatusText('이미지를 처리하고 있어요...');
+
       const { data } = presignedResponse.data;
       const { urls } = data; // 백엔드에서 내려준 presignedUrl, fileUrl, key 목록
 
       // 이미지 병렬 업로드
+      let completedCount = 0;
+      const total = imageList.length;
+
       const uploadedImages = await Promise.all(imageList.map(async (img, index) => {
         try {
           const { presignedUrl, fileUrl } = urls[index];
@@ -69,8 +79,8 @@ export default function NextBtn1({ imageList, onShowAlert }: NextBtnProps) {
 
           // 로컬 파일을 Blob으로 변환
           const response = await fetch(uploadUri);
-          const blob = await response.blob(); 
-          
+          const blob = await response.blob();
+
           // PUT 요청
           await fetch(presignedUrl, {
             method: 'PUT',
@@ -79,6 +89,15 @@ export default function NextBtn1({ imageList, onShowAlert }: NextBtnProps) {
             },
             body: blob
           });
+
+          completedCount++;
+          const uploadPct = 10 + Math.round((completedCount / total) * 70);
+          setProgress(uploadPct);
+          setStatusText(
+            total === 1
+              ? '사진을 업로드하고 있어요...'
+              : `사진 업로드 중 (${completedCount}/${total})`
+          );
 
           // 이전에 localUri, width, height가 이미 저장되어 있었음.
           // 중요: manipulateAsync를 거친 후의 실제 width, height로 업데이트해야 좌표 계산이 정확함.
@@ -93,6 +112,9 @@ export default function NextBtn1({ imageList, onShowAlert }: NextBtnProps) {
           throw err;
         }
       }));
+
+      setProgress(85);
+      setStatusText('거의 다 됐어요...');
 
       // 백엔드 서버에 값 전달
       const response = await api.post('/api/v1/estimates', {
@@ -117,25 +139,47 @@ export default function NextBtn1({ imageList, onShowAlert }: NextBtnProps) {
         console.log('requestData:', requestData);
       }
 
+      setProgress(100);
+      setStatusText('완료!');
+
       // 다음 페이지로 넘어가기
-      if (responseData.data.estimateId) { 
+      if (responseData.data.estimateId) {
         // 넘어갈 때, 이미지 정보, estimatedId가 같이 넘어감
         navigation.navigate('UserSelect', { images: uploadedImages, estimateId: responseData.data.estimateId });
       } else {
         console.error('estimateId 또는 uploadedImages배열을 받아오지 못함');
       }
     } catch (error) {
-    console.error('Network Error:', error);
+      console.error('Network Error:', error);
+      setIsLoading(false);
     }
   };
 
   return (
-    <TouchableOpacity
-      style={[styles.nextBtn, isLoading && styles.nextBtnDisabled]}
-      onPress={handleNextStep}
-    >
-      <Text style={styles.nextBtnText}>다음으로</Text>
-    </TouchableOpacity>
+    <>
+      <TouchableOpacity
+        style={[styles.nextBtn, isLoading && styles.nextBtnDisabled]}
+        onPress={handleNextStep}
+        disabled={isLoading}
+      >
+        <Text style={styles.nextBtnText}>다음으로</Text>
+      </TouchableOpacity>
+
+      <Modal visible={isLoading} transparent animationType="fade" statusBarTranslucent>
+        <View style={styles.overlay}>
+          <View style={styles.card}>
+            <Text style={styles.cardTitle}>업로드 중</Text>
+            <View style={styles.barBg}>
+              <View style={[styles.barFill, { width: `${progress}%` as any }]} />
+            </View>
+            <View style={styles.cardFooter}>
+              <Text style={styles.statusText}>{statusText}</Text>
+              <Text style={styles.pctText}>{progress}%</Text>
+            </View>
+          </View>
+        </View>
+      </Modal>
+    </>
   );
 }
 
@@ -155,5 +199,51 @@ const styles = StyleSheet.create({
   },
   nextBtnDisabled: {
     opacity: 0.5,
+  },
+  overlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 32,
+  },
+  card: {
+    width: '100%',
+    backgroundColor: '#fff',
+    borderRadius: 20,
+    padding: 28,
+    gap: 16,
+  },
+  cardTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#423E3E',
+    textAlign: 'center',
+  },
+  barBg: {
+    height: 8,
+    backgroundColor: '#F0F0F0',
+    borderRadius: 4,
+    overflow: 'hidden',
+  },
+  barFill: {
+    height: 8,
+    backgroundColor: '#F36845',
+    borderRadius: 4,
+  },
+  cardFooter: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  statusText: {
+    fontSize: 13,
+    color: '#949494',
+    flex: 1,
+  },
+  pctText: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#F36845',
   },
 });

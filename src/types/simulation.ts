@@ -26,6 +26,8 @@ export interface Space3DProps {
   truckType?: TruckType;
   autoPlay?: boolean;
   instantResult?: boolean;
+  cameraDistanceMultiplier?: number;
+  highlightedFurnitureIds?: Set<string> | null;
   onAnimationComplete?: () => void;
   onTrucksChange?: (trucks: SimulationTruckResult[]) => void;
 }
