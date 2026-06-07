@@ -4,6 +4,7 @@ if (typeof window !== 'undefined' && !window.ResizeObserver) {
   window.ResizeObserver = ResizeObserverPolyfill;
 }
 import { View, TouchableOpacity, Text, StyleSheet, Platform } from 'react-native';
+import { GestureDetector, Gesture } from 'react-native-gesture-handler';
 import { Canvas as WebCanvas, useThree, useFrame } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
 
@@ -90,14 +91,15 @@ interface AnimatedControlsProps {
   truckType?: TruckType;
   targetPosition: [number, number, number];
   animationDuration?: number;
+  controlsRef: React.RefObject<any>;
 }
 
 const AnimatedControls: React.FC<AnimatedControlsProps> = ({
   truckType,
   targetPosition,
   animationDuration = 800,
+  controlsRef,
 }) => {
-  const controlsRef = useRef<any>(null);
 
   const cameraDistance = useMemo(() => {
     if (!truckType) return { min: 5, max: 100 };
@@ -160,6 +162,30 @@ const AnimatedControls: React.FC<AnimatedControlsProps> = ({
     />
   );
 };
+
+// 핀치 줌 컨트롤러 (Canvas 내부에서 카메라 거리 조절)
+function PinchZoomController({ zoomDeltaRef, controlsRef }: {
+  zoomDeltaRef: React.RefObject<number>;
+  controlsRef: React.RefObject<any>;
+}) {
+  useFrame(() => {
+    const delta = zoomDeltaRef.current ?? 0;
+    if (Math.abs(delta) < 0.001 || !controlsRef.current) return;
+    (zoomDeltaRef as React.MutableRefObject<number>).current = 0;
+
+    const controls = controlsRef.current;
+    const target = controls.target.clone() as THREE.Vector3;
+    const dir = controls.object.position.clone().sub(target);
+    const currentDist = dir.length();
+    const newDist = Math.max(
+      controls.minDistance,
+      Math.min(controls.maxDistance, currentDist * (1 - delta * 2))
+    );
+    controls.object.position.copy(target.add(dir.normalize().multiplyScalar(newDist)));
+    controls.update();
+  });
+  return null;
+}
 
 // 가구 박스 컴포넌트
 interface FurnitureBoxProps {
@@ -332,6 +358,22 @@ const Space3D = forwardRef<Space3DHandle, Space3DProps>(({
   const [simulationState, setSimulationState] = useState<'idle' | 'running' | 'completed'>('idle');
   const simulationStateRef = useRef<'idle' | 'running' | 'completed'>('idle');
   const timerRef = useRef<NodeJS.Timeout | null>(null);
+
+  // 핀치 줌용 refs
+  const orbitControlsRef = useRef<any>(null);
+  const zoomDeltaRef = useRef<number>(0);
+  const lastPinchScaleRef = useRef<number>(1);
+
+  const pinchGesture = Gesture.Pinch()
+    .runOnJS(true)
+    .onUpdate((e) => {
+      const delta = e.scale - lastPinchScaleRef.current;
+      zoomDeltaRef.current += delta;
+      lastPinchScaleRef.current = e.scale;
+    })
+    .onEnd(() => {
+      lastPinchScaleRef.current = 1;
+    });
 
   // 점진적 업데이트용 refs
   const pendingItemsRef = useRef<{ itemId: string; truckIdx: number }[]>([]);
@@ -701,6 +743,7 @@ const Space3D = forwardRef<Space3DHandle, Space3DProps>(({
   }, [currentTruckType, trucks, currentTruckIndex, simulationState]);
 
   return (
+    <GestureDetector gesture={pinchGesture}>
     <View style={styles.canvasContainer}>
       <Canvas
         shadows
@@ -732,9 +775,11 @@ const Space3D = forwardRef<Space3DHandle, Space3DProps>(({
           <TruckContainer truckType="2.5ton" />
         )}
 
+        <PinchZoomController zoomDeltaRef={zoomDeltaRef} controlsRef={orbitControlsRef} />
         <AnimatedControls
           truckType={hasSimulation ? currentTruckType as TruckType : undefined}
           targetPosition={containerCenter}
+          controlsRef={orbitControlsRef}
         />
       </Canvas>
 
@@ -758,6 +803,7 @@ const Space3D = forwardRef<Space3DHandle, Space3DProps>(({
         </View>
       )}
     </View>
+    </GestureDetector>
   );
 });
 

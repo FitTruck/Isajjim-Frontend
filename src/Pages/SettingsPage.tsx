@@ -14,8 +14,8 @@ import BottomTabBar, { TabKey } from '../components/common/BottomTabBar';
 import api from '../api/axiosInstance';
 import { unregisterFCMToken } from '../utils/fcm';
 
-const TERMS_URL = 'https://www.notion.so/35842810fb17802896e5cb20c8596218';
-const PRIVACY_URL = 'https://www.notion.so/35842810fb1780239b8cf7769880d809';
+const TERMS_URL = 'https://isajjim.kro.kr/terms';
+const PRIVACY_URL = 'https://isajjim.kro.kr/privacy-policy';
 
 export default function SettingsPage() {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();

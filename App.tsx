@@ -30,6 +30,8 @@ import PartnerSearchPage from './src/Pages/PartnerSearchPage';
 import ChatRoom from './src/Pages/ChatRoom';
 import FinalEstimatePage from './src/Pages/FinalEstimatePage';
 import EstimateOffersPage from './src/Pages/EstimateOffersPage';
+import TermsPage from './src/Pages/TermsPage';
+import PrivacyPolicyPage from './src/Pages/PrivacyPolicyPage';
 
 // 각 화면의 매개변수 타입들을 정의하고 있는 타입 import
 import { RootStackParamList } from './src/types/navigation';
@@ -117,6 +119,8 @@ export default function App() {
         MyEstimate: 'my-estimate',
         MyChat: 'my-chat',
         SimulationTest: 'simulation-test',
+        Terms: 'terms',
+        PrivacyPolicy: 'privacy-policy',
         // 인증 관련 경로
         Login: 'login',
         AuthCallback: 'oauth2/callback',
@@ -154,6 +158,8 @@ export default function App() {
             <Stack.Screen name="MyChat" component={MyChat} />
             <Stack.Screen name="ChatRoom" component={ChatRoom} />
             <Stack.Screen name="SimulationTest" component={SimulationTest} />
+            <Stack.Screen name="Terms" component={TermsPage} />
+            <Stack.Screen name="PrivacyPolicy" component={PrivacyPolicyPage} />
             <Stack.Screen name="PartnerSearch" component={PartnerSearchPage} />
             <Stack.Screen name="Settings" component={SettingsPage} />
             <Stack.Screen name="PersonalInfo" component={PersonalInfoPage} />

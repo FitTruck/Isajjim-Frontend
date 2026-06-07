@@ -26,6 +26,8 @@ export type RootStackParamList = {
   FinalEstimate: {
     simulationTrucks: { type: string; quantity: number }[];
   };
+  Terms: undefined;
+  PrivacyPolicy: undefined;
   SimulationTest: undefined; // 시뮬레이션 테스트 페이지
   Main: undefined; // 메인 페이지
   PartnerSearch: undefined;
