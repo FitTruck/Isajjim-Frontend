@@ -44,10 +44,36 @@ api.interceptors.request.use(
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
+    if (__DEV__) {
+      (config as any).__startedAt = Date.now();
+      console.log(`[API] → ${config.method?.toUpperCase()} ${config.baseURL ?? ''}${config.url}`);
+    }
     return config;
   },
   (error) => Promise.reject(error),
 );
+
+// 개발용 로깅 인터셉터: API 호출 결과를 logcat(ReactNativeJS 태그)에서 확인 가능
+if (__DEV__) {
+  api.interceptors.response.use(
+    (response: AxiosResponse) => {
+      const config = response.config as any;
+      const duration = config.__startedAt ? Date.now() - config.__startedAt : '?';
+      console.log(
+        `[API] ← ${response.status} ${config.method?.toUpperCase()} ${config.baseURL ?? ''}${config.url} (${duration}ms)`,
+      );
+      return response;
+    },
+    (error) => {
+      const config = error.config as any;
+      const duration = config?.__startedAt ? Date.now() - config.__startedAt : '?';
+      console.log(
+        `[API] ✗ ${error.response?.status ?? 'ERR'} ${config?.method?.toUpperCase()} ${config?.baseURL ?? ''}${config?.url} (${duration}ms) - ${error.message}`,
+      );
+      return Promise.reject(error);
+    },
+  );
+}
 
 // 응답 인터셉터: 401 발생 시 토큰 재발급 및 원래 요청 재시도
 api.interceptors.response.use(
