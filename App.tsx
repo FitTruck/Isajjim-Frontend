@@ -27,6 +27,7 @@ import SettingsPage from './src/Pages/SettingsPage';
 import PersonalInfoPage from './src/Pages/PersonalInfoPage';
 import NotificationSettingsPage from './src/Pages/NotificationSettingsPage';
 import PartnerSearchPage from './src/Pages/PartnerSearchPage';
+import PartnerApplicationPage from './src/Pages/PartnerApplicationPage';
 import ChatRoom from './src/Pages/ChatRoom';
 import FinalEstimatePage from './src/Pages/FinalEstimatePage';
 import EstimateOffersPage from './src/Pages/EstimateOffersPage';
@@ -161,6 +162,7 @@ export default function App() {
             <Stack.Screen name="Terms" component={TermsPage} />
             <Stack.Screen name="PrivacyPolicy" component={PrivacyPolicyPage} />
             <Stack.Screen name="PartnerSearch" component={PartnerSearchPage} />
+            <Stack.Screen name="PartnerApplication" component={PartnerApplicationPage} />
             <Stack.Screen name="Settings" component={SettingsPage} />
             <Stack.Screen name="PersonalInfo" component={PersonalInfoPage} />
             <Stack.Screen name="NotificationSettings" component={NotificationSettingsPage} />

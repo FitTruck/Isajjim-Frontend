@@ -31,6 +31,7 @@ export type RootStackParamList = {
   SimulationTest: undefined; // 시뮬레이션 테스트 페이지
   Main: undefined; // 메인 페이지
   PartnerSearch: undefined;
+  PartnerApplication: undefined;
   Settings: undefined;
   PersonalInfo: undefined;
   NotificationSettings: undefined;
