@@ -6,13 +6,14 @@ import {
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ChevronRight, User } from 'lucide-react-native';
 import * as WebBrowser from 'expo-web-browser';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types/navigation';
 import { useAuth } from '../context/AuthContext';
 import BottomTabBar, { TabKey } from '../components/common/BottomTabBar';
 import api from '../api/axiosInstance';
 import { unregisterFCMToken } from '../utils/fcm';
+import { getMyRole } from '../api/userApi';
 
 const TERMS_URL = 'https://isajjim.kro.kr/terms';
 const PRIVACY_URL = 'https://isajjim.kro.kr/privacy-policy';
@@ -25,6 +26,19 @@ export default function SettingsPage() {
   const [showWithdrawConfirm, setShowWithdrawConfirm] = useState(false);
   const [showWithdrawDone, setShowWithdrawDone] = useState(false);
   const [isWithdrawing, setIsWithdrawing] = useState(false);
+  const [partnerMenuLabel, setPartnerMenuLabel] = useState('파트너 신청');
+
+  useFocusEffect(
+    React.useCallback(() => {
+      let isActive = true;
+      getMyRole()
+        .then((role) => {
+          if (isActive) setPartnerMenuLabel(role === 'PARTNER' ? '파트너 관리' : '파트너 신청');
+        })
+        .catch(() => {});
+      return () => { isActive = false; };
+    }, []),
+  );
 
   const openUrl = (url: string) => {
     if (Platform.OS === 'web') window.open(url, '_blank');
@@ -72,6 +86,7 @@ export default function SettingsPage() {
   const ITEMS = [
     { label: '개인정보 수정', onPress: () => navigation.navigate('PersonalInfo') },
     { label: '알림 설정', onPress: () => navigation.navigate('NotificationSettings') },
+    { label: partnerMenuLabel, onPress: () => navigation.navigate('PartnerApplication') },
     { label: '이용약관', onPress: () => openUrl(TERMS_URL) },
     { label: '개인정보 처리방침', onPress: () => openUrl(PRIVACY_URL) },
     { label: '로그아웃', onPress: handleLogout },
