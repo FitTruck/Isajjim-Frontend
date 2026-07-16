@@ -28,6 +28,9 @@ import PersonalInfoPage from './src/Pages/PersonalInfoPage';
 import NotificationSettingsPage from './src/Pages/NotificationSettingsPage';
 import PartnerSearchPage from './src/Pages/PartnerSearchPage';
 import PartnerApplicationPage from './src/Pages/PartnerApplicationPage';
+import PartnerCreditsPage from './src/Pages/PartnerCreditsPage';
+import PartnerCreditChargeSuccessPage from './src/Pages/PartnerCreditChargeSuccessPage';
+import PartnerCreditChargeFailPage from './src/Pages/PartnerCreditChargeFailPage';
 import ChatRoom from './src/Pages/ChatRoom';
 import FinalEstimatePage from './src/Pages/FinalEstimatePage';
 import EstimateOffersPage from './src/Pages/EstimateOffersPage';
@@ -109,7 +112,7 @@ export default function App() {
 
   // 얘가 있어야 뒤로가기가 됨.
   const linking = {
-    prefixes: ['http://localhost:8081', 'isajjim://'],
+    prefixes: ['http://localhost:8081', 'isajjim://', 'https://isajjim.kro.kr'],
     config: {
       // 주소에 뜨는 경로
       screens: {
@@ -126,6 +129,10 @@ export default function App() {
         Login: 'login',
         AuthCallback: 'oauth2/callback',
         AuthFailed: 'auth/failed',
+        // 파트너 크레딧 충전(TossPayments) 결과 리다이렉트 경로
+        PartnerCredits: 'partner/credits',
+        ChargeSuccess: 'partner/credits/charge/success',
+        ChargeFail: 'partner/credits/charge/fail',
       },
     },
   };
@@ -163,6 +170,9 @@ export default function App() {
             <Stack.Screen name="PrivacyPolicy" component={PrivacyPolicyPage} />
             <Stack.Screen name="PartnerSearch" component={PartnerSearchPage} />
             <Stack.Screen name="PartnerApplication" component={PartnerApplicationPage} />
+            <Stack.Screen name="PartnerCredits" component={PartnerCreditsPage} />
+            <Stack.Screen name="ChargeSuccess" component={PartnerCreditChargeSuccessPage} />
+            <Stack.Screen name="ChargeFail" component={PartnerCreditChargeFailPage} />
             <Stack.Screen name="Settings" component={SettingsPage} />
             <Stack.Screen name="PersonalInfo" component={PersonalInfoPage} />
             <Stack.Screen name="NotificationSettings" component={NotificationSettingsPage} />

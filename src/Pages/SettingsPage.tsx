@@ -27,13 +27,16 @@ export default function SettingsPage() {
   const [showWithdrawDone, setShowWithdrawDone] = useState(false);
   const [isWithdrawing, setIsWithdrawing] = useState(false);
   const [partnerMenuLabel, setPartnerMenuLabel] = useState('파트너 신청');
+  const [isPartner, setIsPartner] = useState(false);
 
   useFocusEffect(
     React.useCallback(() => {
       let isActive = true;
       getMyRole()
         .then((role) => {
-          if (isActive) setPartnerMenuLabel(role === 'PARTNER' ? '파트너 관리' : '파트너 신청');
+          if (!isActive) return;
+          setPartnerMenuLabel(role === 'PARTNER' ? '파트너 관리' : '파트너 신청');
+          setIsPartner(role === 'PARTNER');
         })
         .catch(() => {});
       return () => { isActive = false; };
@@ -87,6 +90,7 @@ export default function SettingsPage() {
     { label: '개인정보 수정', onPress: () => navigation.navigate('PersonalInfo') },
     { label: '알림 설정', onPress: () => navigation.navigate('NotificationSettings') },
     { label: partnerMenuLabel, onPress: () => navigation.navigate('PartnerApplication') },
+    ...(isPartner ? [{ label: '크레딧 관리', onPress: () => navigation.navigate('PartnerCredits') }] : []),
     { label: '이용약관', onPress: () => openUrl(TERMS_URL) },
     { label: '개인정보 처리방침', onPress: () => openUrl(PRIVACY_URL) },
     { label: '로그아웃', onPress: handleLogout },

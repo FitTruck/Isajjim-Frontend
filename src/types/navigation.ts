@@ -32,6 +32,9 @@ export type RootStackParamList = {
   Main: undefined; // 메인 페이지
   PartnerSearch: undefined;
   PartnerApplication: undefined;
+  PartnerCredits: undefined;
+  ChargeSuccess: undefined; // 웹 전용 진입 경로 — 파라미터는 window.location.search에서 파싱
+  ChargeFail: undefined;
   Settings: undefined;
   PersonalInfo: undefined;
   NotificationSettings: undefined;
